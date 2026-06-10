@@ -1,0 +1,477 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Video,
+  LogOut,
+  Trash2,
+  MessageSquare,
+  Settings
+} from "lucide-react";
+import { UsersIcon } from "@/components/ui/users";
+import { Button } from "@/components/ui/button";
+import ChatExpandedView from "@/components/sidebar/chat/ChatExpandedView";
+import PeopleExpandedView from "@/components/sidebar/people/PeopleExpandedView";
+import EventBus, { GameEvents } from "@/game/EventBus";
+import { serversAPI } from "@/lib/services/api.service";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { useDevice } from "@/hooks/useDevice";
+import { DeviceLinkModal } from "@/components/auth/DeviceLinkModal";
+import { BackupSetup } from "@/components/auth/BackupSetup";
+import { RecoveryFlow } from "@/components/auth/RecoveryFlow";
+import { clearLocalDeviceIdentity } from "@/lib/deviceIdentity";
+
+interface BaseSidebarProps {
+  serverId: string;
+}
+
+type SidebarView =
+  | "collapsed"
+  | "map"
+  | "chat"
+  | "media"
+  | "settings"
+  | "people";
+
+export default function BaseSidebar({ serverId }: BaseSidebarProps) {
+  const router = useRouter();
+  const [currentView, setCurrentView] = useState<SidebarView>("collapsed");
+  const [currentZone, setCurrentZone] = useState("Hall");
+  const [isServerOwner, setIsServerOwner] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  const { deviceState, backupInfo, recoverDevice, pendingRequest } =
+    useDevice();
+  const [showBackupSetup, setShowBackupSetup] = useState(false);
+
+  // If device just registered as first device, force backup setup
+  useEffect(() => {
+    if (
+      deviceState === "trusted" &&
+      !localStorage.getItem("backup_configured_v1")
+    ) {
+      // Check if we just registered without a backup
+      setTimeout(() => setShowBackupSetup(true), 0);
+    }
+  }, [deviceState]);
+
+  // Fetch server data to determine ownership and pending requests
+  useEffect(() => {
+    const checkOwnership = async () => {
+      try {
+        const response = await serversAPI.get(serverId);
+        const userId = localStorage.getItem("user_id");
+        const isOwner = response.data.owner_id === userId;
+        setIsServerOwner(isOwner);
+
+        // If owner, also check for pending members
+        if (isOwner) {
+          try {
+            const membersResponse = await serversAPI.listMembers(serverId);
+            const pending = membersResponse.data.filter(
+              (m: any) => m.status === "pending",
+            );
+            setPendingCount(pending.length);
+          } catch (error) {
+            console.error("Failed to load pending members:", error);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to check server ownership:", error);
+      }
+    };
+    checkOwnership();
+
+    // Refresh pending count every 30 seconds if owner
+    const interval = setInterval(() => {
+      if (isServerOwner) {
+        checkOwnership();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [serverId, isServerOwner]);
+
+  // Listen to zone changes via EventBus
+  useEffect(() => {
+    const handleZoneEnter = (data: { roomId: string }) => {
+      setCurrentZone(
+        data.roomId.charAt(0).toUpperCase() + data.roomId.slice(1),
+      );
+    };
+
+    EventBus.on(GameEvents.ROOM_ENTER, handleZoneEnter);
+
+    return () => {
+      EventBus.off(GameEvents.ROOM_ENTER, handleZoneEnter);
+    };
+  }, []);
+
+  // Emit ui:focus/ui:blur events for game input control
+  useEffect(() => {
+    const isModalActive =
+      !!pendingRequest ||
+      deviceState === "recovery_prompt" ||
+      deviceState === "waiting_for_approval" ||
+      showBackupSetup;
+
+    if (currentView !== "collapsed" || isModalActive) {
+      // Tell game to disable input
+      EventBus.emit("ui:focus");
+    } else {
+      // Tell game to re-enable input
+      EventBus.emit("ui:blur");
+    }
+  }, [currentView, pendingRequest, deviceState, showBackupSetup]);
+
+  const toggleView = (view: SidebarView) => {
+    if (currentView === view) {
+      setCurrentView("collapsed");
+    } else {
+      setCurrentView(view);
+    }
+  };
+
+  return (
+    <>
+      {/* Icon Sidebar - Always Visible */}
+      <div className="fixed left-0 top-0 h-full w-19 bg-white border-r-4 border-black z-100 flex flex-col items-center py-4 gap-4">
+        {/* Logo */}
+        <div className="w-12 h-12 bg-blue-500 border-3 border-black rounded-lg flex items-center justify-center mb-4">
+          <span className="text-white font-black text-xl">AV</span>
+        </div>
+
+        {/* Zone Indicator */}
+        <div className="text-center mb-2">
+          <p className="text-xs font-black text-gray-600">{currentZone}</p>
+        </div>
+
+        {/* Divider */}
+        <div className="w-8 h-1 bg-black"></div>
+
+        {/* Chat Button */}
+        <Button
+          onClick={() => toggleView("chat")}
+          variant="neutral"
+          size="icon"
+          className={`w-12 h-12 rounded-lg ${
+            currentView === "chat"
+              ? "bg-blue-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              : "bg-gray-100 hover:bg-gray-200"
+          }`}
+          title="Chat"
+        >
+          <MessageSquare size={24} />
+        </Button>
+
+        {/* People Button */}
+        <Button
+          onClick={() => toggleView("people")}
+          variant="neutral"
+          size="icon"
+          className={`w-12 h-12 rounded-lg ${
+            currentView === "people"
+              ? "bg-purple-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              : "bg-gray-100 hover:bg-gray-200"
+          }`}
+          title="People"
+        >
+          <UsersIcon size={24} />
+        </Button>
+
+        {/* Spacer */}
+        <div className="flex-1"></div>
+
+        {/* Bottom Buttons */}
+        <Button
+          onClick={() => toggleView("settings")}
+          variant="neutral"
+          size="icon"
+          className={`w-12 h-12 rounded-lg relative ${
+            currentView === "settings"
+              ? "bg-gray-800 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              : "bg-gray-100 hover:bg-gray-200"
+          }`}
+          title="Settings"
+        >
+          <Settings size={24} />
+          {pendingCount > 0 && (
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs border-2 border-black">
+              {pendingCount}
+            </Badge>
+          )}
+        </Button>
+      </div>
+
+      {/* Chat View */}
+      {currentView === "chat" && (
+        <ChatExpandedView
+          serverId={serverId}
+          onClose={() => setCurrentView("collapsed")}
+        />
+      )}
+
+      {/* People View */}
+      {currentView === "people" && (
+        <PeopleExpandedView
+          serverId={serverId}
+          onClose={() => setCurrentView("collapsed")}
+          onStartDM={(userId: string, username: string) => {
+            // Switch to chat view first
+            setCurrentView("chat");
+            // Delay event emission to allow ChatExpandedView to mount and register listener
+            setTimeout(() => {
+              EventBus.emit("dm:start", { userId, username });
+            }, 100);
+          }}
+        />
+      )}
+
+      {currentView === "map" && (
+        <div className="fixed left-19 top-0 h-full w-100 bg-white border-r-4 border-black z-90 flex flex-col shadow-[8px_0px_0px_0px_rgba(0,0,0,1)]">
+          {/* Map View Header */}
+          <div className="p-4 border-b-4 border-black bg-purple-500 flex items-center justify-between">
+            <h2 className="text-xl font-black text-white">Map Overview</h2>
+            <Button
+              onClick={() => setCurrentView("collapsed")}
+              variant="default"
+              className="bg-white text-black hover:bg-gray-100"
+            >
+              Collapse
+            </Button>
+          </div>
+
+          {/* Map Content */}
+          <div className="flex-1 p-4 overflow-auto">
+            <div className="bg-yellow-100 border-3 border-black rounded-lg p-4">
+              <p className="font-bold">🗺️ Mini-map coming soon!</p>
+              <p className="text-sm mt-2">
+                This will show an overview of the entire server map with your
+                current position.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {currentView === "media" && (
+        <div className="fixed left-26 top-0 h-full w-100 bg-gray-900 border-r-4 border-black z-40 flex flex-col">
+          <div className="p-4 border-b-4 border-black bg-indigo-600 flex items-center justify-between shrink-0">
+            <h2 className="text-xl font-black text-white">Video Room</h2>
+            <Button
+              onClick={() => setCurrentView("collapsed")}
+              variant="default"
+              className="bg-white text-black hover:bg-gray-100"
+            >
+              Collapse
+            </Button>
+          </div>
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-6 gap-4">
+            <div className="w-16 h-16 rounded-full bg-indigo-900 border-2 border-indigo-500 flex items-center justify-center">
+              <Video className="w-8 h-8 text-indigo-300" />
+            </div>
+            <div>
+              <p className="font-black text-lg text-white">
+                Video call is automatic
+              </p>
+              <p className="text-sm text-gray-400 mt-1">
+                Walk into a <strong className="text-indigo-300">Room_*</strong>{" "}
+                zone on the map. A video call strip will appear — click ↗ to
+                expand it here.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {currentView === "settings" && (
+        <div className="fixed     left-26 top-0 h-full w-100 bg-white border-r-4 border-black z-40 flex flex-col">
+          {/* Settings View Header */}
+          <div className="p-4 border-b-4 border-black bg-gray-800 flex items-center justify-between">
+            <h2 className="text-xl font-black text-white">Settings</h2>
+            <Button
+              onClick={() => setCurrentView("collapsed")}
+              variant="default"
+              className="bg-white text-black hover:bg-gray-100"
+            >
+              Close
+            </Button>
+          </div>
+
+          {/* Settings Content */}
+          <div className="flex-1 p-4 overflow-auto flex flex-col gap-4">
+            {/* Exit Game (No API call) */}
+            <div className="bg-blue-100 border-3 border-blue-500 rounded-lg p-4">
+              <h3 className="font-black text-blue-700 mb-2 flex items-center gap-2">
+                <LogOut className="w-5 h-5" />
+                Exit Game
+              </h3>
+              <p className="text-sm text-black mb-3">
+                Return to dashboard. You&apos;ll remain a member of this server
+                and can rejoin anytime.
+              </p>
+              <Button
+                onClick={() => {
+                  router.push("/dashboard");
+                }}
+                variant="neutral"
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white border-3 border-black"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Exit to Dashboard
+              </Button>
+            </div>
+
+            {/* Leave Server (API call) */}
+            <div className="bg-orange-50 border-3 border-orange-500 rounded-lg p-4">
+              <h3 className="font-black text-orange-700 mb-2 flex items-center gap-2">
+                <LogOut className="w-5 h-5" />
+                Leave Server
+              </h3>
+              <p className="text-sm text-gray-700 mb-3">
+                Remove yourself from this server. You&apos;ll need to be
+                re-invited to join again.
+              </p>
+              <Button
+                onClick={async () => {
+                  if (
+                    confirm(
+                      "Are you sure you want to leave this server? You'll need to be re-invited to join again.",
+                    )
+                  ) {
+                    try {
+                      await serversAPI.leave(serverId);
+                      toast.success("Left server successfully");
+                      router.push("/dashboard");
+                    } catch (error) {
+                      toast.error("Failed to leave server. Please try again.");
+                      console.error("Leave server error:", error);
+                    }
+                  }
+                }}
+                variant="neutral"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white border-3 border-black"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Leave Server
+              </Button>
+            </div>
+
+            {/* Delete Server (Owner Only) */}
+            {isServerOwner && (
+              <div className="bg-red-50 border-4 border-red-600 rounded-lg p-4">
+                <h3 className="font-black text-red-700 mb-2 flex items-center gap-2">
+                  <Trash2 className="w-5 h-5" />
+                  Danger Zone - Delete Server
+                </h3>
+                <p className="text-sm text-gray-700 mb-3">
+                  ⚠️ <strong>This action cannot be undone!</strong> All
+                  channels, messages, and members will be permanently deleted.
+                </p>
+                <Button
+                  onClick={async () => {
+                    const confirmation = prompt(
+                      "⚠️ DELETE SERVER? This CANNOT be undone! Type 'DELETE' to confirm.",
+                    );
+                    if (confirmation === "DELETE") {
+                      try {
+                        await serversAPI.delete(serverId);
+                        toast.success("Server deleted successfully");
+                        window.location.href = "/dashboard";
+                      } catch (error) {
+                        toast.error(error.message || "Failed to delete server");
+                        console.error("Delete server error:", error);
+                      }
+                    } else if (confirmation !== null) {
+                      toast.error(
+                        "Confirmation didn't match 'DELETE', cancelled.",
+                      );
+                    }
+                  }}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold border-3 border-black"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Server Permanently
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* --- Auth / Device Modals --- */}
+
+      {/* 1. Linking Ceremony */}
+      {pendingRequest && (
+        <DeviceLinkModal
+          pendingRequest={pendingRequest}
+          isOpen={true}
+          onSuccess={() => window.location.reload()}
+          onReject={() => window.location.reload()}
+        />
+      )}
+
+      {/* 2. Recovery Prompt */}
+      {deviceState === "waiting_for_approval" && (
+        <div className="fixed left-16 top-0 bottom-0 w-80 z-100 bg-zinc-950/95 backdrop-blur-sm flex items-center justify-center p-4 border-r-4 border-black">
+          <div className="w-full rounded-lg border-4 border-black bg-white p-5 text-center space-y-3">
+            <h2 className="text-xl font-black">Approve This Browser</h2>
+            <p className="text-sm text-muted-foreground">
+              This browser has been registered as a new device but is not
+              trusted yet. Approve it from an existing trusted browser or
+              recover from your backup.
+            </p>
+            <Button
+              variant="neutral"
+              onClick={async () => {
+                await clearLocalDeviceIdentity();
+                window.location.reload();
+              }}
+              className="w-full"
+            >
+              Start Over
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {deviceState === "recovery_prompt" && (
+        <div className="fixed left-16 top-0 bottom-0 w-80 z-100 bg-zinc-950/95 backdrop-blur-sm flex items-center justify-center p-4 border-r-4 border-black">
+          <div className="w-full">
+            <RecoveryFlow
+              backupInfo={backupInfo}
+              onRecovered={async (
+                privateKey: CryptoKey,
+                publicKeyBase64: string,
+              ) => {
+                await recoverDevice(privateKey, publicKeyBase64);
+                localStorage.setItem("backup_configured_v1", "true"); // Avoid forcing backup setup again
+              }}
+              onCancel={async () => {
+                // If they cancel recovery, they have to link as a new device
+                await clearLocalDeviceIdentity();
+                window.location.reload();
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 3. Mandatory Backup Setup (First Time) */}
+      {showBackupSetup && (
+        <div className="fixed left-16 top-0 bottom-0 w-80 z-100 bg-zinc-950/95 backdrop-blur-sm flex items-center justify-center p-4 border-r-4 border-black">
+          <div className="w-full relative">
+            <BackupSetup
+              onComplete={() => {
+                localStorage.setItem("backup_configured_v1", "true");
+                setShowBackupSetup(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

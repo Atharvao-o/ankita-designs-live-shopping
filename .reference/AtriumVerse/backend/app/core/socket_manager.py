@@ -1,0 +1,52 @@
+import asyncio
+
+from fastapi import WebSocket
+
+
+class ConnectionManger:
+    def __init__(self):
+        self.active_connections: dict[str, dict[str, WebSocket]] = {}
+
+    async def connect(self, websocket: WebSocket, server_id: str, user_id: str):
+        await websocket.accept()
+        if server_id not in self.active_connections:
+            self.active_connections[server_id] = {}
+        self.active_connections[server_id][user_id] = websocket
+
+    async def disconnect(self, websocket: WebSocket, server_id: str, user_id: str):
+        if server_id in self.active_connections:
+            if user_id in self.active_connections[server_id]:
+                del self.active_connections[server_id][user_id]
+
+            if len(self.active_connections[server_id]) == 0:
+                del self.active_connections[server_id]
+
+    async def send_personal_message(
+        self, message: dict, server_id: str, target_user_id: str
+    ):
+        if server_id in self.active_connections:
+            target_ws = self.active_connections[server_id].get(target_user_id)
+            if target_ws:
+                try:
+                    await target_ws.send_json(message)
+                except Exception:
+                    pass
+
+    async def broadcast(self, message: dict, server_id: str, sender: WebSocket):
+        if server_id not in self.active_connections:
+            return
+
+        async def safe_send(ws: WebSocket):
+            try:
+                await asyncio.wait_for(ws.send_json(message), timeout=0.5)
+            except asyncio.TimeoutError:
+                pass
+            except Exception:
+                pass
+
+        for target_ws in self.active_connections[server_id].values():
+            if target_ws != sender:
+                asyncio.create_task(safe_send(target_ws))
+
+
+manager = ConnectionManger()

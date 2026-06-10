@@ -1,0 +1,13 @@
+<svg width="900" height="920" viewBox="0 0 900 920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="920" rx="42" fill="url(#bg)"/>
+  <path d="M322 238H580L654 360L586 426V694H316V426L248 360L322 238Z" fill="#4F46E5"/>
+  <path d="M362 274H538V660H362V274Z" fill="#FFFFFF" fill-opacity="0.18"/>
+  <rect x="190" y="740" width="450" height="74" rx="22" fill="#EEF2FF"/>
+  <text x="220" y="790" fill="#111827" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">Product Placeholder</text>
+  <defs>
+    <linearGradient id="bg" x1="60" y1="60" x2="820" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5F3FF"/>
+      <stop offset="1" stop-color="#DBEAFE"/>
+    </linearGradient>
+  </defs>
+</svg>

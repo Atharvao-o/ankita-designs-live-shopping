@@ -1,0 +1,25 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="900" rx="44" fill="url(#bg)"/>
+  <rect x="80" y="80" width="1240" height="740" rx="34" fill="#FFFDF9"/>
+  <rect x="126" y="128" width="720" height="644" rx="28" fill="url(#video)"/>
+  <rect x="892" y="160" width="330" height="56" rx="18" fill="#EEF2FF"/>
+  <rect x="892" y="250" width="330" height="104" rx="24" fill="#F8FAFC"/>
+  <rect x="892" y="390" width="330" height="104" rx="24" fill="#F8FAFC"/>
+  <rect x="892" y="532" width="180" height="54" rx="18" fill="#111827"/>
+  <circle cx="486" cy="414" r="120" fill="#FFFFFF" fill-opacity="0.26"/>
+  <circle cx="486" cy="358" r="78" fill="#F8FAFC"/>
+  <path d="M338 580C338 485.045 414.045 409 509 409H521C615.955 409 692 485.045 692 580V666H338V580Z" fill="#FFFFFF" fill-opacity="0.22"/>
+  <text x="896" y="198" fill="#111827" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">Vendor Live Room</text>
+  <text x="910" y="314" fill="#6B7280" font-family="Inter, Arial, sans-serif" font-size="24">Live festive gifting showcase</text>
+  <text x="940" y="568" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Follow Vendor</text>
+  <defs>
+    <linearGradient id="bg" x1="40" y1="30" x2="1320" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EEF2FF"/>
+      <stop offset="1" stop-color="#FFF7ED"/>
+    </linearGradient>
+    <linearGradient id="video" x1="126" y1="128" x2="846" y2="772" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4338CA"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+</svg>

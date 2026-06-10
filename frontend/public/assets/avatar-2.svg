@@ -1,0 +1,16 @@
+<svg width="720" height="900" viewBox="0 0 720 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="720" height="900" rx="48" fill="url(#bg)"/>
+  <circle cx="360" cy="250" r="120" fill="#F3E8FF"/>
+  <circle cx="360" cy="245" r="84" fill="#FFF7ED"/>
+  <path d="M238 514C238 432.487 304.487 366 386 366H434C515.513 366 582 432.487 582 514V688H238V514Z" fill="#7C3AED"/>
+  <rect x="186" y="678" width="350" height="88" rx="44" fill="#F3E8FF"/>
+  <rect x="250" y="710" width="208" height="18" rx="9" fill="#DDD6FE"/>
+  <text x="78" y="832" fill="#111827" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="700">Avatar 2</text>
+  <text x="78" y="874" fill="#6B7280" font-family="Inter, Arial, sans-serif" font-size="26">Gift curator</text>
+  <defs>
+    <linearGradient id="bg" x1="40" y1="48" x2="680" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F5F3FF"/>
+    </linearGradient>
+  </defs>
+</svg>

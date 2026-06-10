@@ -1,0 +1,15 @@
+<svg width="900" height="920" viewBox="0 0 900 920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="920" rx="42" fill="url(#bg)"/>
+  <circle cx="450" cy="390" r="180" stroke="#F59E0B" stroke-width="28"/>
+  <circle cx="450" cy="390" r="86" fill="#FDE68A"/>
+  <circle cx="286" cy="590" r="72" fill="#FB7185"/>
+  <circle cx="614" cy="590" r="72" fill="#C084FC"/>
+  <rect x="170" y="740" width="520" height="74" rx="22" fill="#FFF1F2"/>
+  <text x="206" y="790" fill="#111827" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">Jewellery Set</text>
+  <defs>
+    <linearGradient id="bg" x1="60" y1="60" x2="820" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7ED"/>
+      <stop offset="1" stop-color="#F5F3FF"/>
+    </linearGradient>
+  </defs>
+</svg>

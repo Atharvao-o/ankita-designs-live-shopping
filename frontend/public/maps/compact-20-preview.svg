@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1152" height="832" viewBox="0 0 1152 832" role="img" aria-label="Compact Expo Hall preview">
+  <defs>
+    <linearGradient id="floor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff8e9"/>
+      <stop offset="0.52" stop-color="#f7ead4"/>
+      <stop offset="1" stop-color="#ead3aa"/>
+    </linearGradient>
+    <linearGradient id="boothA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dcf8e9"/>
+      <stop offset="1" stop-color="#f8e3bc"/>
+    </linearGradient>
+    <linearGradient id="boothB" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#efe4ff"/>
+      <stop offset="1" stop-color="#ffe7e1"/>
+    </linearGradient>
+    <linearGradient id="featured" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#4b1f1d"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#5f3a14" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect width="1152" height="832" fill="url(#floor)"/>
+  <g opacity=".32" stroke="#d9be83" stroke-width="1">
+    <path d="M0 64H1152M0 128H1152M0 192H1152M0 256H1152M0 320H1152M0 384H1152M0 448H1152M0 512H1152M0 576H1152M0 640H1152M0 704H1152M0 768H1152"/>
+    <path d="M64 0V832M128 0V832M192 0V832M256 0V832M320 0V832M384 0V832M448 0V832M512 0V832M576 0V832M640 0V832M704 0V832M768 0V832M832 0V832M896 0V832M960 0V832M1024 0V832M1088 0V832"/>
+  </g>
+  <rect x="252" y="222" width="648" height="396" rx="34" fill="#fffdf8" opacity=".46" stroke="#d9be83" stroke-width="2"/>
+  <rect x="394" y="292" width="364" height="220" rx="44" fill="#fffaf0" opacity=".75" stroke="#c59a4a" stroke-width="2" filter="url(#softShadow)"/>
+  <rect x="406" y="330" width="340" height="120" rx="32" fill="url(#featured)" opacity=".94"/>
+  <text x="576" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" font-weight="800" fill="#fff8ea" letter-spacing="3">FEATURED LIVE</text>
+  <rect x="344" y="510" width="472" height="74" rx="30" fill="#fffaf0" opacity=".82" stroke="#d9be83" stroke-width="2"/>
+  <text x="580" y="556" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="800" fill="#8a5a24" letter-spacing="2">NETWORKING LOUNGE</text>
+  <rect x="840" y="72" width="208" height="90" rx="24" fill="#fffdf8" opacity=".86" stroke="#c59a4a" stroke-width="2" filter="url(#softShadow)"/>
+  <text x="944" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="800" fill="#8a5a24">HELP DESK</text>
+  <rect x="450" y="740" width="252" height="62" rx="28" fill="#e95f45" opacity=".88" stroke="#ffd990" stroke-width="3"/>
+  <text x="576" y="779" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="900" fill="#fff8ea" letter-spacing="2">ENTRANCE</text>
+  <g font-family="Arial, sans-serif" font-size="15" font-weight="900" fill="#6f461a" text-anchor="middle">
+    <text x="170" y="75">FASHION</text>
+    <text x="335" y="75">JEWELLERY</text>
+    <text x="501" y="75">HOME DECOR</text>
+    <text x="686" y="75">POOJA MATERIAL</text>
+  </g>
+  <g filter="url(#softShadow)">
+    <g fill="url(#boothA)" stroke="#c59a4a" stroke-width="2"><rect x="104" y="96" width="128" height="96" rx="16"/><rect x="436" y="96" width="128" height="96" rx="16"/><rect x="768" y="96" width="128" height="96" rx="16"/><rect x="920" y="340" width="128" height="96" rx="16"/><rect x="920" y="584" width="128" height="96" rx="16"/><rect x="602" y="640" width="128" height="96" rx="16"/><rect x="270" y="640" width="128" height="96" rx="16"/><rect x="104" y="510" width="128" height="96" rx="16"/><rect x="104" y="250" width="128" height="96" rx="16"/></g>
+    <g fill="url(#boothB)" stroke="#c59a4a" stroke-width="2"><rect x="270" y="96" width="128" height="96" rx="16"/><rect x="602" y="96" width="128" height="96" rx="16"/><rect x="920" y="218" width="128" height="96" rx="16"/><rect x="920" y="462" width="128" height="96" rx="16"/><rect x="768" y="640" width="128" height="96" rx="16"/><rect x="436" y="640" width="128" height="96" rx="16"/><rect x="104" y="640" width="128" height="96" rx="16"/><rect x="104" y="380" width="128" height="96" rx="16"/><rect x="270" y="250" width="128" height="96" rx="16"/></g>
+    <g fill="#1f2340" stroke="#ff835f" stroke-width="3"><rect x="426" y="350" width="132" height="112" rx="20"/><rect x="594" y="350" width="132" height="112" rx="20"/></g>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="16" font-weight="900" text-anchor="middle">
+    <g fill="#73532a"><text x="168" y="150">A01</text><text x="334" y="150">A02</text><text x="500" y="150">A03</text><text x="666" y="150">A04</text><text x="832" y="150">A05</text><text x="984" y="272">A06</text><text x="984" y="394">A07</text><text x="984" y="516">A08</text><text x="984" y="638">A09</text><text x="832" y="694">A10</text><text x="666" y="694">A11</text><text x="500" y="694">A12</text><text x="334" y="694">A13</text><text x="168" y="694">A14</text><text x="168" y="564">A15</text><text x="168" y="434">A16</text><text x="168" y="304">A17</text><text x="334" y="304">A18</text></g>
+    <g fill="#fff8ea"><text x="492" y="410">A19</text><text x="660" y="410">A20</text></g>
+  </g>
+</svg>
