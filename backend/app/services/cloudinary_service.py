@@ -1,4 +1,4 @@
-from io import BytesIO
+import base64
 import logging
 
 from fastapi import HTTPException, UploadFile
@@ -81,10 +81,10 @@ class CloudinaryService:
             raise HTTPException(status_code=413, detail={"code": "IMAGE_TOO_LARGE", "message": "Image must be 5MB or smaller."})
 
         try:
-            image_stream = BytesIO(content)
-            image_stream.name = f"{upload_type}.jpg"
+            encoded_image = base64.b64encode(content).decode("ascii")
+            data_uri = f"data:{file.content_type};base64,{encoded_image}"
             result = cloudinary.uploader.upload(
-                image_stream,
+                data_uri,
                 folder=UPLOAD_FOLDERS[upload_type],
                 public_id=public_id_prefix,
                 resource_type="image",
