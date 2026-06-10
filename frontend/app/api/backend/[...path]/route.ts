@@ -46,7 +46,7 @@ async function proxyRequest(
   }
 
   const method = request.method.toUpperCase();
-  const body = method === "GET" || method === "HEAD" ? undefined : await request.text();
+  const body = method === "GET" || method === "HEAD" ? undefined : await request.arrayBuffer();
 
   try {
     const response = await fetch(targetUrl, {
