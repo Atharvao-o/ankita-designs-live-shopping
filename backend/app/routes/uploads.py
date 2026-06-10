@@ -10,6 +10,16 @@ from app.services.cloudinary_service import cloudinary_service
 router = APIRouter(prefix="/uploads", tags=["uploads"])
 
 
+@router.get("/cloudinary/status")
+def cloudinary_status(request: Request, db: Session = Depends(get_db)) -> dict:
+    user = current_user_from_request(request, db)
+    if user is None:
+        raise HTTPException(status_code=401, detail={"code": "UNAUTHORIZED", "message": "Login required."})
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail={"code": "ADMIN_REQUIRED", "message": "Admin account required."})
+    return cloudinary_service.status()
+
+
 @router.post("/image")
 async def upload_image(
     request: Request,

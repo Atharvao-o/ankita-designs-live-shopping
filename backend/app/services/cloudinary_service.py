@@ -1,4 +1,5 @@
-﻿from io import BytesIO
+from io import BytesIO
+import logging
 
 from fastapi import HTTPException, UploadFile
 
@@ -13,6 +14,7 @@ except Exception:  # pragma: no cover - optional runtime dependency
 
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
+logger = logging.getLogger(__name__)
 
 UPLOAD_FOLDERS = {
     "product_image": "ankita-designs/products",
@@ -36,6 +38,15 @@ class CloudinaryService:
             and self.settings.cloudinary_api_key
             and self.settings.cloudinary_api_secret
         )
+
+    def status(self) -> dict:
+        return {
+            "cloudinary_package_installed": bool(cloudinary),
+            "cloud_name_configured": bool(self.settings.cloudinary_cloud_name),
+            "api_key_configured": bool(self.settings.cloudinary_api_key),
+            "api_secret_configured": bool(self.settings.cloudinary_api_secret),
+            "configured": self.is_configured(),
+        }
 
     def configure(self) -> None:
         if not self.is_configured():
@@ -82,6 +93,12 @@ class CloudinaryService:
                 use_filename=False,
             )
         except Exception as exc:
+            logger.exception(
+                "Cloudinary upload failed. upload_type=%s status=%s error_type=%s",
+                upload_type,
+                self.status(),
+                type(exc).__name__,
+            )
             raise HTTPException(
                 status_code=502,
                 detail={"code": "CLOUDINARY_UPLOAD_FAILED", "message": "Could not upload image to Cloudinary."},
@@ -98,4 +115,3 @@ class CloudinaryService:
 
 
 cloudinary_service = CloudinaryService()
-
