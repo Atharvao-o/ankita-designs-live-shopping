@@ -868,7 +868,7 @@ function CustomerBargainPanel({
 
   if (!session) {
     return (
-      <div className={`mt-5 rounded-[24px] border p-4 ${isDark ? "border-white/10 bg-white/5 text-white" : "border-[color:var(--border)] bg-[var(--surface)] text-[var(--text)]"}`}>
+      <div className={`mt-5 rounded-[24px] border p-4 ${isDark ? "border-white/10 bg-[#151822] text-white" : "border-[color:var(--border)] bg-[var(--card)] text-[var(--text)]"}`}>
         <div className="flex items-center gap-2">
           <Gavel className="h-4 w-4 text-[var(--gold)]" />
           <p className="text-sm font-black">Live bargain</p>
@@ -879,7 +879,7 @@ function CustomerBargainPanel({
   }
 
   return (
-    <div className={`mt-5 rounded-[24px] border p-4 ${isDark ? "border-white/10 bg-white/5 text-white" : "border-[color:var(--border)] bg-[var(--surface)] text-[var(--text)]"}`}>
+    <div className={`mt-5 rounded-[24px] border p-4 ${isDark ? "border-white/10 bg-[#151822] text-white" : "border-[color:var(--border)] bg-[var(--card)] text-[var(--text)]"}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--gold)]">Group bargain</p>
@@ -1024,7 +1024,7 @@ function LiveStreamBottomNav({
       ] as const;
 
   return (
-    <nav className="fixed inset-x-3 bottom-4 z-[70] grid grid-cols-4 gap-1 rounded-[24px] border border-[color:var(--border)] bg-[var(--surface)] p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_16px_42px_rgba(0,0,0,0.22)] dark:bg-[#080B14]" aria-label={`${role} live stream navigation`}>
+    <nav className="fixed inset-x-3 bottom-4 z-[70] grid grid-cols-4 gap-1 rounded-[24px] border border-[color:var(--border)] bg-[var(--card)] p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_16px_42px_rgba(0,0,0,0.22)] dark:bg-[#11131D]" aria-label={`${role} live stream navigation`}>
       {items.map(([key, label, Icon]) => (
         <button
           key={key}

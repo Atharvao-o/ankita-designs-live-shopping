@@ -6,7 +6,7 @@ export function Screen({
   children: React.ReactNode;
 }) {
   return (
-    <main className="relative min-h-screen w-full overflow-x-hidden">
+    <main className="marketplace-page relative min-h-screen w-full overflow-x-hidden">
       {children}
     </main>
   );

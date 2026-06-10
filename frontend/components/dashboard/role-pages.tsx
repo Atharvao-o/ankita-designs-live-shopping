@@ -74,6 +74,7 @@ import { ImageCropUpload } from "@/components/uploads/image-crop-upload";
 import { MobileExplorePage } from "@/components/mobile/mobile-explore-page";
 import { MobileVendorDashboard } from "@/components/mobile/mobile-vendor-dashboard";
 import { ResponsiveDeviceView } from "@/components/mobile/responsive-device-view";
+import { EmptyState as MarketplaceEmptyState, MarketplaceBottomNav, PageShell } from "@/components/marketplace/marketplace-ui";
 
 type ExhibitionStatusFilter = "all" | "live" | "scheduled" | "ended";
 
@@ -797,6 +798,9 @@ export function CartPageContent() {
   const setCartItems = useExpoStore((state) => state.setCartItems);
   const [error, setError] = useState("");
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discount = total ? Math.min(100, total) : 0;
+  const delivery = total ? 49 : 0;
+  const payable = total ? total - discount + delivery : 0;
 
   useEffect(() => {
     if (!currentUser) {
@@ -834,59 +838,70 @@ export function CartPageContent() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] text-[#111827]">
-      <section className="grid min-h-[calc(100vh-64px)] gap-5 p-5 xl:grid-cols-[1fr_0.75fr]">
-        <div className="screen-panel rounded-[40px] p-6">
-          <h1 className="text-4xl font-semibold tracking-[-0.05em] text-slate-950">Cart</h1>
-          {error ? <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">{error}</p> : null}
-          <div className="mt-6 grid gap-4">
+    <PageShell>
+      <section className="marketplace-container grid min-h-[calc(100dvh-2rem)] gap-5 py-5 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="marketplace-card rounded-[30px] p-4 sm:p-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Shopping cart</p>
+              <h1 className="mt-1 text-3xl font-black tracking-[-0.05em] text-foreground sm:text-4xl">Ready to checkout</h1>
+            </div>
+            <p className="rounded-full bg-secondary px-3 py-1 text-xs font-black text-secondary-foreground">{cart.length} items</p>
+          </div>
+          {error ? <p className="mt-4 rounded-2xl border border-red-300 bg-red-100 px-4 py-3 text-sm font-bold text-red-800 dark:border-red-400/30 dark:bg-red-500/10 dark:text-red-200">{error}</p> : null}
+
+          <div className="mt-6 grid gap-3">
             {cart.length ? cart.map((item) => (
-              <div key={item.id} className="flex gap-4 rounded-[30px] bg-[#F8FAFC] p-4">
-                <AppImage src={item.image} alt={item.title} className="h-28 w-28 rounded-[22px]" />
-                <div className="flex flex-1 items-center justify-between gap-4">
-                  <div>
-                    <p className="text-xl font-semibold text-slate-950">{item.title}</p>
-                    <p className="mt-1 text-sm text-slate-500">{item.vendorName}</p>
-                    <p className="mt-3 font-semibold text-[#FF7A59]">{formatPrice(item.price)}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => void updateQuantity(item.id, item.quantity - 1)} className="h-9 w-9 rounded-full border border-slate-200 bg-white">-</button>
-                    <span className="w-8 text-center">{item.quantity}</span>
-                    <button onClick={() => void updateQuantity(item.id, item.quantity + 1)} className="h-9 w-9 rounded-full border border-slate-200 bg-white">+</button>
-                  </div>
+              <article key={item.id} className="grid gap-4 rounded-[24px] border border-border bg-background p-3 sm:grid-cols-[7rem_1fr_auto] sm:items-center sm:p-4">
+                <AppImage src={item.image} alt={item.title} fallbackSrc="/products/product-placeholder.png" className="aspect-square h-auto w-full rounded-[20px] object-cover sm:h-28 sm:w-28" />
+                <div className="min-w-0">
+                  <p className="line-clamp-2 text-lg font-black text-foreground">{item.title}</p>
+                  <p className="mt-1 truncate text-sm font-semibold text-muted-foreground">{item.vendorName}</p>
+                  <p className="mt-3 text-base font-black text-primary">{formatPrice(item.price)}</p>
                 </div>
-              </div>
+                <div className="flex items-center justify-between gap-2 sm:justify-end">
+                  <button type="button" onClick={() => void updateQuantity(item.id, item.quantity - 1)} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-lg font-black text-foreground">-</button>
+                  <span className="w-10 text-center text-sm font-black text-foreground">{item.quantity}</span>
+                  <button type="button" onClick={() => void updateQuantity(item.id, item.quantity + 1)} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-lg font-black text-foreground">+</button>
+                </div>
+              </article>
             )) : (
-              <div className="rounded-[30px] bg-[#F8FAFC] p-8 text-slate-600">Your cart is empty.</div>
+              <MarketplaceEmptyState title="Your cart is empty" description="Products you add from live vendor stalls will appear here." actionHref="/exhibitions" actionLabel="Browse exhibitions" />
             )}
           </div>
         </div>
-        <div className="screen-panel flex flex-col rounded-[40px] p-6">
-          <p className="text-sm font-medium text-[#4F46E5]">Order summary</p>
-          <div className="mt-5 rounded-[30px] bg-[#FFF7ED] p-5">
-            <div className="flex justify-between text-slate-700">
+
+        <aside className="marketplace-card h-fit rounded-[30px] p-4 sm:p-6 lg:sticky lg:top-24">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Order summary</p>
+          <div className="mt-5 rounded-[24px] border border-border bg-background p-5">
+            <div className="flex justify-between text-sm font-semibold text-muted-foreground">
               <span>Subtotal</span>
               <span>{formatPrice(total)}</span>
             </div>
-            <div className="mt-3 flex justify-between text-slate-700">
+            <div className="mt-3 flex justify-between text-sm font-semibold text-muted-foreground">
               <span>LIVE100</span>
-              <span>-{formatPrice(total ? Math.min(100, total) : 0)}</span>
+              <span>-{formatPrice(discount)}</span>
             </div>
-            <div className="mt-4 flex justify-between border-t border-slate-200 pt-4 text-xl font-semibold">
+            <div className="mt-3 flex justify-between text-sm font-semibold text-muted-foreground">
+              <span>Delivery</span>
+              <span>{formatPrice(delivery)}</span>
+            </div>
+            <div className="mt-4 flex justify-between border-t border-border pt-4 text-xl font-black text-foreground">
               <span>Total</span>
-              <span>{formatPrice(total ? total - Math.min(100, total) + 49 : 0)}</span>
+              <span>{formatPrice(payable)}</span>
             </div>
           </div>
           <button
             disabled={!cart.length}
             onClick={() => router.push("/checkout")}
-            className={buttonStyles("primary", "mt-auto justify-center px-8 py-4 text-base disabled:opacity-50")}
+            className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-primary px-6 text-sm font-black text-primary-foreground transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Checkout
           </button>
-        </div>
+        </aside>
       </section>
-    </main>
+      <MarketplaceBottomNav />
+    </PageShell>
   );
 }
 

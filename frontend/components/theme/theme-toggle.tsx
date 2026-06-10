@@ -21,7 +21,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       type="button"
       onClick={toggleTheme}
       className={cn(
-        "grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#D9C39D] bg-white text-[#172554] shadow-sm transition hover:border-[#B58118] hover:bg-[#FFF7DE] focus:outline-none focus:ring-2 focus:ring-[#B58118]/35 dark:border-white/15 dark:bg-[#121826] dark:text-[#FFF8EA] dark:shadow-none dark:hover:border-[#F5D878]/60 dark:hover:bg-[#1A2232] dark:focus:ring-[#F5D878]/35",
+        "grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-border bg-card text-foreground shadow-sm transition hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring",
         className
       )}
       aria-label={label}

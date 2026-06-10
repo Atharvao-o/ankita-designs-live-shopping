@@ -14,6 +14,7 @@ import { MobileBottomNav } from "@/components/mobile/mobile-bottom-nav";
 import { MobileTopBar } from "@/components/mobile/mobile-top-bar";
 import { ResponsiveDeviceView } from "@/components/mobile/responsive-device-view";
 import { TutorialAdminControls } from "@/components/tutorial/ReplayTutorialButton";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const navByRole: Record<UserRole, Array<{ label: string; href: string; tourId?: string }>> = {
   admin: [
@@ -71,7 +72,7 @@ export function RoleShell({
   if (role === "admin") {
     return (
       <ProtectedRoute role={role}>
-        <main className="theme-transition relative min-h-screen overflow-x-hidden bg-[#FAF7F0] text-[#1B1A17] dark:bg-[#05040A] dark:text-[#FFF8EA] lg:grid lg:grid-cols-[292px_minmax(0,1fr)]">
+        <main className="theme-transition relative min-h-screen overflow-x-hidden bg-background text-foreground lg:grid lg:grid-cols-[292px_minmax(0,1fr)]">
           <AdminSidebar pathname={pathname} currentUserName={currentUser?.name ?? "Admin"} onLogout={doLogout} className="hidden lg:flex" />
 
           {adminDrawerOpen ? (
@@ -88,7 +89,7 @@ export function RoleShell({
           ) : null}
 
           <section className="relative z-10 min-w-0">
-            <header className="sticky top-0 z-40 border-b border-[#E8DDCC] bg-[#FFFDF8]/92 backdrop-blur-xl dark:border-white/10 dark:bg-[#070711]/92">
+            <header className="sticky top-0 z-40 border-b border-border bg-card">
               <div className="flex min-h-[76px] items-center gap-3 px-3 sm:px-5 xl:px-8">
                 <button
                   type="button"
@@ -107,7 +108,8 @@ export function RoleShell({
                   />
                 </label>
                 <div className="ml-auto flex items-center gap-2 sm:gap-3">
-                  <button type="button" className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-[#E8DDCC] bg-white text-[#B88A3D] shadow-sm dark:border-white/10 dark:bg-white/[0.06] dark:text-[#D6AC63]" aria-label="Notifications">
+                  <ThemeToggle />
+                  <button type="button" className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-border bg-card text-primary shadow-sm" aria-label="Notifications">
                     <Bell className="h-5 w-5" />
                   </button>
                   <Link href="/" className={buttonStyles("secondary", "hidden min-h-11 px-4 py-2.5 sm:inline-flex")}>
@@ -115,11 +117,11 @@ export function RoleShell({
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </Link>
                   <TutorialAdminControls />
-                  <div className="hidden items-center gap-3 rounded-2xl border border-[#E8DDCC] bg-white px-3 py-2 shadow-sm dark:border-white/10 dark:bg-white/[0.06] sm:flex">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F7F1E8] text-sm font-bold text-[#B88A3D] dark:bg-[#D6AC63]/10 dark:text-[#D6AC63]">AE</span>
+                  <div className="hidden items-center gap-3 rounded-2xl border border-border bg-card px-3 py-2 shadow-sm sm:flex">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">AE</span>
                     <span>
-                      <span className="block text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{currentUser?.name ?? "Admin"}</span>
-                      <span className="block text-xs text-[#6F675C] dark:text-white/56">Admin</span>
+                      <span className="block text-sm font-semibold text-foreground">{currentUser?.name ?? "Admin"}</span>
+                      <span className="block text-xs text-muted-foreground">Admin</span>
                     </span>
                   </div>
                 </div>
@@ -143,7 +145,7 @@ export function RoleShell({
 
   return (
     <ProtectedRoute role={role}>
-      <AuroraBackground className={`theme-transition min-h-screen overflow-x-hidden ${role === "vendor" ? "bg-[#FAF7F0] text-[#1B1A17] dark:bg-[#05040A] dark:text-[#FFF8EA]" : "luxury-page text-[var(--text)]"}`}>
+      <AuroraBackground className="theme-transition min-h-screen overflow-x-hidden bg-background text-foreground">
       <ResponsiveDeviceView
         mobile={
           <MobileTopBar
@@ -156,7 +158,7 @@ export function RoleShell({
       />
       <ResponsiveDeviceView
         desktop={
-      <header className="sticky top-0 z-40 border-b border-[#E8DDCC] bg-[#FFFDF8]/92 backdrop-blur-xl dark:border-white/10 dark:bg-[#070711]/92">
+      <header className="sticky top-0 z-40 border-b border-border bg-card">
         <div className="flex min-h-16 items-center justify-between gap-3 px-3 sm:px-5">
           <Link href="/" className="flex items-center gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D7BE86] bg-[#F7F1E8] text-xs font-serif font-bold text-[#8A5A24] shadow-sm dark:border-[#D6AC63]/35 dark:bg-[#D6AC63]/10 dark:text-[#F4C879] sm:h-11 sm:w-11 sm:text-sm">
@@ -187,7 +189,8 @@ export function RoleShell({
             })}
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden text-sm text-[#6F675C] dark:text-[#CDBCA8] sm:inline">{currentUser?.name ?? "Guest"}</span>
+            <ThemeToggle className="hidden sm:grid" />
+            <span className="hidden text-sm text-muted-foreground sm:inline">{currentUser?.name ?? "Guest"}</span>
             <button
               type="button"
               onClick={doLogout}

@@ -175,7 +175,7 @@ export function CheckoutScreen() {
             </div>
           </div>
 
-          <div className="sticky bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[65] mt-5 rounded-[28px] border border-[#E9D9BE] bg-[#FFFDF8]/95 p-3 shadow-[0_18px_45px_rgba(94,63,32,0.18)] backdrop-blur dark:border-white/10 dark:bg-[#10131D]/95 dark:shadow-[0_18px_45px_rgba(0,0,0,0.35)] sm:static sm:mt-6 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none sm:dark:bg-transparent sm:dark:shadow-none xl:mt-auto">
+          <div className="sticky bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[65] mt-5 rounded-[28px] border border-[color:var(--border)] bg-[var(--card)] p-3 shadow-[var(--shadow-soft)] sm:static sm:mt-6 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:dark:bg-transparent xl:mt-auto">
             <button
               type="button"
               disabled={processing || !cart.length || !currentUser || !shippingAddress.trim()}
