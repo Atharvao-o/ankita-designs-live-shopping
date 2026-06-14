@@ -77,7 +77,7 @@ export function RoleShell({
 
           {adminDrawerOpen ? (
             <div className="fixed inset-0 z-[90] lg:hidden" role="dialog" aria-modal="true" aria-label="Admin navigation">
-              <button type="button" aria-label="Close admin menu" onClick={() => setAdminDrawerOpen(false)} className="absolute inset-0 bg-[#070A0F]/55 backdrop-blur-sm" />
+              <button type="button" aria-label="Close admin menu" onClick={() => setAdminDrawerOpen(false)} className="absolute inset-0 bg-[#070A0F]/55" />
               <AdminSidebar
                 pathname={pathname}
                 currentUserName={currentUser?.name ?? "Admin"}
@@ -180,7 +180,7 @@ export function RoleShell({
                   className={`min-h-10 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
                     active
                       ? "bg-[#F36B4F] text-white shadow-[0_16px_36px_rgba(243,107,79,0.22)]"
-                      : "text-[#6F675C] hover:bg-[#F7F1E8] hover:text-[#1B1A17] dark:text-[#CDBCA8] dark:hover:bg-white/[0.08] dark:hover:text-white"
+                      : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
                   }`}
                 >
                   {item.label}
@@ -212,7 +212,7 @@ export function RoleShell({
                 className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${
                   active
                     ? "bg-[#F36B4F] text-white shadow-[0_14px_28px_rgba(243,107,79,0.2)]"
-                    : "bg-[#F7F1E8] text-[#6F675C] hover:text-[#1B1A17] dark:bg-white/[0.06] dark:text-[#CDBCA8] dark:hover:text-white"
+                    : "border border-border bg-card text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
                 }`}
               >
                 {item.label}
@@ -244,7 +244,7 @@ function AdminSidebar({
   className?: string;
 }) {
   return (
-    <aside className={`flex min-h-screen flex-col border-r border-[#E8DDCC] bg-[#FFFDF8] p-5 text-[#1B1A17] shadow-[24px_0_70px_rgba(128,91,44,0.12)] dark:border-white/10 dark:bg-[#070711] dark:text-[#FFF7EB] dark:shadow-[24px_0_80px_rgba(0,0,0,0.34)] ${className ?? ""}`}>
+    <aside className={`flex min-h-screen flex-col border-r border-border bg-card p-5 text-card-foreground shadow-[24px_0_70px_rgba(128,91,44,0.12)] dark:shadow-[24px_0_80px_rgba(0,0,0,0.34)] ${className ?? ""}`}>
       <div className="flex items-center gap-3 px-1 py-2">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#D7BE86] bg-[#F7F1E8] font-serif text-lg font-bold text-[#8A5A24] shadow-sm dark:border-[#D6AC63]/35 dark:bg-[#D6AC63]/10 dark:text-[#F4C879]">
           AE
@@ -268,7 +268,7 @@ function AdminSidebar({
               className={`flex min-h-12 items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
                 active
                   ? "bg-[#F36B4F] text-white shadow-[0_18px_44px_rgba(243,107,79,0.24)]"
-                  : "text-[#6F675C] hover:bg-[#F7F1E8] hover:text-[#1B1A17] dark:text-[#E7D7BE] dark:hover:bg-white/[0.08] dark:hover:text-white"
+                  : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -278,7 +278,7 @@ function AdminSidebar({
         })}
       </nav>
 
-      <div className="mt-auto rounded-[26px] border border-[#E8DDCC] bg-[#F7F1E8] p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.06]">
+      <div className="mt-auto rounded-[26px] border border-border bg-background p-4 shadow-sm">
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FFFDF8] text-sm font-bold text-[#8A5A24] dark:bg-[#FFF7EB]">AE</span>
           <div className="min-w-0">
@@ -289,7 +289,7 @@ function AdminSidebar({
         <button
           type="button"
           onClick={onLogout}
-          className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-sm font-semibold text-[#1B1A17] transition hover:bg-[#FFF7EB] dark:border-white/10 dark:bg-white/[0.06] dark:text-[#FFF7EB] dark:hover:bg-white/10"
+          className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-card-foreground transition hover:bg-secondary hover:text-secondary-foreground"
         >
           <LogOut className="h-4 w-4" />
           Logout

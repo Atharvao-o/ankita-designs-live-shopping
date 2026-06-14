@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { X } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
@@ -64,7 +64,7 @@ export function TutorialOverlay({
       )}
 
       <motion.section
-        className="tutorial-tooltip fixed z-[10002] rounded-[28px] border p-5 shadow-[0_32px_110px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:p-6"
+        className="tutorial-tooltip fixed z-[10002] rounded-[28px] border p-5 shadow-[0_32px_110px_rgba(0,0,0,0.55)] sm:p-6"
         style={tooltipStyle}
         initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}

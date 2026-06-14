@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -111,8 +111,8 @@ export function MobileHomePage() {
                   <h2 className="mt-4 text-2xl font-black tracking-[-0.05em]">{expo.title}</h2>
                   <p className="mt-2 line-clamp-2 text-sm leading-6 text-white/75">{expo.description || "Explore stalls, vendors, live rooms, and products."}</p>
                   <div className="mt-4 flex items-center gap-3 text-xs font-bold text-white/80">
-                    <span className="rounded-full bg-white/14 px-3 py-1.5"><Users className="mr-1 inline h-3.5 w-3.5" />{expo.assignedStallsCount ?? 0} assigned</span>
-                    <span className="rounded-full bg-white/14 px-3 py-1.5"><Store className="mr-1 inline h-3.5 w-3.5" />{expo.stallCount ?? expo.stall_count ?? 0} stalls</span>
+                    <span className="rounded-full bg-[#23232d] px-3 py-1.5"><Users className="mr-1 inline h-3.5 w-3.5" />{expo.assignedStallsCount ?? 0} assigned</span>
+                    <span className="rounded-full bg-[#23232d] px-3 py-1.5"><Store className="mr-1 inline h-3.5 w-3.5" />{expo.stallCount ?? expo.stall_count ?? 0} stalls</span>
                   </div>
                   <Link
                     href="/exhibitions"
@@ -158,7 +158,7 @@ export function MobileHomePage() {
               <article key={product.id} className="w-40 shrink-0 rounded-[26px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-3 shadow-[var(--shadow-soft)]">
                 <div className="relative">
                   <AppImage src={product.images[0] ?? "/products/product-placeholder.png"} alt={product.title} className="h-32 w-full rounded-[20px]" fallbackSrc="/products/product-placeholder.png" />
-                  <button type="button" className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-black/30 text-white backdrop-blur" aria-label={`Wishlist ${product.title}`}>
+                  <button type="button" className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-[#11111a] text-white" aria-label={`Wishlist ${product.title}`}>
                     <Heart className="h-4 w-4" />
                   </button>
                 </div>

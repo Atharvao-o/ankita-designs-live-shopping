@@ -41,8 +41,8 @@ export function HomepageAdvertisementCarousel() {
 
   if (!banners.length) {
     return (
-      <section className="overflow-hidden rounded-2xl border border-[#D9C39D] bg-[#101827] text-white shadow-[0_18px_48px_rgba(28,37,65,0.18)] dark:border-white/12 dark:bg-[#101827]">
-        <div className="relative hidden aspect-[16/5] min-h-[230px] sm:block">
+      <section className="overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-soft">
+        <div className="relative hidden aspect-[16/5] min-h-[230px] bg-[#101827] text-white sm:block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/home/live-shopping-sale-banner.png"
@@ -64,7 +64,7 @@ export function HomepageAdvertisementCarousel() {
               <Link href="/exhibitions" className="inline-flex min-h-11 items-center rounded-xl bg-[#F97316] px-5 text-sm font-black text-white transition hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#FDBA74]">
                 Shop Live Exhibitions
               </Link>
-              <Link href="/exhibitions?status=live" className="inline-flex min-h-11 items-center rounded-xl border border-[#F5D878] bg-[#FFFDF8] px-5 text-sm font-black text-[#172554] transition hover:bg-[#FFF2CC] focus:outline-none focus:ring-2 focus:ring-[#F5D878]">
+            <Link href="/exhibitions?status=live" className="inline-flex min-h-11 items-center rounded-xl border border-[#F5D878] bg-[#FFFDF8] px-5 text-sm font-black text-[#172554] transition hover:bg-[#FFF2CC] focus:outline-none focus:ring-2 focus:ring-[#F5D878]">
                 View Live Deals
               </Link>
             </div>
@@ -80,14 +80,14 @@ export function HomepageAdvertisementCarousel() {
               className="absolute inset-0 h-full w-full object-cover object-[70%_center]"
             />
           </div>
-          <div className="bg-[#101827] px-5 py-5">
+          <div className="bg-card px-5 py-5 text-card-foreground">
             <span className="inline-flex rounded-full bg-[#FACC15] px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-[#111827]">
               Live shopping deals
             </span>
-            <h1 className="mt-3 text-2xl font-black leading-tight tracking-[-0.035em]">
+            <h1 className="mt-3 text-2xl font-black leading-tight tracking-[-0.035em] text-foreground">
               See it live. Bargain together. Buy securely.
             </h1>
-            <p className="mt-2 text-sm font-semibold leading-6 text-[#F8E9D2]">
+            <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">
               Shop sarees, jewellery, decor, cosmetics, and more from verified vendor stalls.
             </p>
             <Link href="/exhibitions" className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[#F97316] px-5 text-sm font-black text-white transition hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#FDBA74]">
@@ -101,7 +101,7 @@ export function HomepageAdvertisementCarousel() {
 
   return (
     <div
-      className="group relative overflow-hidden rounded-2xl border border-[#E8DCC7] bg-[#F1E7D7] shadow-[0_14px_40px_rgba(28,37,65,0.12)] dark:border-white/10 dark:bg-[#121826] dark:shadow-none"
+      className="group relative overflow-hidden rounded-[28px] border border-border bg-card shadow-soft"
       role="region"
       aria-roledescription="carousel"
       aria-label="Featured advertisements"

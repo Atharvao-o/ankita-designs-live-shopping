@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+﻿import type { Config } from "tailwindcss";
 
 const config: Config = {
   darkMode: "class",
@@ -71,7 +71,8 @@ const config: Config = {
         ]
       },
       boxShadow: {
-        soft: "0 24px 70px rgba(80, 52, 20, 0.10)",
+        soft: "var(--shadow-soft)",
+        strong: "var(--shadow-strong)",
         glow: "0 18px 44px rgba(197, 154, 74, 0.22)",
         luxury: "0 30px 90px rgba(80, 52, 20, 0.14)",
         darkGlow: "0 30px 90px rgba(0, 0, 0, 0.32)"

@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -34,8 +34,8 @@
   --destructive-foreground: #fff8ea;
   --bg: var(--background);
   --bg-soft: #fffaf0;
-  --surface: rgba(255, 253, 248, 0.82);
-  --surface-strong: rgba(255, 253, 248, 0.96);
+  --surface: #fff8ea;
+  --surface-strong: #fffdf8;
   --text: var(--foreground);
   --muted: var(--muted-foreground);
   --border: var(--border-token);
@@ -53,12 +53,12 @@
     radial-gradient(circle at 15% 8%, rgba(185, 145, 63, 0.16), transparent 24%),
     radial-gradient(circle at 86% 10%, rgba(239, 107, 77, 0.12), transparent 22%),
     linear-gradient(180deg, #fbf4e8 0%, #fffaf0 52%, #f6ead8 100%);
-  --nav-bg: rgba(255, 253, 248, 0.92);
+  --nav-bg: #fffdf8;
   --footer-bg: #161425;
   --footer-text: #f8f3e9;
   --footer-muted: #d8d0c2;
   --footer-border: rgba(255, 255, 255, 0.12);
-  --footer-surface: rgba(255, 255, 255, 0.055);
+  --footer-surface: #211f30;
   --footer-input: #0b0d24;
   --home-bg: #fbf4e8;
   --home-section-bg: #fbf4e8;
@@ -92,8 +92,8 @@
   --destructive-foreground: #160808;
   --bg: var(--background);
   --bg-soft: #11111a;
-  --surface: rgba(255, 255, 255, 0.065);
-  --surface-strong: rgba(255, 255, 255, 0.095);
+  --surface: #171720;
+  --surface-strong: #1d1d27;
   --text: var(--foreground);
   --muted: var(--muted-foreground);
   --border: var(--border-token);
@@ -111,12 +111,12 @@
     radial-gradient(circle at 18% 0%, rgba(124, 58, 237, 0.18), transparent 26%),
     radial-gradient(circle at 82% 12%, rgba(244, 111, 80, 0.16), transparent 24%),
     linear-gradient(180deg, #0b0b11 0%, #101019 48%, #0b0b11 100%);
-  --nav-bg: rgba(11, 11, 17, 0.92);
+  --nav-bg: #11111a;
   --footer-bg: #0b0b11;
   --footer-text: #f8f3e9;
   --footer-muted: #d8d0c2;
   --footer-border: rgba(255, 255, 255, 0.12);
-  --footer-surface: rgba(255, 255, 255, 0.055);
+  --footer-surface: #171720;
   --footer-input: #0b0d24;
   --home-bg: #0b0b11;
   --home-section-bg: #0b0b11;

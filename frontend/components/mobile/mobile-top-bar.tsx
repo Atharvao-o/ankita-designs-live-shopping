@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { Bell, Moon, Sun } from "lucide-react";
@@ -15,7 +15,7 @@ type MobileTopBarProps = {
 
 export function MobileTopBar({
   title = "Ankita Designs",
-  subtitle = "Exhibit • Connect • Sell",
+  subtitle = "Exhibit â€¢ Connect â€¢ Sell",
   avatarSrc,
   avatarAlt = "Profile",
   profileHref = "/orders"
@@ -24,7 +24,7 @@ export function MobileTopBar({
   const nextTheme = theme === "dark" ? "light" : "dark";
 
   return (
-    <header className="sticky top-0 z-[60] border-b border-[color:var(--border)] bg-[var(--nav-bg)] px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-2xl">
+    <header className="sticky top-0 z-[60] border-b border-[color:var(--border)] bg-[var(--nav-bg)] px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
       <div className="flex items-center gap-3">
         <Link href="/exhibitions" className="flex min-w-0 flex-1 items-center gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[color:var(--border)] bg-[var(--surface)] font-serif text-sm font-bold text-[var(--gold)] shadow-sm">

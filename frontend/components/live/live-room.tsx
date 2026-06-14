@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
@@ -338,7 +338,7 @@ export function LiveRoom({ stallId }: { stallId: string }) {
               <div className="flex min-w-0 items-center gap-2">
                 <span className="inline-flex h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-[#E95F45]" aria-hidden />
                 <span className="rounded-full bg-[#E95F45]/18 px-2.5 py-1 text-xs font-bold text-[#FFB9A4]">LIVE</span>
-                <LiveElapsedCounter startedAt={liveStartedAt} className="border-white/10 bg-white/10 text-white dark:border-white/10 dark:bg-white/10 dark:text-white" />
+                <LiveElapsedCounter startedAt={liveStartedAt} className="border-white/10 bg-[#1d1d27] text-white dark:border-white/10 dark:bg-[#23232d] dark:text-white" />
                 <p className="truncate text-sm font-semibold text-white sm:text-base">{vendorName}</p>
               </div>
               <p className="mt-1 truncate text-xs text-slate-400 sm:text-sm">{stall?.name ?? stallId}</p>
@@ -367,7 +367,7 @@ export function LiveRoom({ stallId }: { stallId: string }) {
 
         <div className="grid min-h-[calc(100dvh-69px)] w-full gap-0 xl:h-[calc(100dvh-69px)] xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.58fr)_minmax(360px,0.72fr)] xl:overflow-hidden">
           <div className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-5 xl:h-full xl:overflow-hidden">
-            <div data-tour-id="live-video" className="relative aspect-video w-full overflow-hidden rounded-[28px] border border-white/10 bg-white/5 p-2 shadow-darkGlow sm:rounded-[34px] sm:p-3">
+            <div data-tour-id="live-video" className="relative aspect-video w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#171720] p-2 shadow-darkGlow sm:rounded-[34px] sm:p-3">
               {livekitConnection?.mode === "real" ? (
                 <UserLiveKitViewer connection={livekitConnection} className="h-full w-full overflow-hidden rounded-[24px] bg-slate-950" />
               ) : (
@@ -378,15 +378,15 @@ export function LiveRoom({ stallId }: { stallId: string }) {
               )}
             </div>
 
-            <div className="rounded-[24px] border border-white/10 bg-white/6 p-4 shadow-darkGlow">
+            <div className="rounded-[24px] border border-white/10 bg-[#171720] p-4 shadow-darkGlow">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <ViewerPresenceStrip viewerCount={viewerCount} />
-                <LiveElapsedCounter startedAt={liveStartedAt} size="md" className="border-white/10 bg-white/10 text-white dark:border-white/10 dark:bg-white/10 dark:text-white" />
+                <LiveElapsedCounter startedAt={liveStartedAt} size="md" className="border-white/10 bg-[#1d1d27] text-white dark:border-white/10 dark:bg-[#23232d] dark:text-white" />
               </div>
             </div>
 
             <div className="grid gap-3">
-              <div className="rounded-[24px] border border-white/10 bg-white/6 p-4 text-white shadow-darkGlow">
+              <div className="rounded-[24px] border border-white/10 bg-[#171720] p-4 text-white shadow-darkGlow">
                 <p className="text-xs uppercase tracking-[0.18em] text-[#C59A4A]">Now presenting</p>
                 <h1 className="mt-2 truncate text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl">
                   {featured?.title ?? "No product showcased yet"}
@@ -394,13 +394,13 @@ export function LiveRoom({ stallId }: { stallId: string }) {
                 <p className="mt-1 text-sm text-slate-400">{featured?.description ?? "Vendor has not showcased a product yet."}</p>
                 {dataError ? <p className="mt-2 text-xs font-semibold text-[#DC2626]">{dataError}</p> : null}
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-[24px] border border-white/10 bg-white/6 p-4 shadow-darkGlow xl:hidden">
+              <div className="flex items-center justify-between gap-3 rounded-[24px] border border-white/10 bg-[#171720] p-4 shadow-darkGlow xl:hidden">
                 <button type="button" onClick={() => setMobileChatOpen(true)} className={buttonStyles("secondary", "px-4 py-2")}>
                   <MessageCircleMore className="mr-2 h-4 w-4" />
                   Chat
                 </button>
               </div>
-              <div className="hidden items-center gap-2 rounded-[24px] border border-white/10 bg-white/6 p-4 shadow-darkGlow lg:flex">
+              <div className="hidden items-center gap-2 rounded-[24px] border border-white/10 bg-[#171720] p-4 shadow-darkGlow lg:flex">
                 <button type="button" className={buttonStyles("secondary", "px-4 py-3")}>
                   <MessageCircleMore className="mr-2 h-4 w-4" />
                   Ask Question
@@ -483,7 +483,7 @@ function ProductPanel({
   if (!featured) {
     return (
       <aside data-tour-id="highlighted-product" className="flex min-h-0 min-w-0 flex-col bg-[#06080E] p-4 text-white shadow-[0_30px_80px_rgba(15,23,42,0.24)] sm:p-6 xl:h-full xl:min-h-0 xl:overflow-y-auto">
-        <div className="flex flex-1 items-center justify-center rounded-[28px] border border-white/10 bg-white/5 p-6 text-center">
+        <div className="flex flex-1 items-center justify-center rounded-[28px] border border-white/10 bg-[#171720] p-6 text-center">
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Now Showing</p>
             <h3 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">No product showcased yet</h3>
@@ -521,14 +521,14 @@ function ProductPanel({
           {discount ? <p className="pb-1 text-sm font-semibold text-slate-500 line-through">{formatPrice(featured.compareAtPrice)}</p> : null}
           {discount ? <span className="rounded-full bg-emerald-500/12 px-3 py-1 text-xs font-black text-emerald-300">{discount}% OFF</span> : null}
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/8 px-3 py-2 text-xs text-slate-300">
+        <div className="inline-flex items-center gap-2 rounded-full bg-[#1d1d27] px-3 py-2 text-xs text-slate-300">
           {featured.stock > 0 ? "Available from vendor inventory" : "Out of stock"}
         </div>
       </div>
 
       <div className="mt-5 grid gap-3">
         {productDetails.map((item) => (
-          <div key={item} className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+          <div key={item} className="rounded-[22px] border border-white/10 bg-[#171720] px-4 py-3 text-sm text-slate-300">
             {item}
           </div>
         ))}
@@ -548,18 +548,18 @@ function ProductPanel({
         <button
           type="button"
           onClick={() => setQuantity((current) => Math.max(1, current - 1))}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/6"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#171720]"
           aria-label="Decrease quantity"
         >
           <Minus className="h-4 w-4" />
         </button>
-        <div className="rounded-full border border-white/10 bg-white/6 px-6 py-3 text-white" aria-label={`Quantity ${quantity}`}>
+        <div className="rounded-full border border-white/10 bg-[#171720] px-6 py-3 text-white" aria-label={`Quantity ${quantity}`}>
           {quantity}
         </div>
         <button
           type="button"
           onClick={() => setQuantity((current) => current + 1)}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/6"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#171720]"
           aria-label="Increase quantity"
         >
           <Plus className="h-4 w-4" />
@@ -576,7 +576,7 @@ function ProductPanel({
         <button
           type="button"
           onClick={onBuyNow}
-          className={buttonStyles("secondary", "min-h-12 justify-center border-white/10 bg-white/5 px-5 py-4 text-white hover:bg-white/10")}
+          className={buttonStyles("secondary", "min-h-12 justify-center border-white/10 bg-[#171720] px-5 py-4 text-white hover:bg-[#1d1d27]")}
         >
           Buy Now
         </button>
@@ -586,7 +586,7 @@ function ProductPanel({
         <p className="text-sm text-slate-500">Related products</p>
         <div className="mt-3 grid gap-3">
           {relatedProducts.map((item) => (
-            <div key={item.id} className="flex min-w-0 items-center gap-3 rounded-[22px] border border-white/10 bg-white/5 p-3">
+            <div key={item.id} className="flex min-w-0 items-center gap-3 rounded-[22px] border border-white/10 bg-[#171720] p-3">
               <AppImage src={item.images[0] ?? "/products/product-placeholder.png"} alt={item.title} className="h-16 w-16 rounded-[16px] sm:h-20 sm:w-20" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-white">{item.title}</p>
@@ -687,7 +687,7 @@ function MobileLiveCommerceRoom({
           {viewerCount} watching
         </div>
         <div className="absolute right-4 top-4 z-20">
-          <LiveElapsedCounter startedAt={liveStartedAt} className="border-white/10 bg-black/45 text-white dark:border-white/10 dark:bg-black/45 dark:text-white" />
+          <LiveElapsedCounter startedAt={liveStartedAt} className="border-white/10 bg-[#0b0b11] text-white dark:border-white/10 dark:bg-[#0b0b11] dark:text-white" />
         </div>
         {livekitConnection?.mode === "real" ? (
           <UserLiveKitViewer connection={livekitConnection} className="h-full w-full overflow-hidden rounded-[28px] bg-slate-950" />
@@ -887,7 +887,7 @@ function CustomerBargainPanel({
         </div>
         <span className="rounded-full bg-emerald-500/12 px-3 py-1 text-xs font-black text-emerald-500">Live</span>
       </div>
-      <div className={`mt-3 rounded-[18px] p-3 text-sm ${isDark ? "bg-black/20 text-slate-300" : "bg-[var(--surface-strong)] text-[var(--muted)]"}`}>
+      <div className={`mt-3 rounded-[18px] p-3 text-sm ${isDark ? "bg-[#11111a] text-slate-300" : "bg-[var(--surface-strong)] text-[var(--muted)]"}`}>
         <div className="flex justify-between gap-3">
           <span>Live price</span>
           <strong className={isDark ? "text-white" : "text-[var(--text)]"}>{formatPrice(livePrice)}</strong>
@@ -920,7 +920,7 @@ function CustomerBargainPanel({
         <>
           <div className="mt-3 grid grid-cols-[auto_1fr_auto] gap-2">
             <button type="button" onClick={() => setOfferDraft(Math.max(minOffer, displayOffer - step))} className="min-h-11 rounded-2xl border border-[color:var(--border)] px-4 font-black">-{formatPrice(step)}</button>
-            <div className={`grid min-h-11 place-items-center rounded-2xl border text-lg font-black ${isDark ? "border-white/10 bg-black/20" : "border-[color:var(--border)] bg-[var(--surface-strong)]"}`}>{formatPrice(displayOffer)}</div>
+            <div className={`grid min-h-11 place-items-center rounded-2xl border text-lg font-black ${isDark ? "border-white/10 bg-[#11111a]" : "border-[color:var(--border)] bg-[var(--surface-strong)]"}`}>{formatPrice(displayOffer)}</div>
             <button type="button" onClick={() => setOfferDraft(Math.min(maxOffer, displayOffer + step))} className="min-h-11 rounded-2xl border border-[color:var(--border)] px-4 font-black">+{formatPrice(step)}</button>
           </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -988,7 +988,7 @@ function CustomerBargainPanel({
       {bargainState.offerGroups.length ? (
         <div className="mt-3 grid gap-2">
           {bargainState.offerGroups.slice(0, 3).map((group) => (
-            <div key={group.offerPrice} className={`flex justify-between rounded-2xl px-3 py-2 text-xs font-bold ${isDark ? "bg-black/20 text-slate-300" : "bg-[var(--surface-strong)] text-[var(--muted)]"}`}>
+            <div key={group.offerPrice} className={`flex justify-between rounded-2xl px-3 py-2 text-xs font-bold ${isDark ? "bg-[#11111a] text-slate-300" : "bg-[var(--surface-strong)] text-[var(--muted)]"}`}>
               <span>{formatPrice(group.offerPrice)}</span>
               <span>{group.customers} customer{group.customers === 1 ? "" : "s"}</span>
             </div>
@@ -1042,7 +1042,7 @@ function LiveStreamBottomNav({
 
 function StreamStatusCard({ title, message }: { title: string; message: string }) {
   return (
-    <div className="flex h-full min-h-[260px] w-full items-center justify-center rounded-[24px] border border-dashed border-white/15 bg-white/6 p-8 text-center">
+    <div className="flex h-full min-h-[260px] w-full items-center justify-center rounded-[24px] border border-dashed border-white/15 bg-[#171720] p-8 text-center">
       <div className="max-w-md">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#E95F45]/18 text-xl font-semibold text-[#FFB9A4]">
           LIVE

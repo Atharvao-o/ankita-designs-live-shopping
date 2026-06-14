@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -46,7 +46,7 @@ function liveStatusClass(stall?: Stall | null) {
   const status = stall?.liveStatus || stall?.status || "offline";
   if (status === "live") return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/12 dark:text-emerald-300";
   if (status === "break" || status === "busy") return "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-100";
-  return "bg-[#F4E8D8] text-[#8A5A24] dark:bg-white/[0.08] dark:text-white/64";
+  return "bg-[#F4E8D8] text-[#8A5A24] dark:bg-card dark:text-white/64";
 }
 
 export function VendorStoreScreen({ stallId }: { stallId: string }) {
@@ -149,7 +149,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
               backgroundPosition: "center"
             }}
           >
-            <Link href="/exhibitions" className="inline-flex items-center gap-2 rounded-full border border-[#E8DDCC] bg-white/78 px-4 py-2 text-sm font-bold text-[#6F675C] backdrop-blur dark:border-white/10 dark:bg-black/24 dark:text-white/72">
+            <Link href="/exhibitions" className="inline-flex items-center gap-2 rounded-full border border-[#E8DDCC] bg-card px-4 py-2 text-sm font-bold text-[#6F675C] dark:border-white/10 dark:bg-[#11111a] dark:text-white/72">
               <ArrowLeft className="h-4 w-4" />
               Back to exhibitions
             </Link>
@@ -167,7 +167,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
                     <BadgeCheck className="h-3.5 w-3.5" />
                     Verified vendor
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/78 px-3 py-1.5 text-xs font-black text-[#8A5A24] dark:bg-black/24 dark:text-[#F4C879]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-black text-[#8A5A24] dark:bg-[#11111a] dark:text-[#F4C879]">
                     <ShieldCheck className="h-3.5 w-3.5" />
                     Ankita Designs secure order
                   </span>
@@ -178,7 +178,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
                   {liveStatusLabel(stall)}
                 </span>
                 {isLive ? <LiveElapsedCounter startedAt={stall?.liveStartedAt} size="md" /> : null}
-                <span className="rounded-full bg-white/78 px-4 py-2 text-sm font-black text-[#8A5A24] dark:bg-black/24 dark:text-[#F4C879]">
+                <span className="rounded-full bg-card px-4 py-2 text-sm font-black text-[#8A5A24] dark:bg-[#11111a] dark:text-[#F4C879]">
                   {products.length} products
                 </span>
               </div>
@@ -204,16 +204,16 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
 
           <div className="p-5 sm:p-8">
             <section className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-              <div className="overflow-hidden rounded-[24px] border border-[#E8DDCC] bg-[#111827] text-white shadow-[0_18px_48px_rgba(80,52,20,0.10)] dark:border-white/10 dark:bg-black/35">
+              <div className="overflow-hidden rounded-[24px] border border-[#E8DDCC] bg-[#111827] text-white shadow-[0_18px_48px_rgba(80,52,20,0.10)] dark:border-white/10 dark:bg-[#11111a]">
                 <div className="relative grid min-h-64 place-items-center bg-[radial-gradient(circle_at_20%_10%,rgba(244,200,121,0.24),transparent_34%),linear-gradient(135deg,#111827,#241B2E)] p-6">
                   <div className="text-center">
-                    <span className={cn("mx-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black", isLive ? "bg-emerald-500/18 text-emerald-100" : "bg-white/10 text-white/72")}>
+                    <span className={cn("mx-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black", isLive ? "bg-emerald-500/18 text-emerald-100" : "bg-[#1d1d27] text-white/72")}>
                       <Video className="h-4 w-4" />
                       {isLive ? "Vendor live stream" : "Live stream not active"}
                     </span>
                     {isLive ? (
                       <div className="mt-3 flex justify-center">
-                        <LiveElapsedCounter startedAt={stall?.liveStartedAt} className="border-white/10 bg-white/10 text-white dark:border-white/10 dark:bg-white/10 dark:text-white" />
+                        <LiveElapsedCounter startedAt={stall?.liveStartedAt} className="border-white/10 bg-[#1d1d27] text-white dark:border-white/10 dark:bg-[#23232d] dark:text-white" />
                       </div>
                     ) : null}
                     <h2 className="mt-4 text-2xl font-black tracking-[-0.04em] text-white">Live shopping room</h2>
@@ -229,16 +229,16 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
                 </div>
               </div>
 
-              <aside className="grid gap-3 rounded-[24px] border border-[#E8DDCC] bg-[#FFF7EB] p-4 dark:border-white/10 dark:bg-white/[0.045]">
-                <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-white/[0.06] dark:text-white/66">
+              <aside className="grid gap-3 rounded-[24px] border border-[#E8DDCC] bg-[#FFF7EB] p-4 dark:border-white/10 dark:bg-[#171720]">
+                <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-[#1d1d27] dark:text-white/66">
                   <ShieldCheck className="mr-2 inline h-4 w-4 text-[#B88A3D]" />
                   Verified seller managed by Ankita Designs.
                 </div>
-                <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-white/[0.06] dark:text-white/66">
+                <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-[#1d1d27] dark:text-white/66">
                   <Handshake className="mr-2 inline h-4 w-4 text-[#B88A3D]" />
                   Chat and bargain before checkout.
                 </div>
-                <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-white/[0.06] dark:text-white/66">
+                <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-[#1d1d27] dark:text-white/66">
                   <ShoppingBag className="mr-2 inline h-4 w-4 text-[#B88A3D]" />
                   Secure cart and order placement.
                 </div>
@@ -246,7 +246,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
             </section>
 
             {pinnedProduct ? (
-              <section className="mb-6 rounded-[24px] border border-[#E8DDCC] bg-[#FFF7EB] p-4 dark:border-white/10 dark:bg-white/[0.045]">
+              <section className="mb-6 rounded-[24px] border border-[#E8DDCC] bg-[#FFF7EB] p-4 dark:border-white/10 dark:bg-[#171720]">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                   <AppImage src={pinnedProduct.images[0] || "/products/product-placeholder.png"} alt={pinnedProduct.title} fallbackSrc="/products/product-placeholder.png" className="h-28 w-full rounded-2xl sm:w-32" />
                   <div className="min-w-0 flex-1">
@@ -266,7 +266,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
                 <p className="text-xs font-black uppercase tracking-[0.24em] text-[#B88A3D] dark:text-[#F4C879]">Catalogue</p>
                 <h2 className="mt-1 text-2xl font-black tracking-[-0.04em]">Shop vendor products</h2>
               </div>
-              <label className="flex min-h-12 items-center gap-2 rounded-full border border-[#E8DDCC] bg-[#F7F1E8] px-4 dark:border-white/10 dark:bg-white/[0.06] sm:min-w-80">
+              <label className="flex min-h-12 items-center gap-2 rounded-full border border-[#E8DDCC] bg-[#F7F1E8] px-4 dark:border-white/10 dark:bg-[#1d1d27] sm:min-w-80">
                 <Search className="h-4 w-4 text-[#B88A3D]" />
                 <input
                   value={query}
@@ -278,7 +278,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
             </div>
 
             {cartMessage ? (
-              <p className="mt-4 rounded-2xl border border-[#E8DDCC] bg-[#FFF7EB] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/70">
+              <p className="mt-4 rounded-2xl border border-[#E8DDCC] bg-[#FFF7EB] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:border-white/10 dark:bg-[#1d1d27] dark:text-white/70">
                 {cartMessage}
               </p>
             ) : null}
@@ -286,7 +286,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
             {loading ? (
               <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="h-64 animate-pulse rounded-[24px] bg-[#F0E7D9] dark:bg-white/[0.06] sm:h-80 sm:rounded-[28px]" />
+                  <div key={index} className="h-64 animate-pulse rounded-[24px] bg-[#F0E7D9] dark:bg-[#1d1d27] sm:h-80 sm:rounded-[28px]" />
                 ))}
               </div>
             ) : error ? (
@@ -298,7 +298,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
                 {filteredProducts.map((product) => {
                   const discount = discountPercent(product);
                   return (
-                    <article key={product.id} className="overflow-hidden rounded-[22px] border border-[#E8DDCC] bg-[#FFFDF8] shadow-[0_14px_38px_rgba(80,52,20,0.08)] dark:border-white/10 dark:bg-white/[0.045] sm:rounded-[28px]">
+                    <article key={product.id} className="overflow-hidden rounded-[22px] border border-[#E8DDCC] bg-[#FFFDF8] shadow-[0_14px_38px_rgba(80,52,20,0.08)] dark:border-white/10 dark:bg-[#171720] sm:rounded-[28px]">
                       <div className="relative">
                         <AppImage src={product.images[0] ?? "/products/product-placeholder.png"} alt={product.title} fallbackSrc="/products/product-placeholder.png" className="h-40 w-full rounded-none sm:h-64" />
                         {discount ? <span className="absolute left-2 top-2 rounded-full bg-[#B91C1C] px-2.5 py-1 text-[10px] font-black text-white sm:left-3 sm:top-3 sm:text-xs">Sale</span> : null}
@@ -327,7 +327,7 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
                 })}
               </div>
             ) : (
-              <div className="mt-6 rounded-[28px] border border-dashed border-[#D9C7A8] bg-[#FFF7EB] p-8 text-center dark:border-white/14 dark:bg-white/[0.04]">
+              <div className="mt-6 rounded-[28px] border border-dashed border-[#D9C7A8] bg-[#FFF7EB] p-8 text-center dark:border-white/14 dark:bg-[#15151e]">
                 <Store className="mx-auto h-10 w-10 text-[#B88A3D]" />
                 <h3 className="mt-4 text-2xl font-black">No products listed yet</h3>
                 <p className="mx-auto mt-2 max-w-md text-sm text-[#6F675C] dark:text-white/58">
@@ -349,11 +349,11 @@ export function VendorStoreScreen({ stallId }: { stallId: string }) {
             </div>
           </div>
           <div className="mt-5 grid gap-3">
-            <div className="rounded-2xl bg-[#F7F1E8] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-white/[0.06] dark:text-white/64">
+            <div className="rounded-2xl bg-[#F7F1E8] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-[#1d1d27] dark:text-white/64">
               <Radio className="mr-2 inline h-4 w-4 text-[#B88A3D]" />
               {stall?.viewerCount ?? 0} viewers
             </div>
-            <div className="rounded-2xl bg-[#F7F1E8] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-white/[0.06] dark:text-white/64">
+            <div className="rounded-2xl bg-[#F7F1E8] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-[#1d1d27] dark:text-white/64">
               <Tag className="mr-2 inline h-4 w-4 text-[#B88A3D]" />
               {products.length} active products
             </div>

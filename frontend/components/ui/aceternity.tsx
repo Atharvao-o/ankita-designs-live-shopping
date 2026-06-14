@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ReactNode, useMemo, useState } from "react";
 import type { ButtonHTMLAttributes, HTMLAttributes, InputHTMLAttributes } from "react";
@@ -10,13 +10,11 @@ export function AuroraBackground({ children, className }: { children: ReactNode;
     <div className={cn("relative overflow-hidden", className)}>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_18%_12%,rgba(124,58,237,0.22),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(244,111,80,0.18),transparent_26%),radial-gradient(circle_at_48%_82%,rgba(216,183,106,0.18),transparent_30%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,var(--background)_0%,var(--bg-soft)_52%,var(--background)_100%)]"
       />
-      <motion.div
+      <div
         aria-hidden="true"
-        className="pointer-events-none absolute -inset-[20%] opacity-30 blur-3xl [background:conic-gradient(from_180deg_at_50%_50%,rgba(216,183,106,0.18),rgba(124,58,237,0.2),rgba(244,111,80,0.18),rgba(216,183,106,0.18))]"
-        animate={{ rotate: [0, 360] }}
-        transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,var(--primary),var(--accent),var(--coral))] opacity-80"
       />
       <div className="relative z-10">{children}</div>
     </div>
@@ -74,7 +72,7 @@ export function MovingBorder({ children, className, wrapperClassName, ...props }
     <div {...props} className={cn("group relative overflow-hidden rounded-[32px] p-px", wrapperClassName)}>
       <motion.div
         aria-hidden="true"
-        className="absolute inset-[-45%] bg-[conic-gradient(from_0deg,transparent,rgba(216,183,106,0.85),rgba(244,111,80,0.72),transparent_34%)] opacity-70 blur-sm"
+        className="absolute inset-0 rounded-[inherit] border border-[color:var(--gold)]"
         animate={{ rotate: 360 }}
         transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
       />
@@ -169,7 +167,7 @@ export function InfiniteMovingCards({ items, className }: { items: ReactNode[]; 
 export function LampEffect({ children, className }: { children?: ReactNode; className?: string }) {
   return (
     <div className={cn("relative overflow-hidden", className)}>
-      <div aria-hidden="true" className="absolute left-1/2 top-0 h-44 w-[70%] -translate-x-1/2 rounded-b-full bg-[radial-gradient(ellipse_at_top,rgba(216,183,106,0.36),transparent_68%)] blur-2xl" />
+      <div aria-hidden="true" className="absolute left-1/2 top-0 h-1 w-[70%] -translate-x-1/2 rounded-full bg-[var(--gold)]" />
       <div aria-hidden="true" className="absolute left-1/2 top-10 h-px w-[56%] -translate-x-1/2 bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent" />
       <div className="relative z-10">{children}</div>
     </div>
@@ -196,7 +194,7 @@ export function TextGenerateEffect({ text, className }: { text: string; classNam
 
 export function FloatingDock({ items, className }: { items: Array<{ label: string; href: string; icon: ReactNode }>; className?: string }) {
   return (
-    <nav className={cn("fixed bottom-5 left-1/2 z-50 hidden -translate-x-1/2 rounded-full border border-[color:var(--border)] bg-[var(--nav-bg)] p-2 shadow-[var(--shadow-soft)] backdrop-blur-2xl lg:flex", className)}>
+    <nav className={cn("fixed bottom-5 left-1/2 z-50 hidden -translate-x-1/2 rounded-full border border-[color:var(--border)] bg-[var(--nav-bg)] p-2 shadow-[var(--shadow-soft)] lg:flex", className)}>
       {items.map((item) => (
         <motion.a
           key={item.label}
@@ -366,7 +364,7 @@ export function AnimatedTestimonials({ items }: { items: Array<{ quote: string; 
     <GlareCard>
       <div className="p-7">
         <motion.blockquote key={item.quote} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="text-xl font-medium leading-8 text-[var(--text)]">
-          “{item.quote}”
+          â€œ{item.quote}â€
         </motion.blockquote>
         <div className="mt-6 flex items-center justify-between">
           <div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -61,7 +61,7 @@ export function StatusBadge({
       className={cn(
         "inline-flex rounded-full border px-3 py-1 text-xs font-semibold capitalize",
         live && "border-emerald-200 bg-emerald-50 text-emerald-700",
-        warning && "border-[#E9C98D] bg-[rgba(216,183,106,0.14)] text-[var(--gold)]",
+        warning && "border-[#E9C98D] bg-secondary text-[var(--gold)]",
         closed && "border-slate-200 bg-slate-100 text-slate-500",
         !live && !warning && !closed && "border-[color:var(--border)] bg-[var(--surface)] text-[var(--muted)]",
         className

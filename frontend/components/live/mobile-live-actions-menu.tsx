@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -40,7 +40,7 @@ export function MobileLiveActionsMenu({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/8 text-white shadow-sm xl:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-[#1d1d27] text-white shadow-sm xl:hidden"
         aria-label="Open live room menu"
         aria-expanded={open}
       >
@@ -57,7 +57,7 @@ export function MobileLiveActionsMenu({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 z-[90] bg-slate-950/35 backdrop-blur-sm"
+              className="fixed inset-0 z-[90] bg-slate-950/35"
             />
             <motion.aside
               initial={{ x: "100%" }}

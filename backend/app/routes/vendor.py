@@ -47,6 +47,13 @@ STALL_PLANS = {
 }
 
 
+def has_uploaded_brand_asset(value: str | None) -> bool:
+    if not value:
+        return False
+    normalized = value.strip()
+    return bool(normalized) and "stall-placeholder" not in normalized
+
+
 class VendorStallBookingRequest(BaseModel):
     stall_type: str
     exhibition_id: str | None = None
@@ -401,6 +408,25 @@ def start_vendor_live(request_context: Request, payload: LiveSessionStartRequest
     assert_vendor_approved(vendor)
     if payload.vendor_id != vendor.id:
         raise HTTPException(status_code=403, detail={"code": "INVALID_VENDOR", "message": "Cannot start live for another vendor."})
+    stall = db.get(Stall, payload.stall_id)
+    if stall is None:
+        raise HTTPException(status_code=404, detail={"code": "STALL_NOT_FOUND", "message": "Stall not found."})
+    if stall.vendor_id != vendor.id:
+        raise HTTPException(status_code=403, detail={"code": "STALL_NOT_ASSIGNED", "message": "This stall is not assigned to your vendor account."})
+    missing_branding = []
+    if not has_uploaded_brand_asset(stall.banner_image):
+        missing_branding.append("bannerImage")
+    if not has_uploaded_brand_asset(stall.vendor_logo):
+        missing_branding.append("vendorLogo")
+    if missing_branding:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "code": "STALL_BRANDING_REQUIRED",
+                "message": "Upload a stall banner and vendor logo before going live.",
+                "missingFields": missing_branding,
+            },
+        )
     active_session = get_active_live_session_for_vendor(db, vendor.id)
     if active_session is not None and active_session.stall_id != payload.stall_id:
         raise HTTPException(

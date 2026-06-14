@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -141,7 +141,7 @@ export function MobileExplorePage({
                 onClick={() => setCategoryFilter(category)}
                 className={cn(
                   "min-h-10 shrink-0 rounded-full border px-3 py-2 text-xs font-bold capitalize transition",
-                  categoryFilter === category ? "border-[var(--gold)] bg-[rgba(216,183,106,0.16)] text-[var(--gold)]" : "border-[color:var(--border)] bg-[var(--surface)] text-[var(--muted)]"
+                  categoryFilter === category ? "border-[var(--gold)] bg-secondary text-[var(--gold)]" : "border-[color:var(--border)] bg-[var(--surface)] text-[var(--muted)]"
                 )}
               >
                 {category}
@@ -202,7 +202,7 @@ export function MobileExplorePage({
               <div className="relative">
                 <AppImage src={exhibition.bannerImage || "/stalls/stall-placeholder.png"} alt={exhibition.title} className="h-44 w-full rounded-none" fallbackSrc="/stalls/stall-placeholder.png" />
                 <div className="absolute left-3 top-3"><StatusBadge status={exhibition.status} /></div>
-                <button type="button" aria-label={`Bookmark ${exhibition.title}`} className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-2xl border border-white/20 bg-black/30 text-white backdrop-blur">
+                <button type="button" aria-label={`Bookmark ${exhibition.title}`} className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-2xl border border-white/20 bg-[#11111a] text-white">
                   <Bookmark className="h-4 w-4" />
                 </button>
               </div>

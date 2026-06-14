@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, HTMLAttributes, ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
@@ -208,7 +208,7 @@ export function ExhibitionsPageContent() {
                   onClick={() => setStatusFilter(chip.value)}
                   className={`min-h-10 shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition ${
                     statusFilter === chip.value
-                      ? "border-[color:var(--gold)] bg-[rgba(216,183,106,0.16)] text-[var(--gold)]"
+                      ? "border-[color:var(--gold)] bg-secondary text-[var(--gold)]"
                       : "border-[color:var(--border)] bg-[var(--surface)] text-[var(--muted)]"
                   }`}
                 >
@@ -223,14 +223,14 @@ export function ExhibitionsPageContent() {
             <div className="relative grid gap-6 p-5 sm:p-7 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="flex flex-col justify-between">
                 <SectionHeader
-                  eyebrow="Exhibit • Connect • Sell"
+                  eyebrow="Exhibit â€¢ Connect â€¢ Sell"
                   title="Choose an Exhibition"
                   description="Enter a live exhibition, discover premium vendor stalls, watch live shopping streams, and buy from the products being showcased in real time."
                   action={<Link href="/exhibitions" className={buttonStyles("secondary", "justify-center px-5 py-3")}>Browse Stalls</Link>}
                 />
                 <div className="mt-6 flex flex-wrap gap-2">
                   {["Live Shopping", "Smart Map", "Vendor Showcase", "Real-time Chat", "Secure & Scalable"].map((item) => (
-                    <span key={item} className="rounded-full border border-[#E9D9BE] bg-white/70 px-4 py-2 text-xs font-semibold text-[#8A5A24]">
+                    <span key={item} className="rounded-full border border-[#E9D9BE] bg-card px-4 py-2 text-xs font-semibold text-[#8A5A24]">
                       {item}
                     </span>
                   ))}
@@ -435,30 +435,18 @@ function DesktopExhibitionsExperience({
       className="relative min-h-[calc(100vh-64px)] overflow-hidden p-5 xl:p-8"
     >
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <motion.div
-          aria-hidden="true"
-          animate={reduceMotion ? undefined : { opacity: [0.55, 0.9, 0.55], scale: [1, 1.08, 1] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-[-10%] top-[-16%] h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.24),transparent_65%)] blur-3xl"
-        />
-        <motion.div
-          aria-hidden="true"
-          animate={reduceMotion ? undefined : { opacity: [0.4, 0.78, 0.4], x: [0, 28, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute right-[-8%] top-[10%] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(244,111,80,0.22),transparent_68%)] blur-3xl"
-        />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent opacity-50" />
       </div>
 
       <div className="mx-auto grid max-w-[1840px] gap-6">
-        <motion.div variants={itemVariants} className="overflow-hidden rounded-[44px] border border-[color:var(--border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.045))] shadow-[var(--shadow-strong)] backdrop-blur-2xl">
+        <motion.div variants={itemVariants} className="overflow-hidden rounded-[44px] border border-[color:var(--border)] bg-[var(--surface-strong)] shadow-[var(--shadow-strong)]">
           <div className="relative grid gap-8 p-8 xl:grid-cols-[1.03fr_0.97fr] xl:p-12">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_18%,rgba(216,183,106,0.2),transparent_28%),radial-gradient(circle_at_62%_82%,rgba(244,111,80,0.2),transparent_26%)]" />
             <div className="relative z-10 flex min-h-[410px] flex-col justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[var(--surface)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[var(--gold)]">
                   <Sparkles className="h-4 w-4" />
-                  Exhibit • Connect • Sell
+                  Exhibit â€¢ Connect â€¢ Sell
                 </div>
                 <h1 className="mt-6 max-w-4xl text-6xl font-semibold leading-[0.96] tracking-[-0.07em] text-[var(--text)] 2xl:text-7xl">
                   Choose an Exhibition
@@ -488,7 +476,7 @@ function DesktopExhibitionsExperience({
                   </div>
                 </div>
                 {!selectedAvatarId ? (
-                  <div className="rounded-[22px] border border-[rgba(216,183,106,0.45)] bg-[rgba(216,183,106,0.14)] px-4 py-3 text-sm font-semibold text-[var(--gold)]">
+                  <div className="rounded-[22px] border border-[color:var(--border)] bg-secondary px-4 py-3 text-sm font-semibold text-[var(--gold)]">
                     You can browse exhibitions now. Choose an avatar before entering a live exhibition.
                   </div>
                 ) : null}
@@ -542,7 +530,7 @@ function DesktopExhibitionsExperience({
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="rounded-[36px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-5 shadow-[var(--shadow-soft)] backdrop-blur-2xl xl:p-6">
+        <motion.div variants={itemVariants} className="rounded-[36px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-5 shadow-[var(--shadow-soft)] xl:p-6">
           {error ? (
             <div className="mb-5 rounded-[24px] border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
               <div className="flex items-center justify-between gap-4">
@@ -606,7 +594,7 @@ function DesktopExhibitionsExperience({
                   onClick={() => setStatusFilter(chip.value)}
                   className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
                     statusFilter === chip.value
-                      ? "border-[var(--gold)] bg-[rgba(216,183,106,0.16)] text-[var(--gold)] shadow-[0_16px_40px_rgba(216,183,106,0.12)]"
+                      ? "border-[var(--gold)] bg-secondary text-[var(--gold)] shadow-[var(--shadow-soft)]"
                       : "border-[color:var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--gold)] hover:text-[var(--text)]"
                   }`}
                 >
@@ -675,7 +663,7 @@ function FloatingMapCallout({
     <motion.div
       animate={reduceMotion ? undefined : { y: [0, -8, 0], opacity: [0.92, 1, 0.92] }}
       transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay }}
-      className={`absolute rounded-[22px] border border-[color:var(--border)] bg-[rgba(18,16,28,0.78)] px-4 py-3 text-white shadow-[0_24px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl ${className ?? ""}`}
+      className={`absolute rounded-[22px] border border-[color:var(--border)] bg-[#12101c] px-4 py-3 text-white shadow-[0_24px_70px_rgba(0,0,0,0.28)] ${className ?? ""}`}
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--gold)]">{label}</p>
       <p className="mt-1 text-sm font-semibold">{value}</p>
@@ -704,11 +692,10 @@ function DesktopExhibitionCard({
       variants={reduceMotion ? undefined : { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
       whileHover={reduceMotion ? undefined : { y: -10, scale: 1.01 }}
       transition={{ duration: 0.22 }}
-      className="group/expo relative flex min-h-[620px] flex-col overflow-hidden rounded-[34px] border border-[color:var(--border)] bg-[var(--surface-strong)] shadow-[var(--shadow-soft)] backdrop-blur-2xl"
+      className="group/expo relative flex min-h-[620px] flex-col overflow-hidden rounded-[34px] border border-[color:var(--border)] bg-[var(--surface-strong)] shadow-[var(--shadow-soft)]"
     >
       <div className="absolute inset-0 opacity-0 transition duration-500 group-hover/expo:opacity-100">
         <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[var(--gold)] to-transparent" />
-        <div className="absolute bottom-[-25%] right-[-15%] h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(244,111,80,0.2),transparent_70%)] blur-3xl" />
       </div>
 
       <div className="relative h-64 overflow-hidden">
@@ -925,7 +912,7 @@ function PremiereCountdown({ exhibition, now }: { exhibition: Exhibition; now: n
           ["Minutes", minutes],
           ["Seconds", secs]
         ].map(([unit, value]) => (
-          <div key={unit} className="rounded-2xl bg-white/8 px-2 py-3">
+          <div key={unit} className="rounded-2xl bg-[#1d1d27] px-2 py-3">
             <p className="font-mono text-2xl font-black text-[#FFB199]">{String(value).padStart(2, "0")}</p>
             <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-white/60">{unit}</p>
           </div>
@@ -1016,7 +1003,7 @@ function VendorMetricCard({
   compact?: boolean;
 }) {
   return (
-    <div className={`${compact ? "rounded-[20px] p-3" : "rounded-[24px] p-4"} border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-white/[0.055]`}>
+    <div className={`${compact ? "rounded-[20px] p-3" : "rounded-[24px] p-4"} border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-card`}>
       <div className="flex items-center justify-between gap-3">
         <p className={`${compact ? "text-[10px] tracking-[0.12em]" : "text-xs tracking-[0.14em]"} font-bold uppercase text-[#8A8176] dark:text-white/45`}>{label}</p>
         {Icon ? (
@@ -1047,7 +1034,7 @@ function VendorEmptyState({
   compact?: boolean;
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center rounded-[26px] border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-6 text-center dark:border-[#D6AC63]/30 dark:bg-white/[0.035] ${compact ? "min-h-[180px]" : "min-h-[260px]"}`}>
+    <div className={`flex flex-col items-center justify-center rounded-[26px] border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-6 text-center dark:border-[#D6AC63]/30 dark:bg-card ${compact ? "min-h-[180px]" : "min-h-[260px]"}`}>
       <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#F4C879]">
         <Icon className="h-6 w-6" />
       </span>
@@ -1067,7 +1054,7 @@ function VendorLoadingState({ rows = 3, className = "" }: { rows?: number; class
   return (
     <div className={`grid gap-3 ${className}`}>
       {Array.from({ length: rows }).map((_, index) => (
-        <div key={index} className="min-h-28 animate-pulse rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-white/[0.06]" />
+        <div key={index} className="min-h-28 animate-pulse rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-[#1d1d27]" />
       ))}
     </div>
   );
@@ -1083,8 +1070,13 @@ function VendorAlert({ tone = "error", children }: { tone?: "error" | "warning" 
   return <p className={`rounded-[20px] border px-4 py-3 text-sm font-medium ${toneClass}`}>{children}</p>;
 }
 
+function hasUploadedBrandAsset(value?: string | null) {
+  const normalized = value?.trim() ?? "";
+  return Boolean(normalized) && !normalized.includes("stall-placeholder");
+}
+
 const vendorInputClass =
-  "min-h-12 rounded-[18px] border border-[#E8DDCC] bg-white px-4 py-3 text-sm text-[#1B1A17] outline-none transition placeholder:text-[#8A8176] focus:border-[#B88A3D] dark:border-white/10 dark:bg-white/[0.06] dark:text-[#FFF8EA] dark:placeholder:text-white/38 dark:focus:border-[#D6AC63]/70";
+  "min-h-12 rounded-[18px] border border-[#E8DDCC] bg-white px-4 py-3 text-sm text-[#1B1A17] outline-none transition placeholder:text-[#8A8176] focus:border-[#B88A3D] dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#FFF8EA] dark:placeholder:text-white/38 dark:focus:border-[#D6AC63]/70";
 
 export function VendorDashboardContent() {
   const currentVendor = useExpoStore((state) => state.currentVendor);
@@ -1241,7 +1233,7 @@ export function VendorDashboardContent() {
                         <VendorMetricCard label="Viewers" value={String(viewerCount)} helper="Current persisted live viewers" icon={Activity} />
                       </div>
                       <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                        <VendorPanel className="bg-[#F7F1E8] p-5 shadow-none dark:bg-white/[0.045]">
+                        <VendorPanel className="bg-[#F7F1E8] p-5 shadow-none dark:bg-[#171720]">
                           <h2 className="text-xl font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">Operations</h2>
                           <div className="mt-4 grid gap-3">
                             <VendorMetricCard label="Assigned stall" value={assignedStall?.name ?? "No stall assigned yet"} helper={assignedStall?.category ?? "Request participation before assignment"} icon={Store} />
@@ -1249,7 +1241,7 @@ export function VendorDashboardContent() {
                             <VendorMetricCard label="Pinned product" value={pinnedProduct?.title ?? "No pinned product"} helper={currentLiveSession ? "Pin a product in the live console" : "Start live to showcase products"} icon={Radio} />
                           </div>
                         </VendorPanel>
-                        <VendorPanel className="flex flex-col overflow-hidden bg-[#F7F1E8] shadow-none dark:bg-white/[0.045]">
+                        <VendorPanel className="flex flex-col overflow-hidden bg-[#F7F1E8] shadow-none dark:bg-[#171720]">
                           {dashboard?.vendor.image ? (
                             <AppImage src={dashboard.vendor.image} alt={dashboard.vendor.displayName} className="h-64 w-full rounded-none" />
                           ) : (
@@ -1289,7 +1281,7 @@ export function VendorDashboardContent() {
                       { label: "Stall assigned", complete: Boolean(assignedStall) },
                       { label: "At least 2 active products", complete: productCount >= 2 }
                     ].map((item) => (
-                      <div key={item.label} className="flex items-center gap-3 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-white/[0.045]">
+                      <div key={item.label} className="flex items-center gap-3 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-[#171720]">
                         <span className={`grid h-9 w-9 place-items-center rounded-full ${item.complete ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" : "bg-[#B88A3D]/10 text-[#B88A3D] dark:text-[#F4C879]"}`}>
                           {item.complete ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                         </span>
@@ -1429,8 +1421,8 @@ export function VendorExhibitionsPageContent() {
                   <StatusBadge status={displayStatus === "accepted" ? "active" : displayStatus === "denied" ? "denied" : displayStatus} />
                 </div>
                 {displayStatus === "completed" ? (
-                  <p className="mt-3 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-white/[0.06] dark:text-white/70">Exhibition completed.</p>
-                ) : request.admin_note ? <p className="mt-3 rounded-2xl bg-white px-4 py-3 text-sm text-[#6F675C] dark:bg-white/[0.06] dark:text-white/54">Admin note: {request.admin_note}</p> : null}
+                  <p className="mt-3 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#6F675C] dark:bg-[#1d1d27] dark:text-white/70">Exhibition completed.</p>
+                ) : request.admin_note ? <p className="mt-3 rounded-2xl bg-white px-4 py-3 text-sm text-[#6F675C] dark:bg-[#1d1d27] dark:text-white/54">Admin note: {request.admin_note}</p> : null}
                 {canLeave ? (
                   <button
                     type="button"
@@ -1475,7 +1467,7 @@ export function VendorExhibitionsPageContent() {
                       <div className="flex flex-wrap items-center gap-2">
                         <StatusBadge status={exhibition.status} />
                         {requestDisplay ? <StatusBadge status={requestDisplay === "accepted" ? "active" : requestDisplay} /> : null}
-                        <span className="rounded-full border border-[#E8DDCC] bg-[#FFF7E7] px-3 py-1 text-xs font-semibold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/62">
+                        <span className="rounded-full border border-[#E8DDCC] bg-[#FFF7E7] px-3 py-1 text-xs font-semibold text-[#6F675C] dark:border-white/10 dark:bg-[#1d1d27] dark:text-white/62">
                           {exhibition.stallCount ?? 0} stalls
                         </span>
                         {exhibition.liveSessionsCount ? (
@@ -1490,7 +1482,7 @@ export function VendorExhibitionsPageContent() {
                         </p>
                       ) : null}
                       {isEnded ? (
-                        <p className="vendor-exhibition-note mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 dark:border-white/12 dark:bg-white/10 dark:text-slate-200">
+                        <p className="vendor-exhibition-note mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 dark:border-white/12 dark:bg-[#23232d] dark:text-slate-200">
                           Exhibition has ended. Vendor participation, stall assignment, and live selling are closed.
                         </p>
                       ) : null}
@@ -1544,12 +1536,12 @@ export function VendorExhibitionsPageContent() {
                         </>
                       ) : null}
                       {request?.status === "pending" && !isEnded ? (
-                        <p className="rounded-xl border border-[#E8DDCC] bg-[#FFF7E7] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/62">
+                        <p className="rounded-xl border border-[#E8DDCC] bg-[#FFF7E7] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:border-white/10 dark:bg-[#1d1d27] dark:text-white/62">
                           Awaiting admin approval.
                         </p>
                       ) : null}
                       {isEnded ? (
-                        <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 dark:border-white/12 dark:bg-white/10 dark:text-slate-200">
+                        <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 dark:border-white/12 dark:bg-[#23232d] dark:text-slate-200">
                           Completed exhibition.
                         </p>
                       ) : null}
@@ -1630,7 +1622,7 @@ export function VendorStallPageContent() {
           </VendorPanel>
           <VendorPanel className="overflow-hidden">
             {isLoading ? (
-              <div className="h-[520px] animate-pulse bg-[#F7F1E8] dark:bg-white/[0.06]" />
+              <div className="h-[520px] animate-pulse bg-[#F7F1E8] dark:bg-[#1d1d27]" />
             ) : stall?.image ? (
               <AppImage src={stall.image} alt={stall.name} className="h-80 w-full rounded-none sm:h-full sm:min-h-[520px]" />
             ) : (
@@ -1740,7 +1732,7 @@ export function VendorProductsPageContent() {
               <VendorMetricCard compact label="Stall" value={vendorStall?.name ?? "Not assigned"} helper={vendorStall ? "Products can be created" : "Admin assignment required"} icon={Store} />
             </div>
             {vendorStall ? (
-              <div className="mt-5 rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] p-4 dark:border-white/10 dark:bg-white/[0.045]">
+              <div className="mt-5 rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] p-4 dark:border-white/10 dark:bg-[#171720]">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-black text-[#1B1A17] dark:text-[#FFF8EA]">Live readiness</p>
@@ -1849,9 +1841,13 @@ export function VendorLivePageContent() {
   const activeProductCount = products.filter((product) => product.status === "active").length;
   const pinned = pinnedProduct ?? products.find((product) => product.id === liveSession.pinnedProductId) ?? null;
   const vendorSender = currentUser?.role === "vendor" ? currentUser : null;
+  const hasStallBanner = hasUploadedBrandAsset(vendorStall?.bannerImage);
+  const hasVendorLogo = hasUploadedBrandAsset(vendorStall?.vendorLogo);
   const liveReadiness = [
     { label: "Vendor approved", done: currentVendor?.status === "approved" },
     { label: "Stall assigned", done: Boolean(vendorStall) },
+    { label: "Stall banner uploaded", done: hasStallBanner },
+    { label: "Vendor logo uploaded", done: hasVendorLogo },
     { label: "2 active products", done: activeProductCount >= 2 }
   ];
   const readinessIssues = liveReadiness.filter((item) => !item.done);
@@ -1995,6 +1991,10 @@ export function VendorLivePageContent() {
         setStreamNote("Vendor stall assignment is required before going live.");
         return;
       }
+      if (!hasUploadedBrandAsset(vendorStall.bannerImage) || !hasUploadedBrandAsset(vendorStall.vendorLogo)) {
+        setStreamNote("Upload a stall banner and vendor logo before going live.");
+        return;
+      }
       if (activeProductCount < 2) {
         setStreamNote("Add at least 2 active products before going live.");
         return;
@@ -2135,7 +2135,7 @@ export function VendorLivePageContent() {
             {productError ? <div className="mt-5"><VendorAlert>{productError}</VendorAlert></div> : null}
             <div className="mt-6 grid gap-3">
               {liveReadiness.map((item) => (
-                <div key={item.label} className="flex items-center justify-between gap-3 rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-white/[0.045]">
+                <div key={item.label} className="flex items-center justify-between gap-3 rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-[#171720]">
                   <p className="text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{item.label}</p>
                   <AdminStatusPill status={item.done ? "ready" : "pending"} />
                 </div>
@@ -2187,6 +2187,13 @@ export function VendorLivePageContent() {
               <LiveElapsedCounter startedAt={liveStartedAt} label="Live stream running for" size="md" />
             </div>
           ) : null}
+          {!hasStallBanner || !hasVendorLogo ? (
+            <div className="mt-5">
+              <VendorAlert>
+                Upload a stall banner and vendor logo before going live. These are used for exhibition listings, stall cards, and customer trust.
+              </VendorAlert>
+            </div>
+          ) : null}
           {activeProductCount < 2 ? (
             <div className="mt-5">
               <VendorAlert>
@@ -2196,15 +2203,15 @@ export function VendorLivePageContent() {
           ) : null}
           <div className="hidden" aria-hidden="true">
             {liveReadiness.map((item) => (
-              <div key={item.label} className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3 dark:bg-white/[0.06]">
+              <div key={item.label} className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3 dark:bg-[#1d1d27]">
                 <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-[0px] before:text-sm before:font-black ${item.done ? "bg-emerald-500/10 text-emerald-600 before:content-['OK'] dark:text-emerald-300" : "bg-[#B88A3D]/10 text-[#B88A3D] before:content-['!'] dark:text-[#F4C879]"}`}>
-                  {item.done ? "✓" : "!"}
+                  {item.done ? "âœ“" : "!"}
                 </span>
                 <p className="text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{item.label}</p>
               </div>
             ))}
           </div>
-          <div className="mt-4 grid gap-2 rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] p-1.5 dark:border-white/10 dark:bg-white/[0.045] sm:grid-cols-2">
+          <div className="mt-4 grid gap-2 rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] p-1.5 dark:border-white/10 dark:bg-[#171720] sm:grid-cols-2">
             {[
               ["camera", "Camera Stream"],
               ["rtmp", "RTMP Setup"]
@@ -2214,7 +2221,7 @@ export function VendorLivePageContent() {
                 type="button"
                 onClick={() => setStreamMode(mode as "camera" | "rtmp")}
                 className={`min-h-10 rounded-[16px] px-4 py-2.5 text-sm font-semibold transition ${
-                  streamMode === mode ? "bg-[#1B1A17] text-[#FFF8EA] dark:bg-[#FFF8EA] dark:text-[#11101A]" : "text-[#6F675C] hover:bg-white dark:text-white/54 dark:hover:bg-white/[0.06]"
+                  streamMode === mode ? "bg-[#1B1A17] text-[#FFF8EA] dark:bg-[#FFF8EA] dark:text-[#11101A]" : "text-[#6F675C] hover:bg-white dark:text-white/54 dark:hover:bg-card"
                 }`}
               >
                 {label}
@@ -2229,11 +2236,11 @@ export function VendorLivePageContent() {
             <VendorStreamStatus mode={streamMode} note={streamNote} />
           )}
           <div className="mt-3 grid grid-cols-2 gap-2 sm:flex">
-            <button data-tour-id="vendor-go-live" onClick={startVendorStream} disabled={activeProductCount < 2 || !vendorStall || !currentVendor} className={buttonStyles("primary", "justify-center px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-55 sm:px-6 sm:py-3")}>Go Live</button>
+            <button data-tour-id="vendor-go-live" onClick={startVendorStream} disabled={!isReadyToSell || !vendorStall || !currentVendor} className={buttonStyles("primary", "justify-center px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-55 sm:px-6 sm:py-3")}>Go Live</button>
             <button onClick={stopVendorStream} className={buttonStyles("secondary", "justify-center px-4 py-2.5 text-sm sm:px-6 sm:py-3")}>End Live</button>
             <Link href="/vendor/products" className={buttonStyles("secondary", "hidden justify-center px-6 py-3 sm:inline-flex")}>Manage Products</Link>
           </div>
-          {streamNote ? <p className="mt-3 hidden rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 text-sm text-[#6F675C] dark:border-white/10 dark:bg-white/[0.045] dark:text-white/54 sm:block">{streamNote}</p> : null}
+          {streamNote ? <p className="mt-3 hidden rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 text-sm text-[#6F675C] dark:border-white/10 dark:bg-[#171720] dark:text-white/54 sm:block">{streamNote}</p> : null}
         </VendorPanel>
         <div className="grid gap-4 xl:sticky xl:top-5">
         <VendorPanel id="vendor-live-chat" data-tour-id="vendor-live-chat" className="p-3 sm:p-5">
@@ -2263,7 +2270,7 @@ export function VendorLivePageContent() {
           {orderError ? <p className="mt-3 text-xs font-semibold text-red-500">{orderError}</p> : null}
           <div className="mt-4 grid max-h-56 gap-3 overflow-y-auto pr-1">
             {orders.length ? orders.slice(0, 4).map((order) => (
-              <div key={order.id} className="rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] p-3 dark:border-white/10 dark:bg-white/[0.045]">
+              <div key={order.id} className="rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] p-3 dark:border-white/10 dark:bg-[#171720]">
                 <div className="flex items-center justify-between gap-3">
                   <p className="truncate text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{order.items[0]?.title ?? order.id}</p>
                   <p className="shrink-0 text-sm font-black text-[#F36B4F]">{formatPrice(order.totalAmount)}</p>
@@ -2274,12 +2281,12 @@ export function VendorLivePageContent() {
                 </div>
               </div>
             )) : (
-              <p className="rounded-[20px] border border-dashed border-[#E8DDCC] bg-[#F7F1E8] p-4 text-sm text-[#6F675C] dark:border-white/10 dark:bg-white/[0.045] dark:text-white/54">
+              <p className="rounded-[20px] border border-dashed border-[#E8DDCC] bg-[#F7F1E8] p-4 text-sm text-[#6F675C] dark:border-white/10 dark:bg-[#171720] dark:text-white/54">
                 No orders yet.
               </p>
             )}
           </div>
-          <p className="mt-4 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 text-xs font-semibold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.045] dark:text-white/54">
+          <p className="mt-4 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 text-xs font-semibold text-[#6F675C] dark:border-white/10 dark:bg-[#171720] dark:text-white/54">
             This panel refreshes while you stay in the live console, so your stream is not interrupted just to check new orders.
           </p>
         </VendorPanel>
@@ -2292,7 +2299,7 @@ export function VendorLivePageContent() {
                 {pinned ? "This product is highlighted inside the live room." : "Pin a product so visitors know what to buy during the stream."}
               </p>
             </div>
-            <span className="rounded-full border border-[#E8DDCC] bg-[#F7F1E8] px-3 py-2 text-xs font-black text-[#8A5A24] dark:border-white/10 dark:bg-white/[0.06] dark:text-[#F4C879]">
+            <span className="rounded-full border border-[#E8DDCC] bg-[#F7F1E8] px-3 py-2 text-xs font-black text-[#8A5A24] dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#F4C879]">
               {liveSession.viewerCount ?? 0} viewers
             </span>
           </div>
@@ -2320,13 +2327,13 @@ export function VendorLivePageContent() {
             {isLiveLoading ? (
               <VendorLoadingState rows={3} />
             ) : products.length ? products.map((product) => (
-              <button key={product.id} onClick={() => showProduct(product.id)} className="flex min-h-24 items-center gap-3 rounded-[22px] border border-[#E8DDCC] bg-[#F7F1E8] p-3 text-left transition hover:border-[#F36B4F]/60 dark:border-white/10 dark:bg-white/[0.045]">
+              <button key={product.id} onClick={() => showProduct(product.id)} className="flex min-h-24 items-center gap-3 rounded-[22px] border border-[#E8DDCC] bg-[#F7F1E8] p-3 text-left transition hover:border-[#F36B4F]/60 dark:border-white/10 dark:bg-[#171720]">
                 <AppImage src={product.images[0] ?? "/products/product-placeholder.png"} alt={product.title} className="h-16 w-16 rounded-[18px]" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{product.title}</p>
                   <p className="mt-1 text-sm text-[#6F675C] dark:text-white/52">{formatPrice(product.price)}</p>
                 </div>
-                <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-[#B88A3D] dark:bg-white/[0.08] dark:text-[#F4C879]">
+                <span className="rounded-full bg-white px-3 py-2 text-xs font-bold text-[#B88A3D] dark:bg-card dark:text-[#F4C879]">
                   Pin
                 </span>
                 {product.id === liveSession.pinnedProductId ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : null}
@@ -2400,7 +2407,7 @@ function VendorBargainPanel({
       </div>
 
       {pinned ? (
-        <div className="mt-4 rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] p-3 dark:border-white/10 dark:bg-white/[0.045]">
+        <div className="mt-4 rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] p-3 dark:border-white/10 dark:bg-[#171720]">
           <p className="line-clamp-1 text-sm font-black text-[#1B1A17] dark:text-[#FFF8EA]">{pinned.title}</p>
           <p className="mt-1 text-xs text-[#6F675C] dark:text-white/52">Current price {formatPrice(pinned.price)}</p>
         </div>
@@ -2435,13 +2442,13 @@ function VendorBargainPanel({
 
       {session ? (
         <div className="mt-4 grid gap-2">
-          <div className="rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] p-3 dark:border-white/10 dark:bg-white/[0.045]">
+          <div className="rounded-[20px] border border-[#E8DDCC] bg-[#F7F1E8] p-3 dark:border-white/10 dark:bg-[#171720]">
             <div className="flex justify-between text-sm text-[#6F675C] dark:text-white/56"><span>Live price</span><strong>{formatPrice(livePrice)}</strong></div>
             <div className="mt-2 flex justify-between text-sm text-[#6F675C] dark:text-white/56"><span>{session.acceptedPrice ? "Accepted price" : "Highest group"}</span><strong>{session.acceptedPrice ? formatPrice(session.acceptedPrice) : topGroup ? `${formatPrice(topGroup.offerPrice)} (${topGroup.customers})` : "No active offers"}</strong></div>
             {session.counterPrice ? <div className="mt-2 flex justify-between text-sm text-[#F36B4F]"><span>Counter sent</span><strong>{formatPrice(session.counterPrice)}</strong></div> : null}
           </div>
           {bargainState.offerGroups.slice(0, 4).map((group) => (
-            <div key={group.offerPrice} className="grid grid-cols-[1fr_auto_auto] items-center gap-2 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] p-2 dark:border-white/10 dark:bg-white/[0.045]">
+            <div key={group.offerPrice} className="grid grid-cols-[1fr_auto_auto] items-center gap-2 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] p-2 dark:border-white/10 dark:bg-[#171720]">
               <span className="text-sm font-black text-[#1B1A17] dark:text-[#FFF8EA]">{formatPrice(group.offerPrice)} from {group.customers}</span>
               <button type="button" onClick={() => openCounterWindow(group)} className={buttonStyles("secondary", "px-3 py-2 text-xs")}>Counter</button>
               <button type="button" onClick={() => onAcceptGroup(group.offerPrice)} className={buttonStyles("primary", "px-3 py-2 text-xs")}>Accept</button>
@@ -2560,7 +2567,7 @@ export function VendorOrdersPageContent() {
             <VendorMetricCard compact label="Open" value={String(openOrders.length)} icon={Activity} />
             <VendorMetricCard compact label="Revenue" value={formatPrice(revenue)} icon={ShoppingBag} />
           </div>
-          <div className="mt-6 rounded-[28px] border border-[#E8DDCC] bg-[#FFFDF8] p-3 dark:border-white/10 dark:bg-white/[0.035] sm:p-4">
+          <div className="mt-6 rounded-[28px] border border-[#E8DDCC] bg-[#FFFDF8] p-3 dark:border-white/10 dark:bg-card sm:p-4">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3 px-1">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#B88A3D] dark:text-[#F4C879]">Live order feed</p>
@@ -2617,7 +2624,7 @@ function VendorReceivedOrderCard({
     : "Recent";
 
   return (
-    <article className="rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] p-4 dark:border-white/10 dark:bg-white/[0.05]">
+    <article className="rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] p-4 dark:border-white/10 dark:bg-[#171720]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#B88A3D] dark:text-[#F4C879]">{orderedAt}</p>
@@ -2631,7 +2638,7 @@ function VendorReceivedOrderCard({
 
       <div className="mt-4 grid gap-2">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center gap-3 rounded-[18px] border border-[#E1D3BE] bg-white p-2 dark:border-white/10 dark:bg-black/18">
+          <div key={item.id} className="flex items-center gap-3 rounded-[18px] border border-[#E1D3BE] bg-white p-2 dark:border-white/10 dark:bg-[#11111a]">
             <AppImage src={item.image} alt={item.title} fallbackSrc="/products/product-placeholder.png" className="h-14 w-14 shrink-0 rounded-[14px]" />
             <div className="min-w-0 flex-1">
               <p className="line-clamp-1 text-sm font-black text-[#1B1A17] dark:text-[#FFF8EA]">{item.title}</p>
@@ -2643,12 +2650,12 @@ function VendorReceivedOrderCard({
       </div>
 
       {order.shippingAddress ? (
-        <div className="mt-3 rounded-[18px] border border-[#E1D3BE] bg-white px-3 py-2 text-sm text-[#6F675C] dark:border-white/10 dark:bg-black/18 dark:text-white/62">
+        <div className="mt-3 rounded-[18px] border border-[#E1D3BE] bg-white px-3 py-2 text-sm text-[#6F675C] dark:border-white/10 dark:bg-[#11111a] dark:text-white/62">
           <span className="font-bold text-[#1B1A17] dark:text-[#FFF8EA]">Ship to:</span> {order.shippingAddress}
         </div>
       ) : null}
 
-      <div className="mt-3 grid gap-2 rounded-[18px] border border-[#E1D3BE] bg-white px-3 py-3 text-sm dark:border-white/10 dark:bg-black/18">
+      <div className="mt-3 grid gap-2 rounded-[18px] border border-[#E1D3BE] bg-white px-3 py-3 text-sm dark:border-white/10 dark:bg-[#11111a]">
         <p className="font-black text-[#1B1A17] dark:text-[#FFF8EA]">Customer details</p>
         <div className="grid gap-1 text-[#6F675C] dark:text-white/62 sm:grid-cols-3">
           <span>Name: <strong className="text-[#1B1A17] dark:text-[#FFF8EA]">{order.customerName ?? "Not available"}</strong></span>
@@ -2680,7 +2687,7 @@ function VendorReceivedOrderCard({
       </div>
 
       {fulfillmentOpen ? (
-        <div className="mt-4 rounded-[20px] border border-[#E1D3BE] bg-white p-3 dark:border-white/10 dark:bg-black/18">
+        <div className="mt-4 rounded-[20px] border border-[#E1D3BE] bg-white p-3 dark:border-white/10 dark:bg-[#11111a]">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="text-sm font-black text-[#1B1A17] dark:text-[#FFF8EA]">Fulfillment proof</p>
@@ -2821,7 +2828,7 @@ export function AdminDashboardContent() {
                   <Database className="h-3.5 w-3.5" />
                   Database records only
                 </span>
-                <span className="inline-flex min-h-8 items-center gap-2 rounded-full border border-[#E8DDCC] bg-white px-3 text-xs font-semibold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/60">
+                <span className="inline-flex min-h-8 items-center gap-2 rounded-full border border-[#E8DDCC] bg-white px-3 text-xs font-semibold text-[#6F675C] dark:border-white/10 dark:bg-[#1d1d27] dark:text-white/60">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
                   Live platform
                 </span>
@@ -2876,7 +2883,6 @@ export function AdminDashboardContent() {
 
         <div className="mt-5 grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
           <AdminPanel className="relative overflow-hidden p-5 sm:p-6">
-            <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-[#F36B4F]/10 blur-3xl dark:bg-[#FF785C]/12" />
             <div className="relative">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#B88A3D] dark:text-[#D6AC63]">
                 {hasExhibitions ? "Operations" : "Onboarding"}
@@ -2928,7 +2934,7 @@ export function AdminDashboardContent() {
                   const assignedCount = exhibition.assignedStallsCount ?? 0;
                   const stallCount = exhibition.stallCount ?? exhibition.stall_count ?? 0;
                 return (
-                  <article key={exhibition.id} className="overflow-hidden rounded-[26px] border border-[#E8DDCC] bg-white shadow-[0_16px_45px_rgba(128,91,44,0.1)] dark:border-white/10 dark:bg-white/[0.045]">
+                  <article key={exhibition.id} className="overflow-hidden rounded-[26px] border border-[#E8DDCC] bg-white shadow-[0_16px_45px_rgba(128,91,44,0.1)] dark:border-white/10 dark:bg-[#171720]">
                     <div className="relative h-36">
                       <AppImage src={exhibition.bannerImage || "/stalls/stall-placeholder.png"} alt={exhibition.title} className="h-full w-full rounded-none" fallbackSrc="/stalls/stall-placeholder.png" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
@@ -2970,7 +2976,7 @@ export function AdminDashboardContent() {
 
           <AdminPanel className="p-5 sm:p-6">
             <AdminSectionTitle title="Vendor & Stall Operations" eyebrow="Database operations" href="/admin/stalls" action="Manage stalls" />
-            <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] p-1 dark:border-white/10 dark:bg-white/[0.045]">
+            <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] p-1 dark:border-white/10 dark:bg-[#171720]">
               {[
                 ["stalls", "Stalls"],
                 ["requests", "Requests"],
@@ -2983,7 +2989,7 @@ export function AdminDashboardContent() {
                   className={`min-h-11 rounded-xl px-3 text-xs font-bold transition ${
                     operationsTab === value
                       ? "bg-white text-[#1B1A17] shadow-sm dark:bg-[#FF785C] dark:text-white"
-                      : "text-[#6F675C] hover:bg-white/70 dark:text-white/58 dark:hover:bg-white/[0.08]"
+                      : "text-[#6F675C] hover:bg-card dark:text-white/58 dark:hover:bg-card"
                   }`}
                 >
                   {label}
@@ -3000,7 +3006,7 @@ export function AdminDashboardContent() {
                     recentStalls.length ? (
                       <div className="grid gap-3">
                         {recentStalls.slice(0, 6).map((stall) => (
-                          <div key={stall.id} className="flex items-center justify-between gap-3 rounded-[22px] border border-[#E8DDCC] bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.045]">
+                          <div key={stall.id} className="flex items-center justify-between gap-3 rounded-[22px] border border-[#E8DDCC] bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#171720]">
                             <div className="min-w-0">
                               <p className="truncate text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{stall.stallCode ?? stall.number ?? stall.name}</p>
                               <p className="mt-1 truncate text-xs text-[#6F675C] dark:text-white/56">{stall.exhibitionTitle ?? "Exhibition unavailable"}</p>
@@ -3019,7 +3025,7 @@ export function AdminDashboardContent() {
                     vendorRequests.length ? (
                       <div className="grid gap-3">
                         {vendorRequests.map((request) => (
-                          <div key={request.id} className="rounded-[22px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-white/[0.045]">
+                          <div key={request.id} className="rounded-[22px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <p className="truncate text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{request.vendorName ?? request.vendor_id}</p>
@@ -3038,7 +3044,7 @@ export function AdminDashboardContent() {
 
                   {operationsTab === "assignments" ? (
                     (totals?.stalls ?? 0) ? (
-                      <div className="rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-white/[0.045]">
+                      <div className="rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
                         <div className="flex items-center justify-between gap-3">
                           <div>
                             <p className="text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">Assigned stall coverage</p>
@@ -3046,7 +3052,7 @@ export function AdminDashboardContent() {
                           </div>
                           <span className="text-2xl font-semibold tracking-[-0.04em] text-[#B88A3D] dark:text-[#D6AC63]">{assignmentRatio}%</span>
                         </div>
-                        <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#F1E3CF] dark:bg-white/10">
+                        <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#F1E3CF] dark:bg-[#23232d]">
                           <div className="h-full rounded-full bg-[#F36B4F] transition-all" style={{ width: `${assignmentRatio}%` }} />
                         </div>
                         <Link href="/admin/stalls" className={buttonStyles("secondary", "mt-4 w-full justify-center px-4 py-2.5 text-sm")}>
@@ -3079,7 +3085,7 @@ export function AdminDashboardContent() {
                 </div>
 
                 {hasAnalyticsData ? (
-                  <div className="mt-5 grid gap-2 rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-white/[0.045]">
+                  <div className="mt-5 grid gap-2 rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
                     {[
                       ["Visitors", totals?.liveVisitors ?? 0],
                       ["Orders", totals?.orders ?? 0],
@@ -3088,7 +3094,7 @@ export function AdminDashboardContent() {
                     ].map(([label, value]) => (
                       <div key={String(label)} className="grid grid-cols-[86px_1fr_72px] items-center gap-3 text-xs">
                         <span className="font-semibold text-[#6F675C] dark:text-white/56">{label}</span>
-                        <span className="h-2 overflow-hidden rounded-full bg-[#F1E3CF] dark:bg-white/10">
+                        <span className="h-2 overflow-hidden rounded-full bg-[#F1E3CF] dark:bg-[#23232d]">
                           <span className="block h-full rounded-full bg-[#F36B4F]" style={{ width: `${Math.max(4, Math.round((Number(value) / analyticsMax) * 100))}%` }} />
                         </span>
                         <span className="text-right font-bold text-[#1B1A17] dark:text-[#FFF8EA]">{label === "Revenue" ? formatPrice(Number(value)) : String(value)}</span>
@@ -3099,16 +3105,16 @@ export function AdminDashboardContent() {
                   <AdminEmptyState icon={Activity} title="Analytics will appear soon" description="Once visitors join exhibitions and orders are placed, metrics will populate automatically." compact />
                 )}
 
-                <div className="mt-5 rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] p-4 dark:border-white/10 dark:bg-white/[0.035]">
+                <div className="mt-5 rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] p-4 dark:border-white/10 dark:bg-card">
                   <h3 className="text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">Vendor performance</h3>
                   <div className="mt-3 grid gap-2">
                     {vendorPerformance.length ? vendorPerformance.map((vendor) => (
-                      <div key={vendor.vendorId ?? vendor.vendor} className="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 text-sm dark:bg-white/[0.06]">
+                      <div key={vendor.vendorId ?? vendor.vendor} className="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 text-sm dark:bg-[#1d1d27]">
                         <span className="min-w-0 truncate font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{vendor.vendor}</span>
                         <span className="shrink-0 text-[#6F675C] dark:text-white/56">{formatPrice(vendor.revenue)} | {vendor.viewers} viewers</span>
                       </div>
                     )) : (
-                      <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6F675C] dark:bg-white/[0.06] dark:text-white/56">Vendor performance will appear once vendors start selling.</p>
+                      <p className="rounded-2xl bg-white px-4 py-3 text-sm text-[#6F675C] dark:bg-[#1d1d27] dark:text-white/56">Vendor performance will appear once vendors start selling.</p>
                     )}
                   </div>
                 </div>
@@ -3124,7 +3130,7 @@ export function AdminDashboardContent() {
               ) : recentActivities.length ? recentActivities.map((activity) => {
                 const Icon = getActivityIcon(activity);
                 return (
-                  <Link key={activity.id} href={activity.href ?? "/admin"} className="flex items-center gap-3 rounded-[22px] border border-[#E8DDCC] bg-white p-3 transition hover:-translate-y-0.5 hover:border-[#D6AC63] dark:border-white/10 dark:bg-white/[0.045]">
+                  <Link key={activity.id} href={activity.href ?? "/admin"} className="flex items-center gap-3 rounded-[22px] border border-[#E8DDCC] bg-white p-3 transition hover:-translate-y-0.5 hover:border-[#D6AC63] dark:border-white/10 dark:bg-[#171720]">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#D6AC63]">
                       <Icon className="h-4 w-4" />
                     </span>
@@ -3197,7 +3203,7 @@ function AdminKpiCard({
   loading?: boolean;
 }) {
   return (
-    <div className="rounded-[24px] border border-[#E8DDCC] bg-[#FFFDF8] p-4 shadow-[0_16px_40px_rgba(128,91,44,0.08)] dark:border-white/10 dark:bg-white/[0.045]">
+    <div className="rounded-[24px] border border-[#E8DDCC] bg-[#FFFDF8] p-4 shadow-[0_16px_40px_rgba(128,91,44,0.08)] dark:border-white/10 dark:bg-[#171720]">
       <div className="flex items-center gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] text-[#B88A3D] dark:border-white/10 dark:bg-[#D6AC63]/10 dark:text-[#D6AC63]">
           <Icon className="h-5 w-5" />
@@ -3205,7 +3211,7 @@ function AdminKpiCard({
         <div className="min-w-0">
           <p className="truncate text-xs font-bold uppercase tracking-[0.08em] text-[#6F675C] dark:text-white/52">{label}</p>
           {loading ? (
-            <span className="mt-2 block h-7 w-16 animate-pulse rounded-xl bg-[#E8DDCC] dark:bg-white/10" />
+            <span className="mt-2 block h-7 w-16 animate-pulse rounded-xl bg-[#E8DDCC] dark:bg-[#23232d]" />
           ) : (
             <p className="mt-1 text-2xl font-semibold tracking-[-0.05em] text-[#1B1A17] dark:text-[#FFF8EA]">{value}</p>
           )}
@@ -3218,7 +3224,7 @@ function AdminKpiCard({
 
 function AdminMiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-[#F7F1E8] px-3 py-2 dark:bg-white/[0.06]">
+    <div className="rounded-2xl bg-[#F7F1E8] px-3 py-2 dark:bg-[#1d1d27]">
       <p className="text-[11px] text-[#6F675C] dark:text-white/50">{label}</p>
       <p className="mt-1 text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{value}</p>
     </div>
@@ -3227,7 +3233,7 @@ function AdminMiniStat({ label, value }: { label: string; value: string }) {
 
 function AdminAnalyticsCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[22px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-white/[0.045]">
+    <div className="rounded-[22px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
       <p className="text-xs font-semibold text-[#6F675C] dark:text-white/52">{label}</p>
       <p className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">{value}</p>
     </div>
@@ -3248,7 +3254,7 @@ function AdminActionCard({
   badge?: string;
 }) {
   return (
-    <Link href={href} className="group relative min-h-28 rounded-[22px] border border-[#E8DDCC] bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#F36B4F] hover:shadow-[0_18px_48px_rgba(128,91,44,0.14)] dark:border-white/10 dark:bg-white/[0.045] dark:hover:border-[#FF785C]/70">
+    <Link href={href} className="group relative min-h-28 rounded-[22px] border border-[#E8DDCC] bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#F36B4F] hover:shadow-[0_18px_48px_rgba(128,91,44,0.14)] dark:border-white/10 dark:bg-[#171720] dark:hover:border-[#FF785C]/70">
       {badge ? <span className="absolute right-3 top-3 rounded-full bg-[#F36B4F] px-2 py-0.5 text-[10px] font-bold text-white">{badge}</span> : null}
       <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#D6AC63]">
         <Icon className="h-5 w-5" />
@@ -3279,7 +3285,7 @@ function AdminEmptyState({
   compact?: boolean;
 }) {
   return (
-    <div className={`mt-5 flex flex-col items-center justify-center rounded-[26px] border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-6 text-center dark:border-[#D6AC63]/30 dark:bg-white/[0.035] ${compact ? "min-h-[190px]" : "min-h-[260px]"}`}>
+    <div className={`mt-5 flex flex-col items-center justify-center rounded-[26px] border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-6 text-center dark:border-[#D6AC63]/30 dark:bg-card ${compact ? "min-h-[190px]" : "min-h-[260px]"}`}>
       <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#D6AC63]">
         <Icon className="h-6 w-6" />
       </span>
@@ -3307,7 +3313,7 @@ function AdminLoadingState({ rows = 3, className = "" }: { rows?: number; classN
   return (
     <div className={`grid gap-3 ${spacingClass}`}>
       {Array.from({ length: rows }).map((_, index) => (
-        <div key={index} className="min-h-28 animate-pulse rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-white/[0.06]" />
+        <div key={index} className="min-h-28 animate-pulse rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-[#1d1d27]" />
       ))}
     </div>
   );
@@ -3315,7 +3321,7 @@ function AdminLoadingState({ rows = 3, className = "" }: { rows?: number; classN
 
 function AdminReadinessRow({ label, value, complete }: { label: string; value: number; complete: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-[20px] border border-[#E8DDCC] bg-white px-4 py-3 dark:border-white/10 dark:bg-white/[0.045]">
+    <div className="flex items-center justify-between gap-3 rounded-[20px] border border-[#E8DDCC] bg-white px-4 py-3 dark:border-white/10 dark:bg-[#171720]">
       <div className="flex min-w-0 items-center gap-3">
         <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${complete ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" : "bg-[#B88A3D]/10 text-[#B88A3D] dark:text-[#D6AC63]"}`}>
           {complete ? <CheckCircle2 className="h-4 w-4" /> : <CalendarDays className="h-4 w-4" />}
@@ -3335,7 +3341,7 @@ function AdminStatusPill({ status }: { status: string }) {
       ? "border-[#D6AC63]/35 bg-[#D6AC63]/10 text-[#8A5A24] dark:text-[#F4C879]"
       : ["rejected", "denied", "failed", "cancelled"].includes(normalized)
         ? "border-red-500/25 bg-red-500/10 text-red-700 dark:text-red-200"
-        : "border-[#E8DDCC] bg-[#F7F1E8] text-[#6F675C] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/62";
+        : "border-[#E8DDCC] bg-[#F7F1E8] text-[#6F675C] dark:border-white/10 dark:bg-[#1d1d27] dark:text-white/62";
   return (
     <span className={`inline-flex min-h-7 shrink-0 items-center rounded-full border px-3 text-[11px] font-bold uppercase tracking-[0.08em] ${tone}`}>
       {status}
@@ -3578,20 +3584,20 @@ export function AdminExhibitionsPageContent() {
               >
                 <label className="block text-sm font-semibold text-[#3B352C] dark:text-white/72">
                   Exhibition title
-                  <input value={title} onChange={(event) => setTitle(event.target.value)} required className="mt-2 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition placeholder:text-[#8A8175] focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-white/[0.06] dark:text-[#FFF8EA] dark:placeholder:text-white/36" />
+                  <input value={title} onChange={(event) => setTitle(event.target.value)} required className="mt-2 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition placeholder:text-[#8A8175] focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#FFF8EA] dark:placeholder:text-white/36" />
                 </label>
                 <label className="block text-sm font-semibold text-[#3B352C] dark:text-white/72">
                   Description
-                  <textarea value={description} onChange={(event) => setDescription(event.target.value)} className="mt-2 min-h-28 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition placeholder:text-[#8A8175] focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-white/[0.06] dark:text-[#FFF8EA] dark:placeholder:text-white/36" />
+                  <textarea value={description} onChange={(event) => setDescription(event.target.value)} className="mt-2 min-h-28 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition placeholder:text-[#8A8175] focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#FFF8EA] dark:placeholder:text-white/36" />
                 </label>
                 <div className="grid gap-4 md:grid-cols-2">
                   <label className="block text-sm font-semibold text-[#3B352C] dark:text-white/72">
                     Theme/category
-                    <input value={category} onChange={(event) => setCategory(event.target.value)} placeholder="Exhibition category" className="mt-2 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition placeholder:text-[#8A8175] focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-white/[0.06] dark:text-[#FFF8EA] dark:placeholder:text-white/36" />
+                    <input value={category} onChange={(event) => setCategory(event.target.value)} placeholder="Exhibition category" className="mt-2 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition placeholder:text-[#8A8175] focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#FFF8EA] dark:placeholder:text-white/36" />
                   </label>
                   <label className="block text-sm font-semibold text-[#3B352C] dark:text-white/72">
                     Stall count
-                    <input value={stallCount} onChange={(event) => setStallCount(event.target.value.replace(/\D/g, ""))} required inputMode="numeric" pattern="[0-9]*" min="1" max={selectedMapTemplate.maxStalls} placeholder="Number of stalls" className="mt-2 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition placeholder:text-[#8A8175] focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-white/[0.06] dark:text-[#FFF8EA] dark:placeholder:text-white/36" />
+                    <input value={stallCount} onChange={(event) => setStallCount(event.target.value.replace(/\D/g, ""))} required inputMode="numeric" pattern="[0-9]*" min="1" max={selectedMapTemplate.maxStalls} placeholder="Number of stalls" className="mt-2 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition placeholder:text-[#8A8175] focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#FFF8EA] dark:placeholder:text-white/36" />
                   </label>
                 </div>
                 <label className="block text-sm font-semibold text-[#3B352C] dark:text-white/72">
@@ -3630,7 +3636,7 @@ export function AdminExhibitionsPageContent() {
                     <input value={endAt} onChange={(event) => setEndAt(event.target.value)} type="datetime-local" className="mt-2 w-full rounded-2xl border border-[#E8DDCC] bg-white px-4 py-3 text-[#1B1A17] outline-none transition focus:border-[#F36B4F] focus:ring-4 focus:ring-[#F36B4F]/10 dark:border-white/10 dark:bg-[#1B1D28] dark:text-[#FFF8EA]" />
                   </label>
                 </div>
-                <p className="rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.05] dark:text-white/58">
+                <p className="rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:border-white/10 dark:bg-[#171720] dark:text-white/58">
                   {Number(stallCount || 0) > 0 ? `This will create exactly ${Number(stallCount)} database stall records for this exhibition.` : "Enter a stall count to generate database stall records automatically."}
                 </p>
                 <button disabled={!mapTemplateCapacityOk} className={buttonStyles("primary", "w-full justify-center px-8 py-4 text-base disabled:cursor-not-allowed disabled:opacity-50")}>
@@ -3656,7 +3662,7 @@ export function AdminExhibitionsPageContent() {
                     className={`rounded-[24px] border p-4 text-left transition ${
                       exhibition.id === selectedExhibitionId
                         ? "border-[#F36B4F] bg-[#FFF1E9] shadow-[0_18px_44px_rgba(243,107,79,0.16)] dark:border-[#FF785C]/70 dark:bg-[#FF785C]/10"
-                        : "border-[#E8DDCC] bg-white hover:border-[#D7BE86] dark:border-white/10 dark:bg-white/[0.045] dark:hover:border-[#D6AC63]/35"
+                        : "border-[#E8DDCC] bg-white hover:border-[#D7BE86] dark:border-white/10 dark:bg-[#171720] dark:hover:border-[#D6AC63]/35"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -3727,7 +3733,7 @@ export function AdminExhibitionsPageContent() {
               <AdminPanel data-tour-id="admin-stalls-list" className="p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-3">
                   <AdminSectionTitle title="Generated stalls" eyebrow="Real stall records" />
-                  <span className="rounded-full border border-[#E8DDCC] bg-white px-3 py-1 text-xs font-bold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.05] dark:text-white/58">{stalls.length} loaded</span>
+                  <span className="rounded-full border border-[#E8DDCC] bg-white px-3 py-1 text-xs font-bold text-[#6F675C] dark:border-white/10 dark:bg-[#171720] dark:text-white/58">{stalls.length} loaded</span>
                 </div>
                 <div className="mt-5 grid max-h-[560px] gap-3 overflow-y-auto pr-1">
                   {isLoadingManagement ? (
@@ -3747,7 +3753,7 @@ export function AdminExhibitionsPageContent() {
                         className={`rounded-[22px] border p-4 text-left transition ${
                           selected
                             ? "border-[#F36B4F] bg-[#FFF1E9] shadow-[0_18px_44px_rgba(243,107,79,0.14)] dark:border-[#FF785C]/70 dark:bg-[#FF785C]/10"
-                            : "border-[#E8DDCC] bg-white hover:border-[#D7BE86] dark:border-white/10 dark:bg-white/[0.045] dark:hover:border-[#D6AC63]/35"
+                            : "border-[#E8DDCC] bg-white hover:border-[#D7BE86] dark:border-white/10 dark:bg-[#171720] dark:hover:border-[#D6AC63]/35"
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -3780,7 +3786,7 @@ export function AdminExhibitionsPageContent() {
                     <AdminLoadingState rows={3} className="mt-5" />
                   ) : selectedStall ? (
                     <>
-                      <div className="mt-5 rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-white/[0.045]">
+                      <div className="mt-5 rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#B88A3D] dark:text-[#D6AC63]">{selectedStallLabel}</p>
@@ -3838,7 +3844,7 @@ export function AdminExhibitionsPageContent() {
                           Remove
                         </button>
                       </div>
-                      {!assignableVendors.length ? <p className="mt-3 rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.05] dark:text-white/58">Only approved vendors with accepted requests for this exhibition can be assigned. None are available yet.</p> : null}
+                      {!assignableVendors.length ? <p className="mt-3 rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 text-sm font-semibold text-[#6F675C] dark:border-white/10 dark:bg-[#171720] dark:text-white/58">Only approved vendors with accepted requests for this exhibition can be assigned. None are available yet.</p> : null}
                     </>
                   ) : (
                     <AdminEmptyState icon={Users} title="Select a stall" description="Choose a generated stall to assign or remove an accepted vendor." compact />
@@ -3848,13 +3854,13 @@ export function AdminExhibitionsPageContent() {
                 <AdminPanel className="p-5 sm:p-6">
                   <div className="flex items-start justify-between gap-3">
                     <AdminSectionTitle title="Vendor requests" eyebrow="Participation" />
-                    <span className="rounded-full border border-[#E8DDCC] bg-white px-3 py-1 text-xs font-bold text-[#6F675C] dark:border-white/10 dark:bg-white/[0.05] dark:text-white/58">{requests.length}</span>
+                    <span className="rounded-full border border-[#E8DDCC] bg-white px-3 py-1 text-xs font-bold text-[#6F675C] dark:border-white/10 dark:bg-[#171720] dark:text-white/58">{requests.length}</span>
                   </div>
                   <div className="mt-5 grid gap-3">
                     {isLoadingManagement ? (
                       <AdminLoadingState rows={3} className="mt-0" />
                     ) : requests.length ? requests.map((request) => (
-                      <div key={request.id} className="rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-white/[0.045]">
+                      <div key={request.id} className="rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <p className="truncate font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{request.vendorName ?? request.vendor_id}</p>
@@ -3973,13 +3979,13 @@ export function AdminVendorsPageContent() {
           <div className="mt-6 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
             {isLoading ? (
               Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="min-h-44 animate-pulse rounded-[26px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-white/[0.06]" />
+                <div key={index} className="min-h-44 animate-pulse rounded-[26px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-[#1d1d27]" />
               ))
             ) : vendors.length ? vendors.map((vendor) => {
               const contactDetails = [vendor.ownerName, vendor.email].filter(Boolean).join(" | ");
               const hasProfileDetails = Boolean(contactDetails || vendor.businessCategory || vendor.phone);
               return (
-                <div key={vendor.id} className="rounded-[26px] border border-[#E8DDCC] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.045]">
+                <div key={vendor.id} className="rounded-[26px] border border-[#E8DDCC] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#171720]">
                   <div className="flex items-start justify-between gap-3">
                     <p className="min-w-0 truncate text-lg font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{vendor.displayName || vendor.businessName}</p>
                     <AdminStatusPill status={vendor.status} />
@@ -4181,7 +4187,7 @@ export function AdminStallsPageContent() {
               <div className="mt-5 grid gap-3">
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, index) => (
-                    <div key={index} className="h-32 animate-pulse rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-white/[0.06]" />
+                    <div key={index} className="h-32 animate-pulse rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-[#1d1d27]" />
                   ))
                 ) : selectedExhibitionStalls.length ? (
                   selectedExhibitionStalls.map((stall) => {
@@ -4199,7 +4205,7 @@ export function AdminStallsPageContent() {
                         className={`rounded-[24px] border p-4 text-left shadow-sm transition ${
                           selected
                             ? "border-[#F36B4F] bg-[#FFF1E9] dark:border-[#FF785C]/70 dark:bg-[#FF785C]/10"
-                            : "border-[#E8DDCC] bg-white hover:border-[#D7BE86] dark:border-white/10 dark:bg-white/[0.045] dark:hover:border-[#D6AC63]/35"
+                            : "border-[#E8DDCC] bg-white hover:border-[#D7BE86] dark:border-white/10 dark:bg-[#171720] dark:hover:border-[#D6AC63]/35"
                         }`}
                       >
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -4247,7 +4253,7 @@ export function AdminStallsPageContent() {
             {isLoading || isLoadingRequests ? (
               <div className="mt-5 space-y-3">
                 {Array.from({ length: 5 }).map((_, index) => (
-                  <div key={index} className="h-12 animate-pulse rounded-2xl bg-[#F7F1E8] dark:bg-white/[0.06]" />
+                  <div key={index} className="h-12 animate-pulse rounded-2xl bg-[#F7F1E8] dark:bg-[#1d1d27]" />
                 ))}
               </div>
             ) : !exhibitions.length ? (
@@ -4278,7 +4284,7 @@ export function AdminStallsPageContent() {
             ) : (
               <div className="mt-5 space-y-4">
                 {success ? <p className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-200">{success}</p> : null}
-                <div className="rounded-[26px] border border-[#E8DDCC] bg-[#FFFDF8] p-4 dark:border-white/10 dark:bg-white/[0.055]">
+                <div className="rounded-[26px] border border-[#E8DDCC] bg-[#FFFDF8] p-4 dark:border-white/10 dark:bg-card">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#B8892F] dark:text-[#F4C879]">{selectedStall.stallCode || selectedStall.number || selectedStall.id}</p>
@@ -4413,7 +4419,7 @@ export function AdminOrdersPageContent() {
             {isLoading ? (
               <AdminLoadingState rows={5} className="mt-0" />
             ) : orders.length ? orders.map((order) => (
-              <article key={order.id} className="rounded-[26px] border border-[#E8DDCC] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.045]">
+              <article key={order.id} className="rounded-[26px] border border-[#E8DDCC] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#171720]">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#B88A3D] dark:text-[#D6AC63]">{order.id}</p>
@@ -4509,7 +4515,7 @@ export function AdminAnalyticsPageContent() {
             {isLoading ? (
               <AdminLoadingState rows={2} />
             ) : hasAnalytics ? (
-              <div className="mt-5 rounded-[26px] border border-[#E8DDCC] bg-white p-5 dark:border-white/10 dark:bg-white/[0.045]">
+              <div className="mt-5 rounded-[26px] border border-[#E8DDCC] bg-white p-5 dark:border-white/10 dark:bg-[#171720]">
                 <h2 className="text-lg font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">Signals</h2>
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <AdminMiniStat label="Orders" value={String(analytics?.orders ?? 0)} />
@@ -4536,7 +4542,7 @@ export function AdminAnalyticsPageContent() {
                 {isLoading ? (
                   <AdminLoadingState rows={4} className="mt-0" />
                 ) : (analytics?.recentOrders ?? []).length ? analytics?.recentOrders.map((order) => (
-                  <div key={order.id} className="flex flex-col gap-3 rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-white/[0.045] sm:flex-row sm:items-center sm:justify-between">
+                  <div key={order.id} className="flex flex-col gap-3 rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720] sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{order.id}</p>
                       <p className="mt-1 truncate text-xs text-[#6F675C] dark:text-white/56">{order.vendorName || "Vendor unavailable"} | {formatDateTime(order.createdAt)}</p>
@@ -4558,7 +4564,7 @@ export function AdminAnalyticsPageContent() {
                 {isLoading ? (
                   <AdminLoadingState rows={3} className="mt-0" />
                 ) : (analytics?.vendorPerformance ?? []).length ? analytics?.vendorPerformance.map((vendor) => (
-                  <div key={vendor.vendorId ?? vendor.vendor} className="rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-white/[0.045]">
+                  <div key={vendor.vendorId ?? vendor.vendor} className="rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
                     <div className="flex items-center justify-between gap-3">
                       <p className="min-w-0 truncate text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{vendor.vendor}</p>
                       <span className="text-sm font-bold text-[#B88A3D] dark:text-[#D6AC63]">{formatPrice(vendor.revenue)}</span>
@@ -4584,7 +4590,7 @@ function ProductCard({ product, onChanged }: { product: Product; onChanged: () =
   const discount = product.compareAtPrice > product.price ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100) : 0;
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-[#E8DDCC] bg-[#F7F1E8] shadow-sm transition hover:-translate-y-0.5 hover:border-[#F36B4F]/60 hover:shadow-[0_18px_50px_rgba(128,91,44,0.14)] dark:border-white/10 dark:bg-white/[0.045]">
+    <div className="overflow-hidden rounded-[28px] border border-[#E8DDCC] bg-[#F7F1E8] shadow-sm transition hover:-translate-y-0.5 hover:border-[#F36B4F]/60 hover:shadow-[0_18px_50px_rgba(128,91,44,0.14)] dark:border-white/10 dark:bg-[#171720]">
       <div className="relative">
         <AppImage src={product.images[0] ?? "/products/product-placeholder.png"} alt={product.title} className="h-44 w-full rounded-none" />
         {discount ? <span className="absolute left-3 top-3 rounded-full bg-[#EF3B37] px-3 py-1 text-xs font-black text-white">{discount}% off</span> : null}
@@ -4636,7 +4642,7 @@ function VendorStreamStatus({ mode, note }: { mode: "camera" | "rtmp"; note: str
       : "Click Go Live to generate RTMP details for streaming apps.");
 
   return (
-    <div className="mt-4 flex aspect-video max-h-[56vh] w-full items-center justify-center rounded-[22px] border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-5 text-center dark:border-[#D6AC63]/30 dark:bg-white/[0.035] sm:rounded-[28px] sm:p-8">
+    <div className="mt-4 flex aspect-video max-h-[56vh] w-full items-center justify-center rounded-[22px] border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-5 text-center dark:border-[#D6AC63]/30 dark:bg-card sm:rounded-[28px] sm:p-8">
       <div className="max-w-md">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#F4C879]">
           <Radio className="h-6 w-6" />

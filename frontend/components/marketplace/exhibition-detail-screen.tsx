@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -37,7 +37,7 @@ function exhibitionStatusLabel(status?: Exhibition["status"]) {
 function exhibitionStatusClass(status?: Exhibition["status"]) {
   if (status === "live") return "border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-emerald-400/30 dark:bg-emerald-500/15 dark:text-emerald-200";
   if (status === "scheduled") return "border-amber-200 bg-amber-100 text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-100";
-  return "border-slate-200 bg-slate-100 text-slate-700 dark:border-white/10 dark:bg-white/10 dark:text-slate-200";
+  return "border-slate-200 bg-slate-100 text-slate-700 dark:border-white/10 dark:bg-[#23232d] dark:text-slate-200";
 }
 
 function stallStatus(stall: Stall) {
@@ -52,7 +52,7 @@ function stallStatusClass(stall: Stall) {
   const status = stall.liveStatus || stall.status || "offline";
   if (status === "live") return "border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-emerald-400/30 dark:bg-emerald-500/15 dark:text-emerald-200";
   if (status === "break" || status === "busy") return "border-amber-200 bg-amber-100 text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-100";
-  return "border-slate-200 bg-slate-100 text-slate-700 dark:border-white/10 dark:bg-white/10 dark:text-slate-200";
+  return "border-slate-200 bg-slate-100 text-slate-700 dark:border-white/10 dark:bg-[#23232d] dark:text-slate-200";
 }
 
 function StallRow({
@@ -81,7 +81,7 @@ function StallRow({
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
-        className="grid min-h-24 w-full gap-3 p-4 text-left transition hover:bg-[#FFF8EA] focus:outline-none focus:ring-2 focus:ring-[#FACC15]/40 dark:hover:bg-white/[0.04] sm:grid-cols-[1fr_auto] sm:items-center"
+        className="grid min-h-24 w-full gap-3 p-4 text-left transition hover:bg-[#FFF8EA] focus:outline-none focus:ring-2 focus:ring-[#FACC15]/40 dark:hover:bg-[#23232d] sm:grid-cols-[1fr_auto] sm:items-center"
       >
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -97,11 +97,11 @@ function StallRow({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#5B4631] dark:text-[#D7CBB9] sm:justify-end">
-          <span className="inline-flex items-center gap-2 rounded-xl bg-[#F5F0E8] px-3 py-2 dark:bg-white/10">
+          <span className="inline-flex items-center gap-2 rounded-xl bg-[#F5F0E8] px-3 py-2 dark:bg-[#23232d]">
             <Store className="h-4 w-4 text-[#A16207] dark:text-[#F5D878]" />
             {stall.productCount ?? 0} products
           </span>
-          <span className="inline-flex items-center gap-2 rounded-xl bg-[#F5F0E8] px-3 py-2 dark:bg-white/10">
+          <span className="inline-flex items-center gap-2 rounded-xl bg-[#F5F0E8] px-3 py-2 dark:bg-[#23232d]">
             <Video className="h-4 w-4 text-[#A16207] dark:text-[#F5D878]" />
             {stall.liveStatus === "live" ? "Live room" : "Room"}
           </span>
@@ -123,7 +123,7 @@ function StallRow({
                   {stall.category || "General"}
                 </span>
                 {stall.liveStatus === "live" ? <LiveElapsedCounter startedAt={stall.liveStartedAt} /> : null}
-                <span className="rounded-full bg-[#F5F0E8] px-3 py-1 text-xs font-black text-[#5B4631] dark:bg-white/10 dark:text-[#D7CBB9]">
+                <span className="rounded-full bg-[#F5F0E8] px-3 py-1 text-xs font-black text-[#5B4631] dark:bg-[#23232d] dark:text-[#D7CBB9]">
                   {stall.stallType || "standard"} stall
                 </span>
                 <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-200">
@@ -139,7 +139,7 @@ function StallRow({
                 <Link href={`/stalls/${stall.id}/store`} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#F97316] px-5 text-sm font-black text-white transition hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#F97316]/40">
                   Enter Stall
                 </Link>
-                <Link href={`/live/${stall.id}`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D9C39D] bg-[#FFF8EA] px-5 text-sm font-black text-[#172554] transition hover:bg-[#FFF2CC] dark:border-white/12 dark:bg-white/10 dark:text-[#FFF8EA] dark:hover:bg-white/15">
+                <Link href={`/live/${stall.id}`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D9C39D] bg-[#FFF8EA] px-5 text-sm font-black text-[#172554] transition hover:bg-[#FFF2CC] dark:border-white/12 dark:bg-[#23232d] dark:text-[#FFF8EA] dark:hover:bg-[#2a2935]">
                   Live Room
                 </Link>
               </div>
@@ -215,7 +215,7 @@ export function ExhibitionDetailScreen({ exhibitionId }: { exhibitionId: string 
     <main className="min-h-screen overflow-x-hidden bg-[#F8F1E7] pb-28 text-[#111827] dark:bg-[#070B12] dark:text-[#FFF8EA] md:pb-0">
       <section className="border-b border-[#E8DCC7] bg-[#FFFDF8] dark:border-white/10 dark:bg-[#090D16]">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <Link href="/exhibitions" className="inline-flex items-center gap-2 rounded-full border border-[#D9C39D] bg-white px-4 py-2 text-sm font-black text-[#172554] transition hover:bg-[#FFF7DE] dark:border-white/12 dark:bg-[#121826] dark:text-[#FFF8EA] dark:hover:bg-white/10">
+          <Link href="/exhibitions" className="inline-flex items-center gap-2 rounded-full border border-[#D9C39D] bg-white px-4 py-2 text-sm font-black text-[#172554] transition hover:bg-[#FFF7DE] dark:border-white/12 dark:bg-[#121826] dark:text-[#FFF8EA] dark:hover:bg-[#1d1d27]">
             <ArrowLeft className="h-4 w-4" />
             Back to exhibitions
           </Link>
@@ -294,7 +294,7 @@ export function ExhibitionDetailScreen({ exhibitionId }: { exhibitionId: string 
               This exhibition is completed. Live stalls, vendor chat, product demos, and ordering from this exhibition are closed.
             </p>
             {exhibition?.message ? (
-              <p className="mx-auto mt-3 max-w-xl rounded-xl border border-[#E8DCC7] bg-[#FFF8EA] px-4 py-3 text-sm font-black text-[#7C4A03] dark:border-white/10 dark:bg-white/10 dark:text-[#F5D878]">
+              <p className="mx-auto mt-3 max-w-xl rounded-xl border border-[#E8DCC7] bg-[#FFF8EA] px-4 py-3 text-sm font-black text-[#7C4A03] dark:border-white/10 dark:bg-[#23232d] dark:text-[#F5D878]">
                 {exhibition.message}
               </p>
             ) : null}

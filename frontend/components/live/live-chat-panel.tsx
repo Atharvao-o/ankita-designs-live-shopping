@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent } from "react";
 import { Send } from "lucide-react";
@@ -60,7 +60,7 @@ export function LiveChatPanel({
   return (
     <>
       {isDrawer && open ? (
-        <button type="button" aria-label="Close chat" onClick={onClose} className="fixed inset-0 z-40 bg-slate-950/30 backdrop-blur-sm xl:hidden" />
+        <button type="button" aria-label="Close chat" onClick={onClose} className="fixed inset-0 z-40 bg-slate-950/30 xl:hidden" />
       ) : null}
       <section
         data-tour-id="live-chat"
@@ -96,7 +96,7 @@ export function LiveChatPanel({
               onClick={onClose}
               className={cn(
                 "rounded-full border px-3 py-2 text-xs font-semibold xl:hidden",
-                isDark ? "border-white/10 text-slate-300 hover:bg-white/10" : "border-[#E9D9BE] text-[#7B7065] hover:bg-[#FFF7EB]"
+                isDark ? "border-white/10 text-slate-300 hover:bg-[#1d1d27]" : "border-[#E9D9BE] text-[#7B7065] hover:bg-[#FFF7EB]"
               )}
             >
               Close
@@ -108,7 +108,7 @@ export function LiveChatPanel({
           {messages.length ? (
             messages.map((entry) => <ChatMessageRow key={entry.id} entry={entry} tone={tone} compact={compact} />)
           ) : (
-            <div className={cn("flex min-h-36 flex-col items-center justify-center rounded-[24px] border border-dashed px-5 py-6 text-center text-sm", isDark ? "border-[#D6AC63]/25 bg-white/[0.035] text-slate-400" : "border-[#D7BE86] bg-[#F7F1E8] text-[#7B7065]")}>
+            <div className={cn("flex min-h-36 flex-col items-center justify-center rounded-[24px] border border-dashed px-5 py-6 text-center text-sm", isDark ? "border-[#D6AC63]/25 bg-card text-slate-400" : "border-[#D7BE86] bg-[#F7F1E8] text-[#7B7065]")}>
               <span className={cn("grid h-11 w-11 place-items-center rounded-2xl text-lg", isDark ? "bg-[#D6AC63]/12 text-[#F4C879]" : "bg-[#B88A3D]/10 text-[#B88A3D]")}>?</span>
               <span className="mt-3 font-semibold">No live chat messages yet</span>
               <span className="mt-1 text-xs">Visitor messages from PostgreSQL will appear here.</span>
@@ -129,7 +129,7 @@ export function LiveChatPanel({
             className={cn(
               "min-h-12 min-w-0 flex-1 rounded-full border px-4 py-3 text-sm outline-none transition disabled:cursor-not-allowed",
               isDark
-                ? "border-white/10 bg-white/[0.07] text-white placeholder:text-slate-500 focus:border-[#D6AC63] focus:bg-white/[0.1] disabled:bg-white/5 disabled:text-slate-500"
+                ? "border-white/10 bg-card text-white placeholder:text-slate-500 focus:border-[#D6AC63] focus:bg-card disabled:bg-[#171720] disabled:text-slate-500"
                 : "border-[#E8DDCC] bg-white text-[#17120C] placeholder:text-[#A79A8B] focus:border-[#B88A3D] focus:bg-[#FFFDF8] disabled:bg-[#F4E8D8] disabled:text-[#A79A8B]"
             )}
           />
@@ -161,7 +161,7 @@ function ChatMessageRow({ entry, tone, compact = false }: { entry: LiveChatMessa
     const compactNameColor = isVendor ? "#F7D794" : isSystem ? "#FDBA74" : isDark ? "#93C5FD" : colorForName(entry.senderName);
 
     return (
-      <div className={cn("flex items-start gap-2 rounded-xl px-1.5 py-1.5 text-sm transition", isDark ? "hover:bg-white/[0.06]" : "hover:bg-[#F7F1E8]")}>
+      <div className={cn("flex items-start gap-2 rounded-xl px-1.5 py-1.5 text-sm transition", isDark ? "hover:bg-card" : "hover:bg-[#F7F1E8]")}>
         <span
           className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-[10px] font-black text-white shadow-sm"
           style={{ background: isVendor ? "#C59A4A" : isSystem ? "#B45309" : colorForName(entry.senderName) }}
@@ -189,7 +189,7 @@ function ChatMessageRow({ entry, tone, compact = false }: { entry: LiveChatMessa
             ? "border border-[#C59A4A]/35 bg-[#C59A4A]/12"
             : isSystem
               ? "border border-[#E95F45]/30 bg-[#E95F45]/10"
-              : "border border-white/10 bg-white/[0.06]"
+              : "border border-white/10 bg-card"
           : isVendor
             ? "border border-[#C59A4A]/30 bg-[#FFF7EB]"
           : isSystem
@@ -202,7 +202,7 @@ function ChatMessageRow({ entry, tone, compact = false }: { entry: LiveChatMessa
           <span className="font-bold" style={{ color: isVendor ? "#C59A4A" : isSystem ? "#B45309" : colorForName(entry.senderName) }}>
             {entry.senderName}
           </span>
-          <span className={cn("ml-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em]", isDark ? "bg-white/10 text-[#F7D794]" : "bg-[#F7F1E8] text-[#8A5A24]")}>
+          <span className={cn("ml-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em]", isDark ? "bg-[#1d1d27] text-[#F7D794]" : "bg-[#F7F1E8] text-[#8A5A24]")}>
             {isVendor ? "Vendor" : isSystem ? "Admin" : "Visitor"}
           </span>
         </div>

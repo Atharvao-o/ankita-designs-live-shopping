@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -63,10 +63,10 @@ export function AppHeader({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-card/95 text-foreground shadow-sm backdrop-blur">
-      <div className="marketplace-container flex items-center gap-3 py-3">
+    <header className="sticky top-0 z-40 border-b border-border bg-card text-foreground shadow-[0_10px_32px_rgba(80,52,20,0.08)] dark:shadow-[0_12px_34px_rgba(0,0,0,0.28)]">
+      <div className="marketplace-container flex items-center gap-2 py-3 sm:gap-3">
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Ankita Designs home">
-          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-accent text-sm font-black text-accent-foreground shadow-sm">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-accent text-sm font-black text-accent-foreground shadow-sm ring-1 ring-border">
             AD
           </span>
           <span className="hidden leading-tight sm:block">
@@ -83,17 +83,17 @@ export function AppHeader({
           placeholder="Search exhibitions, stalls, vendors, products"
         />
 
-        <Link className="hidden min-h-10 items-center rounded-2xl border border-border bg-card px-4 text-sm font-black text-foreground transition hover:bg-secondary md:inline-flex" href="/login">
+        <Link className="hidden min-h-10 items-center rounded-2xl border border-border bg-background px-4 text-sm font-black text-foreground transition hover:border-primary hover:bg-secondary md:inline-flex" href="/login">
           Login
         </Link>
         <Link className="hidden min-h-10 items-center rounded-2xl bg-accent px-4 text-sm font-black text-accent-foreground transition hover:brightness-95 lg:inline-flex" href={vendorHref}>
           Vendor
         </Link>
-        <button type="button" onClick={onCart} className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-border bg-card text-foreground transition hover:bg-secondary" aria-label="Open cart">
+        <button type="button" onClick={onCart} className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary" aria-label="Open cart">
           <ShoppingBag className="h-5 w-5" />
         </button>
         <ThemeToggle />
-        <button type="button" className="hidden h-10 w-10 shrink-0 place-items-center rounded-2xl border border-border bg-card text-foreground transition hover:bg-secondary sm:grid" aria-label="Notifications">
+        <button type="button" className="hidden h-10 w-10 shrink-0 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary sm:grid" aria-label="Notifications">
           <Bell className="h-5 w-5" />
         </button>
       </div>
@@ -124,7 +124,7 @@ export function SearchBar({
         onKeyDown={(event) => {
           if (event.key === "Enter") onSubmit();
         }}
-        className="marketplace-input h-11 w-full rounded-2xl px-10 pr-3 text-sm font-semibold outline-none transition focus:border-primary focus:ring-2 focus:ring-ring sm:pr-24"
+        className="marketplace-input h-11 w-full rounded-2xl px-10 pr-3 text-sm font-semibold shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring sm:pr-24"
         placeholder={placeholder}
       />
       <button type="button" onClick={onSubmit} className="absolute right-1.5 top-1/2 hidden h-8 -translate-y-1/2 rounded-xl bg-primary px-4 text-xs font-black text-primary-foreground transition hover:brightness-105 sm:block">
@@ -137,12 +137,12 @@ export function SearchBar({
 export function CategoryStrip({ items }: { items: Array<{ label: string; href: string }> }) {
   return (
     <nav className="border-b border-border bg-background" aria-label="Marketplace categories">
-      <div className="marketplace-container flex gap-2 overflow-x-auto py-2">
+      <div className="marketplace-container flex gap-2 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((item) => (
           <Link
             key={`${item.href}-${item.label}`}
             href={item.href}
-            className="shrink-0 rounded-full border border-transparent px-3 py-2 text-xs font-black text-muted-foreground transition hover:border-border hover:bg-card hover:text-foreground sm:text-sm"
+            className="shrink-0 rounded-full border border-border bg-card px-3 py-2 text-xs font-black text-muted-foreground shadow-sm transition hover:border-primary hover:bg-secondary hover:text-secondary-foreground sm:text-sm"
           >
             {item.label}
           </Link>
@@ -225,7 +225,7 @@ export function MarketplaceBanner({
             {primaryLabel}
           </Link>
           {secondaryHref && secondaryLabel ? (
-            <Link href={secondaryHref} className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/40 bg-white/10 px-5 text-sm font-black text-white transition hover:bg-white/18">
+            <Link href={secondaryHref} className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white bg-white px-5 text-sm font-black text-[#18131f] transition hover:bg-[#fff1c7]">
               {secondaryLabel}
             </Link>
           ) : null}
@@ -307,7 +307,7 @@ export function ExhibitionCard({ exhibition }: { exhibition: Exhibition }) {
   const isEnded = exhibition.status === "ended";
 
   return (
-    <article className="marketplace-card overflow-hidden rounded-[26px] transition hover:-translate-y-0.5 hover:border-primary">
+    <article className="marketplace-card overflow-hidden rounded-[26px] transition hover:-translate-y-1 hover:border-primary hover:shadow-strong">
       <div className="relative aspect-[16/10] bg-muted">
         <AppImage src={exhibition.bannerImage || "/stalls/stall-placeholder.png"} alt={`${exhibition.title} banner`} fallbackSrc="/stalls/stall-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/68 via-black/8 to-transparent" />
@@ -336,7 +336,7 @@ export function StallCard({ stall }: { stall: Stall }) {
   const vendorName = stall.vendorName || stall.assignedVendorName || stall.name || "Vendor Stall";
 
   return (
-    <article className="marketplace-card overflow-hidden rounded-[26px] transition hover:-translate-y-0.5 hover:border-primary">
+    <article className="marketplace-card overflow-hidden rounded-[26px] transition hover:-translate-y-1 hover:border-primary hover:shadow-strong">
       <div className="relative aspect-[16/9] bg-muted">
         <AppImage src={banner} alt={`${vendorName} stall banner`} fallbackSrc="/stalls/stall-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
         <StatusBadge status={status} className="absolute left-3 top-3" />
@@ -361,7 +361,7 @@ export function ProductCard({ product }: { product: Product }) {
   const discount = product.compareAtPrice > product.price ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100) : 0;
 
   return (
-    <article className="marketplace-card overflow-hidden rounded-[24px]">
+    <article className="marketplace-card overflow-hidden rounded-[24px] transition hover:-translate-y-1 hover:border-primary hover:shadow-strong">
       <div className="relative aspect-[4/5] bg-muted">
         <AppImage src={product.images[0] || "/products/product-placeholder.png"} alt={product.title} fallbackSrc="/products/product-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
         {discount ? <span className="absolute left-2 top-2 rounded-full bg-destructive px-2.5 py-1 text-[11px] font-black text-destructive-foreground">{discount}% off</span> : null}
@@ -430,7 +430,7 @@ export function MarketplaceBottomNav({ role = "user" }: { role?: Extract<UserRol
   const items = role === "vendor" ? vendorNav : customerNav;
 
   return (
-    <nav aria-label={`${role} bottom navigation`} className="fixed inset-x-3 bottom-3 z-50 rounded-[28px] border border-border bg-card px-2 py-2 text-card-foreground shadow-soft md:hidden">
+    <nav aria-label={`${role} bottom navigation`} className="fixed inset-x-3 bottom-3 z-50 rounded-[28px] border border-border bg-card px-2 py-2 text-card-foreground shadow-strong md:hidden">
       <div className="grid grid-cols-5 gap-1">
         {items.map((item) => {
           const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));

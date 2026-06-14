@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { Globe, Instagram, MessageCircle, Package, Radio } from "lucide-react";
@@ -154,7 +154,7 @@ export function StallInfoCard({ zone, position }: { zone: TiledStallZone; positi
     <>
       {position ? (
         <aside
-          className="pointer-events-auto absolute z-40 hidden max-h-[calc(100%-32px)] w-[360px] overflow-y-auto rounded-[30px] border border-[#E4C88C]/80 bg-[#FFFDF8]/96 p-5 opacity-100 shadow-[0_24px_80px_rgba(80,52,20,0.24)] backdrop-blur-xl transition-transform duration-150 md:block"
+          className="pointer-events-auto absolute z-40 hidden max-h-[calc(100%-32px)] w-[360px] overflow-y-auto rounded-[30px] border border-[#E4C88C]/80 bg-[#FFFDF8]/96 p-5 opacity-100 shadow-[0_24px_80px_rgba(80,52,20,0.24)] transition-transform duration-150 md:block"
           style={{ transform: `translate3d(${position.x}px, ${position.y}px, 0)` }}
         >
           <span
@@ -169,7 +169,7 @@ export function StallInfoCard({ zone, position }: { zone: TiledStallZone; positi
           {card}
         </aside>
       ) : null}
-      <aside className="fixed inset-x-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 max-h-[58dvh] overflow-y-auto rounded-[30px] border border-[#E4C88C]/80 bg-[#FFFDF8]/96 p-4 shadow-[0_22px_70px_rgba(80,52,20,0.2)] backdrop-blur-xl md:hidden">
+      <aside className="fixed inset-x-3 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 max-h-[58dvh] overflow-y-auto rounded-[30px] border border-[#E4C88C]/80 bg-[#FFFDF8]/96 p-4 shadow-[0_22px_70px_rgba(80,52,20,0.2)] md:hidden">
         {card}
       </aside>
     </>

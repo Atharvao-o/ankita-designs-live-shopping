@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -29,7 +29,9 @@ export function VendorStallSetupScreen() {
 
   const vendorApproved = dashboard?.vendor.status === "approved";
   const activeProducts = products.filter((product) => product.status === "active").length;
-  const canOpenLive = Boolean(stall && vendorApproved && activeProducts >= 2);
+  const hasStallBanner = hasUploadedBrandAsset(bannerImage || stall?.bannerImage);
+  const hasVendorLogo = hasUploadedBrandAsset(vendorLogo || stall?.vendorLogo);
+  const canOpenLive = Boolean(stall && vendorApproved && activeProducts >= 2 && hasStallBanner && hasVendorLogo);
 
   const applyStall = (value: Stall) => {
     setStall(value);
@@ -148,7 +150,7 @@ export function VendorStallSetupScreen() {
                       {stall.exhibitionTitle || "Assigned exhibition"} | {stall.category || "General"}
                     </p>
                   </div>
-                  <span className="w-fit rounded-full border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-2 text-xs font-black uppercase tracking-[0.1em] text-[#8A5A24] dark:border-white/10 dark:bg-white/[0.06] dark:text-[#F4C879]">
+                  <span className="w-fit rounded-full border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-2 text-xs font-black uppercase tracking-[0.1em] text-[#8A5A24] dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#F4C879]">
                     {stall.liveStatus || "offline"}
                   </span>
                 </div>
@@ -222,6 +224,8 @@ export function VendorStallSetupScreen() {
                   <div className="mt-4 grid gap-3">
                     <ReadinessRow label="Admin approved vendor" done={vendorApproved} />
                     <ReadinessRow label="Stall assigned by admin" done={Boolean(stall)} />
+                    <ReadinessRow label="Stall banner uploaded" done={hasStallBanner} helper="Required for marketplace promotion" />
+                    <ReadinessRow label="Vendor logo uploaded" done={hasVendorLogo} helper="Required for stall identity" />
                     <ReadinessRow label="At least 2 active products" done={activeProducts >= 2} helper={`${activeProducts} active products`} />
                   </div>
                   {canOpenLive ? (
@@ -230,9 +234,9 @@ export function VendorStallSetupScreen() {
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                   ) : (
-                    <Link href="/vendor/products" className={buttonStyles("secondary", "mt-5 w-full justify-center px-5 py-3")}>
+                    <Link href={activeProducts >= 2 ? "/vendor/stall" : "/vendor/products"} className={buttonStyles("secondary", "mt-5 w-full justify-center px-5 py-3")}>
                       <Boxes className="mr-2 h-4 w-4" />
-                      Add Products to Unlock Live
+                      {activeProducts >= 2 ? "Complete Branding to Unlock Live" : "Add Products to Unlock Live"}
                     </Link>
                   )}
                 </Panel>
@@ -263,12 +267,17 @@ function Field({ label, value, onChange }: { label: string; value: string; onCha
 }
 
 function inputClass(extra = "") {
-  return `min-h-12 rounded-[18px] border border-[#E8DDCC] bg-white px-4 py-3 text-sm text-[#1B1A17] outline-none transition placeholder:text-[#8A8176] focus:border-[#B88A3D] dark:border-white/10 dark:bg-white/[0.06] dark:text-[#FFF8EA] dark:placeholder:text-white/38 dark:focus:border-[#D6AC63]/70 ${extra}`;
+  return `min-h-12 rounded-[18px] border border-[#E8DDCC] bg-white px-4 py-3 text-sm text-[#1B1A17] outline-none transition placeholder:text-[#8A8176] focus:border-[#B88A3D] dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#FFF8EA] dark:placeholder:text-white/38 dark:focus:border-[#D6AC63]/70 ${extra}`;
+}
+
+function hasUploadedBrandAsset(value?: string | null) {
+  const normalized = value?.trim() ?? "";
+  return Boolean(normalized) && !normalized.includes("stall-placeholder");
 }
 
 function ReadinessRow({ label, done, helper }: { label: string; done: boolean; helper?: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-white/[0.045]">
+    <div className="flex items-center justify-between gap-3 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-[#171720]">
       <div>
         <p className="text-sm font-black text-[#1B1A17] dark:text-[#FFF8EA]">{label}</p>
         {helper ? <p className="mt-1 text-xs font-semibold text-[#6F675C] dark:text-white/56">{helper}</p> : null}

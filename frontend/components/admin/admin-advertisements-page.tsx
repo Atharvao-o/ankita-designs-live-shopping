@@ -28,7 +28,7 @@ function bannerStatus(banner: AdvertisementBanner) {
 function statusClass(status: string) {
   if (status === "Active") return "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200";
   if (status === "Scheduled") return "border-amber-500/25 bg-amber-500/10 text-amber-800 dark:text-amber-100";
-  return "border-[#E8DDCC] bg-[#F7F1E8] text-[#6F675C] dark:border-white/10 dark:bg-white/[0.06] dark:text-white/65";
+  return "border-[#E8DDCC] bg-[#F7F1E8] text-[#6F675C] dark:border-white/10 dark:bg-[#1d1d27] dark:text-white/65";
 }
 
 function formatSchedule(value?: string | null) {
@@ -254,7 +254,7 @@ export function AdminAdvertisementsPageContent() {
                   </label>
                 </div>
 
-                <label className="flex min-h-12 items-center justify-between gap-4 rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-white/[0.05]">
+                <label className="flex min-h-12 items-center justify-between gap-4 rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-[#171720]">
                   <span>
                     <span className="block text-sm font-semibold">Publish immediately</span>
                     <span className="block text-xs text-[#6F675C] dark:text-white/50">Schedule limits still apply when dates are set.</span>
@@ -278,9 +278,9 @@ export function AdminAdvertisementsPageContent() {
               </div>
 
               <div className="mt-5 grid gap-4">
-                {isLoading ? Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-48 animate-pulse rounded-2xl bg-[#F7F1E8] dark:bg-white/[0.06]" />) : null}
+                {isLoading ? Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-48 animate-pulse rounded-2xl bg-[#F7F1E8] dark:bg-[#1d1d27]" />) : null}
                 {!isLoading && !banners.length ? (
-                  <div className="rounded-2xl border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-8 text-center dark:border-[#D6AC63]/30 dark:bg-white/[0.035]">
+                  <div className="rounded-2xl border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-8 text-center dark:border-[#D6AC63]/30 dark:bg-card">
                     <GalleryHorizontal className="mx-auto h-8 w-8 text-[#B88A3D] dark:text-[#D6AC63]" />
                     <p className="mt-3 font-semibold">No advertisement banners yet</p>
                     <p className="mt-1 text-sm text-[#6F675C] dark:text-white/52">The homepage will use its compact marketplace fallback until a banner is published.</p>

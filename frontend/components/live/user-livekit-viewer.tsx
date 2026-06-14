@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { LiveKitRoom, RoomAudioRenderer, VideoTrack, useTracks } from "@livekit/components-react";
 import { Track } from "livekit-client";
@@ -49,7 +49,7 @@ function VendorOnlyVideo() {
     return (
       <div className="flex h-full min-h-[260px] w-full items-center justify-center rounded-[24px] bg-slate-950 p-6 text-center text-white">
         <div className="max-w-sm">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/10">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#1d1d27]">
             <MonitorPlay className="h-7 w-7 text-white" />
           </div>
           <h3 className="mt-5 text-xl font-semibold">Vendor is preparing the stream</h3>

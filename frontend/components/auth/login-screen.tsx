@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -136,11 +136,6 @@ export function LoginScreen() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[color:var(--gold)]/10 to-transparent"
       />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-[-18rem] left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-[color:var(--coral)]/12 blur-3xl"
-      />
-
       <section className="relative z-10 w-full max-w-[520px]">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -150,7 +145,7 @@ export function LoginScreen() {
         >
           <Link
             href="/"
-            className="inline-flex min-h-11 items-center gap-3 rounded-full border border-[color:var(--border)] bg-[var(--surface-strong)] px-4 py-2 text-[var(--text)] shadow-[var(--shadow-soft)] backdrop-blur-xl"
+            className="inline-flex min-h-11 items-center gap-3 rounded-full border border-[color:var(--border)] bg-[var(--surface-strong)] px-4 py-2 text-[var(--text)] shadow-[var(--shadow-soft)]"
           >
             <span className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--gold)]/50 bg-[color:var(--gold)]/10 font-semibold text-[var(--gold)]">
               AE
@@ -181,17 +176,12 @@ export function LoginScreen() {
               setIsSubmitting(false);
             }
           }}
-          className="relative w-full overflow-hidden rounded-[32px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-5 shadow-[var(--shadow-strong)] backdrop-blur-2xl sm:rounded-[36px] sm:p-8"
+          className="relative w-full overflow-hidden rounded-[32px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-5 shadow-[var(--shadow-strong)] sm:rounded-[36px] sm:p-8"
         >
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--gold)] to-transparent"
           />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-[color:var(--gold)]/12 blur-3xl"
-          />
-
           <div className="flex items-start justify-between gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-[color:var(--gold)]/12 text-[var(--gold)] ring-1 ring-[color:var(--gold)]/20">
               <LockKeyhole className="h-6 w-6" />
@@ -245,7 +235,7 @@ export function LoginScreen() {
           </div>
 
           {error ? (
-            <p className="mt-4 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-500">
+            <p className="mt-4 rounded-2xl border border-destructive bg-destructive px-4 py-3 text-sm font-bold text-destructive-foreground">
               {error}
             </p>
           ) : null}
@@ -273,7 +263,7 @@ export function LoginScreen() {
               </div>
             )}
             {googleError ? (
-              <p className="mt-3 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-500">
+              <p className="mt-3 rounded-2xl border border-destructive bg-destructive px-4 py-3 text-sm font-bold text-destructive-foreground">
                 {googleError}
               </p>
             ) : null}

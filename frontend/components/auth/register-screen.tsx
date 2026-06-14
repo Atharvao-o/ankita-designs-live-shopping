@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type { ReactNode } from "react";
 import Link from "next/link";
@@ -60,8 +60,6 @@ export function RegisterScreen() {
       <div className="grid w-full max-w-6xl gap-4 lg:grid-cols-[0.78fr_1fr]">
         <aside className="hidden overflow-hidden rounded-[34px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-7 shadow-[var(--shadow-soft)] lg:block">
           <div className="relative min-h-full">
-            <div className="absolute -right-20 top-10 h-56 w-56 rounded-full bg-[var(--coral)]/20 blur-3xl" />
-            <div className="absolute -bottom-24 left-4 h-72 w-72 rounded-full bg-[var(--gold)]/20 blur-3xl" />
             <div className="relative z-10">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--gold)]">Registration</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-[var(--text)]">
@@ -165,7 +163,7 @@ export function RegisterScreen() {
               setIsSubmitting(false);
             }
           }}
-          className="w-full rounded-[28px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-5 shadow-[var(--shadow-soft)] backdrop-blur sm:rounded-[32px] sm:p-7"
+          className="w-full rounded-[28px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-5 shadow-[var(--shadow-soft)] sm:rounded-[32px] sm:p-7"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -308,8 +306,8 @@ export function RegisterScreen() {
             ) : null}
           </div>
 
-          {error ? <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p> : null}
-          {message ? <p className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{message}</p> : null}
+          {error ? <p className="mt-4 rounded-2xl border border-destructive bg-destructive px-4 py-3 text-sm font-bold text-destructive-foreground">{error}</p> : null}
+          {message ? <p className="mt-4 rounded-2xl border border-emerald-600 bg-emerald-600 px-4 py-3 text-sm font-bold text-white">{message}</p> : null}
           <StatefulButton data-tour-id="auth-submit-button" loading={isSubmitting} disabled={isSubmitting} type="submit" className="mt-6 w-full px-8 py-4 text-base">
             {isSubmitting ? "Creating account..." : "Register"}
           </StatefulButton>
