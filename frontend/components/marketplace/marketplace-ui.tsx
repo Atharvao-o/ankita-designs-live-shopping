@@ -305,26 +305,43 @@ export function CategoryCard({
 export function ExhibitionCard({ exhibition }: { exhibition: Exhibition }) {
   const stallCount = exhibition.stallCount ?? exhibition.stall_count ?? 0;
   const isEnded = exhibition.status === "ended";
+  const href = `/exhibition/${exhibition.id}`;
+  const description = isEnded ? "Exhibition has ended. Live shopping and stall entry are closed." : exhibition.description || "Enter the exhibition and explore verified vendor stalls.";
 
   return (
-    <article className="marketplace-card overflow-hidden rounded-[26px] transition hover:-translate-y-1 hover:border-primary hover:shadow-strong">
-      <div className="relative aspect-[16/10] bg-muted">
+    <article className="marketplace-card overflow-hidden rounded-[22px] transition hover:border-primary hover:shadow-strong md:rounded-[26px] md:hover:-translate-y-1">
+      <Link href={href} className="flex min-h-[132px] gap-3 p-3 md:hidden">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <StatusBadge status={exhibition.status} className="px-2.5 py-0.5 text-[11px]" />
+            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-black text-secondary-foreground">{stallCount} stalls</span>
+          </div>
+          <h3 className="line-clamp-1 text-base font-black leading-5 tracking-[-0.02em] text-foreground">{exhibition.title}</h3>
+          <p className="mt-1 line-clamp-2 text-xs font-semibold leading-5 text-muted-foreground">{description}</p>
+          <p className="mt-2 inline-flex rounded-full bg-muted px-2.5 py-1 text-[11px] font-black text-muted-foreground">Verified vendors</p>
+        </div>
+        <span className="grid w-[112px] shrink-0 place-items-center self-stretch rounded-2xl bg-primary px-3 text-center text-xs font-black leading-4 text-primary-foreground">
+          {isEnded ? "View Ended" : "Enter Exhibition"}
+        </span>
+      </Link>
+
+      <div className="hidden md:block">
+        <div className="relative aspect-[16/10] bg-muted">
         <AppImage src={exhibition.bannerImage || "/stalls/stall-placeholder.png"} alt={`${exhibition.title} banner`} fallbackSrc="/stalls/stall-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/68 via-black/8 to-transparent" />
         <StatusBadge status={exhibition.status} className="absolute left-3 top-3" />
-      </div>
-      <div className="p-4">
-        <h3 className="line-clamp-2 min-h-12 text-lg font-black leading-6 tracking-[-0.03em] text-foreground">{exhibition.title}</h3>
-        <p className="mt-2 line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-muted-foreground">
-          {isEnded ? "Exhibition has ended. Live shopping and stall entry are closed." : exhibition.description || "Enter the exhibition and explore verified vendor stalls."}
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-secondary px-3 py-1 text-xs font-black text-secondary-foreground">{stallCount} stalls</span>
-          <span className="rounded-full bg-muted px-3 py-1 text-xs font-black text-muted-foreground">Verified vendors</span>
         </div>
-        <Link href={`/exhibition/${exhibition.id}`} className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-sm font-black text-primary-foreground transition hover:brightness-105">
-          {isEnded ? "View Ended Exhibition" : "Enter Exhibition"}
-        </Link>
+        <div className="p-4">
+          <h3 className="line-clamp-2 min-h-12 text-lg font-black leading-6 tracking-[-0.03em] text-foreground">{exhibition.title}</h3>
+          <p className="mt-2 line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-muted-foreground">{description}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className="rounded-full bg-secondary px-3 py-1 text-xs font-black text-secondary-foreground">{stallCount} stalls</span>
+            <span className="rounded-full bg-muted px-3 py-1 text-xs font-black text-muted-foreground">Verified vendors</span>
+          </div>
+          <Link href={href} className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-sm font-black text-primary-foreground transition hover:brightness-105">
+            {isEnded ? "View Ended Exhibition" : "Enter Exhibition"}
+          </Link>
+        </div>
       </div>
     </article>
   );
@@ -334,24 +351,45 @@ export function StallCard({ stall }: { stall: Stall }) {
   const status = stall.liveStatus || stall.status || "offline";
   const banner = stall.bannerImage || stall.featuredImage || stall.image || "/stalls/stall-placeholder.png";
   const vendorName = stall.vendorName || stall.assignedVendorName || stall.name || "Vendor Stall";
+  const href = `/stalls/${stall.id}/store`;
 
   return (
-    <article className="marketplace-card overflow-hidden rounded-[26px] transition hover:-translate-y-1 hover:border-primary hover:shadow-strong">
-      <div className="relative aspect-[16/9] bg-muted">
+    <article className="marketplace-card overflow-hidden rounded-[22px] transition hover:border-primary hover:shadow-strong md:rounded-[26px] md:hover:-translate-y-1">
+      <Link href={href} className="flex min-h-[118px] gap-3 p-3 md:hidden">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <StatusBadge status={status} className="px-2.5 py-0.5 text-[11px]" />
+            {stall.isFeatured ? <span className="rounded-full bg-destructive px-2.5 py-0.5 text-[11px] font-black text-destructive-foreground">Offer</span> : null}
+          </div>
+          <h3 className="line-clamp-1 text-base font-black leading-5 tracking-[-0.02em] text-foreground">{vendorName}</h3>
+          <p className="mt-1 line-clamp-1 text-xs font-semibold text-muted-foreground">{stall.category || "General"}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <span className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-black text-secondary-foreground">{stall.productCount ?? 0} products</span>
+            <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-black text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200">Verified</span>
+          </div>
+        </div>
+        <span className="grid w-[96px] shrink-0 place-items-center self-stretch rounded-2xl bg-primary px-3 text-center text-xs font-black leading-4 text-primary-foreground">
+          Enter Stall
+        </span>
+      </Link>
+
+      <div className="hidden md:block">
+        <div className="relative aspect-[16/9] bg-muted">
         <AppImage src={banner} alt={`${vendorName} stall banner`} fallbackSrc="/stalls/stall-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
         <StatusBadge status={status} className="absolute left-3 top-3" />
         {stall.isFeatured ? <span className="absolute right-3 top-3 rounded-full bg-destructive px-3 py-1 text-xs font-black text-destructive-foreground">Offer</span> : null}
-      </div>
-      <div className="p-4">
-        <h3 className="truncate text-base font-black text-foreground">{vendorName}</h3>
-        <p className="mt-1 text-sm font-semibold text-muted-foreground">{stall.category || "General"}</p>
-        <div className="mt-3 flex items-center justify-between gap-2">
-          <span className="rounded-full bg-secondary px-3 py-1 text-xs font-black text-secondary-foreground">{stall.productCount ?? 0} products</span>
-          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200">Verified</span>
         </div>
-        <Link href={`/stalls/${stall.id}/store`} className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-sm font-black text-primary-foreground transition hover:brightness-105">
-          Enter Stall
-        </Link>
+        <div className="p-4">
+          <h3 className="truncate text-base font-black text-foreground">{vendorName}</h3>
+          <p className="mt-1 text-sm font-semibold text-muted-foreground">{stall.category || "General"}</p>
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <span className="rounded-full bg-secondary px-3 py-1 text-xs font-black text-secondary-foreground">{stall.productCount ?? 0} products</span>
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200">Verified</span>
+          </div>
+          <Link href={href} className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-sm font-black text-primary-foreground transition hover:brightness-105">
+            Enter Stall
+          </Link>
+        </div>
       </div>
     </article>
   );
