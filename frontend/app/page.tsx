@@ -10,7 +10,6 @@ import {
   CategoryStrip,
   EmptyState,
   ExhibitionCard,
-  MarketplaceBanner,
   MarketplaceBottomNav,
   PageShell,
   ProductCard,
@@ -112,15 +111,6 @@ export default function Home() {
           </div>
         ) : null}
         <HomepageAdvertisementCarousel />
-        <MarketplaceBanner
-          title="Shop live exhibitions from trusted vendor stalls."
-          subtitle="Watch demos, bargain together, unlock live-only offers, and order securely through Ankita Designs."
-          primaryHref="/exhibitions"
-          primaryLabel="Explore Live Exhibitions"
-          secondaryHref="/register?role=vendor"
-          secondaryLabel="Become a Vendor"
-          image="/images/home/live-shopping-sale-banner.png"
-        />
       </section>
 
       <section className="marketplace-container py-5">
