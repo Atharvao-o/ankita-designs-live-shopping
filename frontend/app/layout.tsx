@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@livekit/components-styles";
 import "@/app/globals.css";
+import { GlobalBackButton } from "@/components/layout/global-back-button";
 import { GlobalSidebar } from "@/components/layout/global-sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { TutorialProvider } from "@/components/tutorial/TutorialProvider";
@@ -43,6 +44,7 @@ export default function RootLayout({
         <ThemeProvider>
           <TutorialProvider>
             {children}
+            <GlobalBackButton />
             <GlobalSidebar />
           </TutorialProvider>
         </ThemeProvider>
