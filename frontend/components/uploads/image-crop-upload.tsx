@@ -6,7 +6,7 @@ import { ImagePlus, RotateCcw, Upload, X } from "lucide-react";
 import { uploadImage } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-type UploadType = "product_image" | "profile_picture" | "stall_banner" | "vendor_logo" | "package_photo" | "advertisement_banner" | "exhibition_banner";
+type UploadType = "product_image" | "profile_picture" | "stall_banner" | "vendor_logo" | "package_photo" | "advertisement_banner" | "exhibition_banner" | "subscription_payment_proof" | "live_slot_payment_proof";
 
 type CropPreset = {
   aspect: number;

@@ -31,6 +31,7 @@ from app.services.db_data_service import (
 )
 from app.services.livekit_service import livekit_service
 from app.services.order_service import order_service
+from app.services.subscription_service import get_vendor_live_access_status
 from app.routes.live_sessions import end_live_session, get_active_live_session_for_vendor, pin_product, start_live_session_for_db
 
 router = APIRouter(prefix="/vendor", tags=["vendor"])
@@ -436,6 +437,16 @@ def start_vendor_live(request_context: Request, payload: LiveSessionStartRequest
                 "message": "You are already live in another exhibition. End that live session before starting a new one.",
             },
         )
+    live_access = get_vendor_live_access_status(db, vendor, stall)
+    if live_access["enforcementEnabled"] and not live_access["canGoLive"]:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "code": live_access["blockingCode"] or "UNKNOWN",
+                "message": live_access["message"],
+                "liveAccess": live_access,
+            },
+        )
     live_session = start_live_session_for_db(db, payload)
     if payload.stream_mode == "rtmp":
         livekit = {
@@ -466,7 +477,7 @@ def start_vendor_live(request_context: Request, payload: LiveSessionStartRequest
             "stall_id": live_session.stall_id,
             "message": "LiveKit is not configured. The stall is marked live for catalogue, chat, and order testing.",
         }
-    return {"live_session": serialize_live_session(db, live_session), "livekit": livekit, "role": "vendor"}
+    return {"live_session": serialize_live_session(db, live_session), "livekit": livekit, "role": "vendor", "live_access": live_access}
 
 
 @router.post("/live/end")

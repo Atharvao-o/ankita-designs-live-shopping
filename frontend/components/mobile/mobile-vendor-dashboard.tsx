@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { ArrowUpRight, BadgeIndianRupee, Handshake, PackagePlus, Radio, ReceiptText, Store, WalletCards } from "lucide-react";
+import { ArrowUpRight, BadgeIndianRupee, CalendarClock, CreditCard, Handshake, PackagePlus, Radio, ReceiptText, Store, WalletCards } from "lucide-react";
 import { AppImage } from "@/components/ui/app-image";
 import { buttonStyles } from "@/components/ui/button";
-import { Exhibition, Stall, VendorDashboard, VendorExhibitionRequest } from "@/lib/types";
+import { Exhibition, LiveSlot, Stall, VendorDashboard, VendorExhibitionRequest, VendorSubscriptionState } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 
 type Props = {
@@ -13,11 +13,13 @@ type Props = {
   stall: Stall | null;
   exhibition: Exhibition | null;
   latestRequest?: VendorExhibitionRequest | null;
+  subscription?: VendorSubscriptionState | null;
+  nextLiveSlot?: LiveSlot | null;
   revenue: number;
   error?: string;
 };
 
-export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequest, revenue, error }: Props) {
+export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequest, subscription, nextLiveSlot, revenue, error }: Props) {
   const vendor = dashboard?.vendor;
   const orders = dashboard?.orders ?? [];
   const currentLiveSession = dashboard?.currentLiveSession ?? (dashboard?.liveSession?.status === "live" ? dashboard.liveSession : null);
@@ -58,6 +60,8 @@ export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequ
             <ActionCard href="/vendor/exhibitions" icon={Handshake} label="Join Exhibition" featured />
             <ActionCard href="/vendor/products" icon={PackagePlus} label="Add Product" />
             <ActionCard href="/vendor/stall" icon={Store} label="Manage Stall" />
+            <ActionCard href="/vendor/subscription" icon={CreditCard} label="Subscription" />
+            <ActionCard href="/vendor/live-slots" icon={CalendarClock} label="Live Slots" />
             {canOpenLive || isLive ? <ActionCard href="/vendor/live" icon={Radio} label="Live Console" /> : null}
             <ActionCard href="/vendor/orders" icon={WalletCards} label="Orders" />
           </div>
@@ -115,6 +119,18 @@ export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequ
           <KpiCard icon={BadgeIndianRupee} label="Revenue" value={formatPrice(revenue)} change="Orders" />
           <KpiCard icon={Radio} label="Visitors" value={String(stats?.visitors ?? dashboard?.activeViewers ?? 0)} change={isLive ? "Live" : "Offline"} />
           <KpiCard icon={Store} label="Products" value={String(productCount)} change={`${stats?.productsSold ?? dashboard?.productsSold ?? 0} sold`} />
+        </div>
+
+        <div className="mobile-vendor-card rounded-[30px] p-4">
+          <p className="mobile-vendor-eyebrow text-xs font-bold uppercase tracking-[0.16em]">Plan & live slot</p>
+          <h3 className="mobile-vendor-heading mt-2 text-xl font-black">{subscription?.currentSubscription?.plan?.name ?? "No active subscription"}</h3>
+          <p className="mobile-vendor-muted mt-1 text-sm">
+            {nextLiveSlot ? `Next slot: ${new Date(nextLiveSlot.startTime).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "No approved live slot yet."}
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <Link href="/vendor/subscription" className={buttonStyles("secondary", "min-h-11 justify-center px-3 py-2 text-xs")}>Plan</Link>
+            <Link href="/vendor/live-slots" className={buttonStyles("primary", "min-h-11 justify-center px-3 py-2 text-xs")}>Slots</Link>
+          </div>
         </div>
 
         <div className="mobile-vendor-card rounded-[30px] p-4">

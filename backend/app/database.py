@@ -183,6 +183,17 @@ def init_database() -> None:
         "CREATE INDEX IF NOT EXISTS ix_saved_posts_post_id ON saved_posts (post_id)",
         "CREATE INDEX IF NOT EXISTS ix_saved_products_user_id ON saved_products (user_id)",
         "CREATE INDEX IF NOT EXISTS ix_saved_products_product_id ON saved_products (product_id)",
+        "CREATE INDEX IF NOT EXISTS ix_subscription_plans_is_active ON subscription_plans (is_active)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_subscriptions_vendor_id ON vendor_subscriptions (vendor_id)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_subscriptions_status ON vendor_subscriptions (status)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_subscriptions_payment_status ON vendor_subscriptions (payment_status)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_subscriptions_ends_at ON vendor_subscriptions (ends_at)",
+        "CREATE INDEX IF NOT EXISTS ix_live_slots_vendor_id ON live_slots (vendor_id)",
+        "CREATE INDEX IF NOT EXISTS ix_live_slots_status ON live_slots (status)",
+        "CREATE INDEX IF NOT EXISTS ix_live_slots_start_time ON live_slots (start_time)",
+        "CREATE INDEX IF NOT EXISTS ix_live_slots_end_time ON live_slots (end_time)",
+        "CREATE INDEX IF NOT EXISTS ix_live_slots_exhibition_id ON live_slots (exhibition_id)",
+        "CREATE INDEX IF NOT EXISTS ix_live_slots_stall_id ON live_slots (stall_id)",
     ]
     try:
         with engine.begin() as connection:

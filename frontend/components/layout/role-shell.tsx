@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { BarChart3, Bell, Boxes, ExternalLink, FileText, GalleryHorizontal, LayoutDashboard, LogOut, Menu, Search, ShoppingBag, Store, UserRound, Users } from "lucide-react";
+import { BarChart3, Bell, Boxes, CalendarClock, CreditCard, ExternalLink, FileText, GalleryHorizontal, LayoutDashboard, LogOut, Menu, Search, ShoppingBag, Store, UserRound, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,6 +21,8 @@ const navByRole: Record<UserRole, Array<{ label: string; href: string; tourId?: 
     { label: "Dashboard", href: "/admin" },
     { label: "Feed", href: "/admin/feed" },
     { label: "Products", href: "/admin/products" },
+    { label: "Subscriptions", href: "/admin/subscriptions" },
+    { label: "Live Slots", href: "/admin/live-slots" },
     { label: "Exhibitions", href: "/admin/exhibitions" },
     { label: "Advertisements", href: "/admin/advertisements" },
     { label: "Vendors", href: "/admin/vendors" },
@@ -32,6 +34,8 @@ const navByRole: Record<UserRole, Array<{ label: string; href: string; tourId?: 
     { label: "Dashboard", href: "/vendor" },
     { label: "Profile", href: "/vendor/profile" },
     { label: "Posts", href: "/vendor/posts" },
+    { label: "Subscription", href: "/vendor/subscription" },
+    { label: "Live Slots", href: "/vendor/live-slots" },
     { label: "Exhibitions", href: "/vendor/exhibitions" },
     { label: "Stall", href: "/vendor/stall" },
     { label: "Products", href: "/vendor/products" },
@@ -48,6 +52,8 @@ const adminNavItems: Array<{ label: string; href: string; icon: LucideIcon; tour
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
   { label: "Feed", href: "/admin/feed", icon: FileText },
   { label: "Products", href: "/admin/products", icon: Boxes },
+  { label: "Subscriptions", href: "/admin/subscriptions", icon: CreditCard },
+  { label: "Live Slots", href: "/admin/live-slots", icon: CalendarClock },
   { label: "Exhibitions", href: "/admin/exhibitions", icon: Store },
   { label: "Advertisements", href: "/admin/advertisements", icon: GalleryHorizontal },
   { label: "Stalls", href: "/admin/stalls", icon: Boxes },

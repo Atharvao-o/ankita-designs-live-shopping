@@ -9,8 +9,10 @@
   FeedResponse,
   FollowStateResponse,
   LiveChatMessage,
+  LiveAccessStatus,
   LiveJoinResponse,
   LiveKitTokenPayload,
+  LiveSlot,
   LiveStartResponse,
   OnboardingState,
   Order,
@@ -27,7 +29,10 @@
   VendorPostStatus,
   VendorPostType,
   VendorPublicProfile,
-  SocialProfile
+  SocialProfile,
+  SubscriptionPlan,
+  VendorSubscription,
+  VendorSubscriptionState
 } from "@/lib/types";
 import { API_URL } from "@/lib/constants";
 
@@ -464,6 +469,150 @@ export function updateAdminProductModeration(productId: string, payload: {
   });
 }
 
+export function getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
+  return request<SubscriptionPlan[]>("/subscription/plans");
+}
+
+export function getLiveSchedule(): Promise<LiveSlot[]> {
+  return request<LiveSlot[]>("/live/schedule");
+}
+
+export function getVendorSubscription(): Promise<VendorSubscriptionState> {
+  return request<VendorSubscriptionState>("/vendor/subscription");
+}
+
+export function requestVendorSubscription(planId: string): Promise<VendorSubscription> {
+  return request<VendorSubscription>("/vendor/subscription/request", {
+    method: "POST",
+    body: JSON.stringify({ planId })
+  });
+}
+
+export function submitVendorSubscriptionPaymentProof(payload: {
+  subscriptionId: string;
+  paymentProofUrl: string;
+  paymentReference?: string;
+}): Promise<VendorSubscription> {
+  return request<VendorSubscription>("/vendor/subscription/payment-proof", {
+    method: "PATCH",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function getVendorLiveSlots(): Promise<LiveSlot[]> {
+  return request<LiveSlot[]>("/vendor/live-slots");
+}
+
+export function requestVendorLiveSlot(payload: {
+  title?: string;
+  startTime: string;
+  endTime: string;
+  slotType: "subscription" | "exhibition" | "paid_extra" | "admin_assigned";
+  exhibitionId?: string;
+  stallId?: string;
+  price?: number;
+}): Promise<LiveSlot> {
+  return request<LiveSlot>("/vendor/live-slots/request", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function submitVendorLiveSlotPaymentProof(slotId: string, payload: {
+  paymentProofUrl: string;
+  paymentReference?: string;
+}): Promise<LiveSlot> {
+  return request<LiveSlot>(`/vendor/live-slots/${slotId}/payment-proof`, {
+    method: "PATCH",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function cancelVendorLiveSlot(slotId: string): Promise<LiveSlot> {
+  return request<LiveSlot>(`/vendor/live-slots/${slotId}/cancel`, { method: "PATCH", body: JSON.stringify({}) });
+}
+
+export function getVendorLiveAccess(stallId?: string): Promise<LiveAccessStatus> {
+  const query = stallId ? `?stall_id=${encodeURIComponent(stallId)}` : "";
+  return request<LiveAccessStatus>(`/vendor/live-access${query}`);
+}
+
+export function getAdminSubscriptions(params?: {
+  status?: string;
+  paymentStatus?: string;
+  vendorId?: string;
+  planId?: string;
+}): Promise<VendorSubscription[]> {
+  const query = new URLSearchParams();
+  if (params?.status && params.status !== "all") query.set("status", params.status);
+  if (params?.paymentStatus && params.paymentStatus !== "all") query.set("payment_status", params.paymentStatus);
+  if (params?.vendorId) query.set("vendor_id", params.vendorId);
+  if (params?.planId) query.set("plan_id", params.planId);
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return request<VendorSubscription[]>(`/admin/subscriptions${suffix}`);
+}
+
+export function approveAdminSubscription(subscriptionId: string): Promise<VendorSubscription> {
+  return request<VendorSubscription>(`/admin/subscriptions/${subscriptionId}/approve`, { method: "PATCH", body: JSON.stringify({}) });
+}
+
+export function rejectAdminSubscription(subscriptionId: string, rejectionReason: string): Promise<VendorSubscription> {
+  return request<VendorSubscription>(`/admin/subscriptions/${subscriptionId}/reject`, {
+    method: "PATCH",
+    body: JSON.stringify({ rejectionReason })
+  });
+}
+
+export function cancelAdminSubscription(subscriptionId: string): Promise<VendorSubscription> {
+  return request<VendorSubscription>(`/admin/subscriptions/${subscriptionId}/cancel`, { method: "PATCH", body: JSON.stringify({}) });
+}
+
+export function getAdminLiveSlots(params?: {
+  status?: string;
+  paymentStatus?: string;
+  vendorId?: string;
+  exhibitionId?: string;
+}): Promise<LiveSlot[]> {
+  const query = new URLSearchParams();
+  if (params?.status && params.status !== "all") query.set("status", params.status);
+  if (params?.paymentStatus && params.paymentStatus !== "all") query.set("payment_status", params.paymentStatus);
+  if (params?.vendorId) query.set("vendor_id", params.vendorId);
+  if (params?.exhibitionId) query.set("exhibition_id", params.exhibitionId);
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return request<LiveSlot[]>(`/admin/live-slots${suffix}`);
+}
+
+export function createAdminLiveSlot(payload: {
+  vendorId: string;
+  title?: string;
+  startTime: string;
+  endTime: string;
+  slotType: "subscription" | "exhibition" | "paid_extra" | "admin_assigned";
+  exhibitionId?: string;
+  stallId?: string;
+  price?: number;
+}): Promise<LiveSlot> {
+  return request<LiveSlot>("/admin/live-slots", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function approveAdminLiveSlot(slotId: string): Promise<LiveSlot> {
+  return request<LiveSlot>(`/admin/live-slots/${slotId}/approve`, { method: "PATCH", body: JSON.stringify({}) });
+}
+
+export function rejectAdminLiveSlot(slotId: string, rejectionReason: string): Promise<LiveSlot> {
+  return request<LiveSlot>(`/admin/live-slots/${slotId}/reject`, {
+    method: "PATCH",
+    body: JSON.stringify({ rejectionReason })
+  });
+}
+
+export function cancelAdminLiveSlot(slotId: string): Promise<LiveSlot> {
+  return request<LiveSlot>(`/admin/live-slots/${slotId}/cancel`, { method: "PATCH", body: JSON.stringify({}) });
+}
+
 type CreateOrderPayload = {
   items: CartItem[];
   payment_method: string;
@@ -854,7 +1003,7 @@ export function updateUserAvatar(avatar: string): Promise<User> {
   });
 }
 
-export function uploadImage(uploadType: "product_image" | "profile_picture" | "stall_banner" | "vendor_logo" | "package_photo" | "advertisement_banner" | "exhibition_banner", file: Blob): Promise<{
+export function uploadImage(uploadType: "product_image" | "profile_picture" | "stall_banner" | "vendor_logo" | "package_photo" | "advertisement_banner" | "exhibition_banner" | "subscription_payment_proof" | "live_slot_payment_proof", file: Blob): Promise<{
   url: string;
   publicId: string;
   width?: number;

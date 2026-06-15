@@ -40,6 +40,9 @@ import {
   getStalls,
   isApiNotFoundError,
   getVendorProducts,
+  getVendorLiveAccess,
+  getVendorLiveSlots,
+  getVendorSubscription,
   getVendorDashboard,
   getVendorExhibitions,
   getVendorExhibitionRequests,
@@ -65,7 +68,7 @@ import {
   updateCartItem,
   updateVendorOrderStatus
 } from "@/lib/api";
-import { AdminDashboardResponse, AdminRecentActivity, AvatarOption, BargainState, Exhibition, LiveKitConnection, Order, Product, Stall, Vendor, VendorExhibitionRequest } from "@/lib/types";
+import { AdminDashboardResponse, AdminRecentActivity, AvatarOption, BargainState, Exhibition, LiveAccessStatus, LiveKitConnection, LiveSlot, Order, Product, Stall, Vendor, VendorExhibitionRequest, VendorSubscriptionState } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { LiveKitStage } from "@/components/live/livekit-stage";
 import { LiveChatPanel } from "@/components/live/live-chat-panel";
@@ -1085,19 +1088,33 @@ export function VendorDashboardContent() {
   const [stall, setStall] = useState<Awaited<ReturnType<typeof getStalls>>[number] | null>(null);
   const [exhibition, setExhibition] = useState<Awaited<ReturnType<typeof getExhibitions>>[number] | null>(null);
   const [participationRequests, setParticipationRequests] = useState<VendorExhibitionRequest[]>([]);
+  const [subscriptionState, setSubscriptionState] = useState<VendorSubscriptionState | null>(null);
+  const [liveSlots, setLiveSlots] = useState<LiveSlot[]>([]);
+  const [liveAccess, setLiveAccess] = useState<LiveAccessStatus | null>(null);
   const [error, setError] = useState("");
   const [isLoadingDashboard, setIsLoadingDashboard] = useState(true);
 
   useEffect(() => {
     let active = true;
     setIsLoadingDashboard(true);
-    Promise.all([getVendorDashboard(), getVendorStall().catch(() => null), getExhibitions(), getVendorExhibitionRequests()])
-      .then(([dashboardResponse, stallResponse, exhibitionResponse, requestResponse]) => {
+    Promise.all([
+      getVendorDashboard(),
+      getVendorStall().catch(() => null),
+      getExhibitions(),
+      getVendorExhibitionRequests(),
+      getVendorSubscription().catch(() => null),
+      getVendorLiveSlots().catch(() => []),
+      getVendorLiveAccess().catch(() => null)
+    ])
+      .then(([dashboardResponse, stallResponse, exhibitionResponse, requestResponse, subscriptionResponse, liveSlotResponse, liveAccessResponse]) => {
         if (!active) return;
         const assignedStall = dashboardResponse.assignedStall ?? stallResponse;
         setDashboard(dashboardResponse);
         setStall(assignedStall);
         setParticipationRequests(requestResponse);
+        setSubscriptionState(subscriptionResponse);
+        setLiveSlots(liveSlotResponse);
+        setLiveAccess(liveAccessResponse);
         setExhibition(assignedStall ? exhibitionResponse.find((item) => item.id === assignedStall.exhibitionId) ?? null : null);
         setError("");
       })
@@ -1194,6 +1211,9 @@ export function VendorDashboardContent() {
   const orderCount = dashboardStats?.orderCount ?? dashboard?.orders.length ?? 0;
   const viewerCount = dashboardStats?.visitors ?? dashboard?.activeViewers ?? 0;
   const liveConsoleUnlocked = Boolean(assignedStall && productCount >= 2);
+  const nextApprovedSlot = liveSlots
+    .filter((slot) => slot.status === "approved" && new Date(slot.endTime).getTime() >= Date.now())
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())[0] ?? null;
   const liveStatus = !assignedStall
     ? "No assigned stall"
     : currentLiveSession?.status === "live"
@@ -1212,6 +1232,8 @@ export function VendorDashboardContent() {
             exhibition={exhibition}
             latestRequest={latestRequest}
             revenue={revenue}
+            subscription={subscriptionState}
+            nextLiveSlot={nextApprovedSlot}
             error={error}
           />
         }
@@ -1243,9 +1265,11 @@ export function VendorDashboardContent() {
                           <h2 className="text-xl font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">Operations</h2>
                           <div className="mt-4 grid gap-3">
                             <VendorMetricCard label="Assigned stall" value={assignedStall?.name ?? "No stall assigned yet"} helper={assignedStall?.category ?? "Request participation before assignment"} icon={Store} />
-                            <VendorMetricCard label="Participation" value={latestRequest ? `${latestRequest.status} request` : "No request submitted"} helper={latestRequest?.message || "Request an exhibition from the exhibitions tab"} icon={UserPlus} />
-                            <VendorMetricCard label="Pinned product" value={pinnedProduct?.title ?? "No pinned product"} helper={currentLiveSession ? "Pin a product in the live console" : "Start live to showcase products"} icon={Radio} />
-                          </div>
+                        <VendorMetricCard label="Participation" value={latestRequest ? `${latestRequest.status} request` : "No request submitted"} helper={latestRequest?.message || "Request an exhibition from the exhibitions tab"} icon={UserPlus} />
+                        <VendorMetricCard label="Pinned product" value={pinnedProduct?.title ?? "No pinned product"} helper={currentLiveSession ? "Pin a product in the live console" : "Start live to showcase products"} icon={Radio} />
+                        <VendorMetricCard label="Plan" value={subscriptionState?.currentSubscription?.plan?.name ?? "No active plan"} helper={subscriptionState?.latestSubscription ? `${subscriptionState.latestSubscription.status} request` : "Request a plan for controlled live access"} icon={ShieldCheck} />
+                        <VendorMetricCard label="Next live slot" value={nextApprovedSlot ? formatDateTime(nextApprovedSlot.startTime) : "No approved slot"} helper={liveAccess?.enforcementEnabled ? liveAccess.message : "Slot gating is in rollout mode"} icon={CalendarClock} />
+                      </div>
                         </VendorPanel>
                         <VendorPanel className="flex flex-col overflow-hidden bg-[#F7F1E8] shadow-none dark:bg-[#171720]">
                           {dashboard?.vendor.image ? (
@@ -1276,6 +1300,8 @@ export function VendorDashboardContent() {
                     <Link href="/vendor/exhibitions" className={buttonStyles("primary", "justify-between px-5 py-4")}>Join Exhibition <ArrowRight className="h-4 w-4" /></Link>
                     <Link href="/vendor/stall" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Stall <ArrowRight className="h-4 w-4" /></Link>
                     <Link href="/vendor/products" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Products <ArrowRight className="h-4 w-4" /></Link>
+                    <Link href="/vendor/subscription" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Subscription <ArrowRight className="h-4 w-4" /></Link>
+                    <Link href="/vendor/live-slots" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Live Slots <ArrowRight className="h-4 w-4" /></Link>
                     <Link data-tour-id="vendor-orders" href="/vendor/orders" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Orders <ArrowRight className="h-4 w-4" /></Link>
                   </div>
                 </VendorPanel>
@@ -1614,6 +1640,11 @@ export function VendorStallPageContent() {
                   <VendorMetricCard compact label="Live status" value={stall.liveStatus ?? "offline"} helper="Customer-facing status" icon={Radio} />
                   <VendorMetricCard compact label="Product limit" value={String(stall.productLimit ?? "-")} helper={stall.stallType ?? "Assigned stall"} icon={Boxes} />
                 </div>
+                <div className="mt-5">
+                  <VendorAlert tone="info">
+                    Controlled live access uses approved live slots. Request or review your slot window from the Live Slots page before planned streams.
+                  </VendorAlert>
+                </div>
                 <div className="mt-6 grid gap-3 pb-[calc(7.5rem+env(safe-area-inset-bottom))] sm:grid-cols-3 sm:pb-0">
                   <Link href="/vendor/products" className={buttonStyles("primary", "justify-center px-5 py-3")}>Add Products</Link>
                   <Link href="/vendor/products" className={buttonStyles("secondary", "justify-center px-5 py-3")}>Manage Products</Link>
@@ -1843,6 +1874,7 @@ export function VendorLivePageContent() {
   const [productError, setProductError] = useState("");
   const [orderError, setOrderError] = useState("");
   const [vendorStall, setVendorStall] = useState<Stall | null>(null);
+  const [liveAccess, setLiveAccess] = useState<LiveAccessStatus | null>(null);
   const [isLiveLoading, setIsLiveLoading] = useState(true);
   const activeProductCount = products.filter((product) => product.status === "active").length;
   const pinned = pinnedProduct ?? products.find((product) => product.id === liveSession.pinnedProductId) ?? null;
@@ -1877,6 +1909,11 @@ export function VendorLivePageContent() {
         setVendorStall(stallResponse);
         setProducts(productResponse);
         setProductError("");
+        getVendorLiveAccess(stallResponse.id).then((response) => {
+          if (active) setLiveAccess(response);
+        }).catch(() => {
+          if (active) setLiveAccess(null);
+        });
         try {
           const response = await getLiveSessionState(stallResponse.id);
           if (!active) {
@@ -1920,6 +1957,7 @@ export function VendorLivePageContent() {
       } catch {
         if (active) {
           setVendorStall(null);
+          setLiveAccess(null);
           setLivekitConnection(null);
           setLiveSessionId("");
           setLiveStartedAt(null);
@@ -2022,6 +2060,9 @@ export function VendorLivePageContent() {
         vendor_id: currentVendor.id,
         stream_mode: streamMode
       });
+      if (response.live_access) {
+        setLiveAccess(response.live_access);
+      }
       const session = response.live_session;
       const sessionId = session.id ?? session.liveSessionId;
       if (sessionId) setLiveSessionId(sessionId);
@@ -2216,6 +2257,37 @@ export function VendorLivePageContent() {
               <VendorAlert>
                 Add at least 2 active products before going live. You currently have {activeProductCount}.
               </VendorAlert>
+            </div>
+          ) : null}
+          {liveAccess ? (
+            <div className="mt-5 rounded-[22px] border border-[#E8DDCC] bg-[#F7F1E8] p-4 dark:border-white/10 dark:bg-[#171720]">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#B88A3D] dark:text-[#F4C879]">Live access</p>
+                  <h3 className="mt-1 text-lg font-black text-[#1B1A17] dark:text-[#FFF8EA]">{liveAccess.message}</h3>
+                  <p className="mt-1 text-sm font-semibold text-[#6F675C] dark:text-white/54">
+                    {liveAccess.enforcementEnabled ? "Live slot enforcement is active." : "Live slot enforcement is currently in rollout mode."}
+                  </p>
+                </div>
+                <AdminStatusPill status={liveAccess.canGoLive ? "access ready" : liveAccess.blockingCode ? liveAccess.blockingCode.replaceAll("_", " ") : "warning"} />
+              </div>
+              {liveAccess.activeSubscription || liveAccess.activeSlot ? (
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[18px] border border-[#E8DDCC] bg-card px-4 py-3 dark:border-white/10">
+                    <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#B88A3D] dark:text-[#F4C879]">Plan</p>
+                    <p className="mt-1 text-sm font-black text-[#1B1A17] dark:text-[#FFF8EA]">{liveAccess.activeSubscription?.plan?.name ?? "No active plan"}</p>
+                  </div>
+                  <div className="rounded-[18px] border border-[#E8DDCC] bg-card px-4 py-3 dark:border-white/10">
+                    <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#B88A3D] dark:text-[#F4C879]">Current slot</p>
+                    <p className="mt-1 text-sm font-black text-[#1B1A17] dark:text-[#FFF8EA]">{liveAccess.activeSlot ? formatDateTime(liveAccess.activeSlot.startTime) : "No active slot"}</p>
+                  </div>
+                </div>
+              ) : null}
+              {liveAccess.warnings.length ? (
+                <div className="mt-4 grid gap-2">
+                  {liveAccess.warnings.map((warning) => <VendorAlert key={warning} tone="info">{warning}</VendorAlert>)}
+                </div>
+              ) : null}
             </div>
           ) : null}
           <div className="hidden" aria-hidden="true">

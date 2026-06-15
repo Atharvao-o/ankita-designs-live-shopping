@@ -295,6 +295,7 @@ export interface LiveStartResponse {
   live_session: Record<string, any>;
   livekit: LiveKitConnection;
   role: "vendor";
+  live_access?: LiveAccessStatus;
 }
 
 export interface LiveJoinResponse {
@@ -502,4 +503,86 @@ export interface FollowStateResponse {
 
 export interface AdminProductModerationItem extends Product {
   vendorName?: string;
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  durationDays: number;
+  productLimit?: number | null;
+  postLimit?: number | null;
+  liveSlotLimit?: number | null;
+  exhibitionJoinLimit?: number | null;
+  adCreditLimit?: number | null;
+  priorityLevel: number;
+  analyticsEnabled: boolean;
+  isActive: boolean;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+export type VendorSubscriptionStatus = "pending_payment" | "active" | "expired" | "cancelled" | "rejected" | string;
+export type VendorSubscriptionPaymentStatus = "unpaid" | "submitted" | "verified" | "rejected" | string;
+
+export interface VendorSubscription {
+  id: string;
+  vendorId: string;
+  vendorName?: string | null;
+  planId: string;
+  plan?: SubscriptionPlan | null;
+  status: VendorSubscriptionStatus;
+  paymentStatus: VendorSubscriptionPaymentStatus;
+  paymentReference?: string | null;
+  paymentProofUrl?: string | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  approvedByAdminId?: string | null;
+  rejectionReason?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+export interface VendorSubscriptionState {
+  currentSubscription?: VendorSubscription | null;
+  latestSubscription?: VendorSubscription | null;
+  history: VendorSubscription[];
+  plans: SubscriptionPlan[];
+}
+
+export type LiveSlotStatus = "requested" | "approved" | "rejected" | "cancelled" | "completed" | "expired" | string;
+export type LiveSlotPaymentStatus = "not_required" | "unpaid" | "submitted" | "verified" | "rejected" | string;
+export type LiveSlotType = "subscription" | "exhibition" | "paid_extra" | "admin_assigned" | string;
+
+export interface LiveSlot {
+  id: string;
+  vendorId: string;
+  vendorName?: string | null;
+  exhibitionId?: string | null;
+  exhibitionTitle?: string | null;
+  stallId?: string | null;
+  stallName?: string | null;
+  slotType: LiveSlotType;
+  title?: string | null;
+  startTime: string;
+  endTime: string;
+  status: LiveSlotStatus;
+  paymentStatus: LiveSlotPaymentStatus;
+  paymentProofUrl?: string | null;
+  price: number;
+  approvedByAdminId?: string | null;
+  rejectionReason?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+export interface LiveAccessStatus {
+  canGoLive: boolean;
+  enforcementEnabled: boolean;
+  blockingCode?: string | null;
+  message: string;
+  activeSubscription?: VendorSubscription | null;
+  activeSlot?: LiveSlot | null;
+  warnings: string[];
 }

@@ -31,7 +31,7 @@ async def upload_image(
     if user is None:
         raise HTTPException(status_code=401, detail={"code": "UNAUTHORIZED", "message": "Login required."})
 
-    if upload_type in {"product_image", "stall_banner", "vendor_logo", "package_photo"} and user.role != "vendor":
+    if upload_type in {"product_image", "stall_banner", "vendor_logo", "package_photo", "subscription_payment_proof", "live_slot_payment_proof"} and user.role != "vendor":
         raise HTTPException(status_code=403, detail={"code": "VENDOR_REQUIRED", "message": "Vendor account required for this upload."})
     if upload_type in {"advertisement_banner", "exhibition_banner"} and user.role != "admin":
         raise HTTPException(status_code=403, detail={"code": "ADMIN_REQUIRED", "message": "Admin account required for this upload."})
