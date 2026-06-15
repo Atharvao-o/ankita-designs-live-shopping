@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HomepageAdvertisementCarousel } from "@/components/marketplace/homepage-advertisement-carousel";
 import {
   CategoryRail,
@@ -12,7 +12,34 @@ import {
 } from "@/components/social/social-shopping";
 
 export default function Home() {
-  const { posts, stalls, exhibitions, isLoading, error } = useSocialShoppingData(16);
+  const { posts, stalls, exhibitions, isLoading, isLoadingMore, hasMore, loadMore, error } = useSocialShoppingData(8);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const loadTriggerRef = useRef<HTMLDivElement | null>(null);
+  const visiblePosts = useMemo(() => posts.slice(0, visibleCount), [posts, visibleCount]);
+  const hasHiddenPosts = visibleCount < posts.length;
+  const canLoadMore = hasHiddenPosts || hasMore;
+
+  const loadNextBatch = useCallback(() => {
+    if (isLoading || isLoadingMore) return;
+    if (hasHiddenPosts) {
+      setVisibleCount((count) => Math.min(count + 5, posts.length));
+      return;
+    }
+    if (hasMore) void loadMore();
+  }, [hasHiddenPosts, hasMore, isLoading, isLoadingMore, loadMore, posts.length]);
+
+  useEffect(() => {
+    const target = loadTriggerRef.current;
+    if (!target || !canLoadMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadNextBatch();
+      },
+      { rootMargin: "700px 0px" }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [canLoadMore, loadNextBatch, posts.length, visibleCount]);
 
   return (
     <SocialShell>
@@ -25,27 +52,25 @@ export default function Home() {
           </div>
         ) : null}
         <HomepageAdvertisementCarousel />
-        <section className="rounded-[30px] border border-border bg-card p-4 text-card-foreground shadow-soft">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Social shopping feed</p>
-              <h1 className="mt-1 text-2xl font-black tracking-[-0.05em] text-foreground sm:text-3xl">Discover small vendors, product drops, and live deals.</h1>
-              <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">
-                Browse vendor posts, save products, enter live rooms, and buy directly from trusted sellers.
-              </p>
-            </div>
-            <Link href="/explore" className="hidden shrink-0 rounded-2xl bg-primary px-4 py-3 text-sm font-black text-primary-foreground sm:inline-flex">
-              Explore
-            </Link>
-          </div>
-        </section>
         {isLoading ? (
           <div className="grid gap-4">
             {Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-[520px] animate-pulse rounded-[30px] bg-card" />)}
           </div>
         ) : posts.length ? (
           <div className="grid gap-5">
-            {posts.map((post) => <FeedCard key={post.id} post={post} />)}
+            {visiblePosts.map((post) => <FeedCard key={`${post.isRealPost ? "post" : "product"}-${post.id}`} post={post} />)}
+            <div ref={loadTriggerRef} className="min-h-8" aria-hidden="true">
+              {canLoadMore ? (
+                <div className="grid gap-3 py-2">
+                  <div className="mx-auto h-1.5 w-16 overflow-hidden rounded-full bg-muted">
+                    <span className="block h-full w-1/2 animate-pulse rounded-full bg-primary" />
+                  </div>
+                  {isLoadingMore ? <div className="h-[420px] animate-pulse rounded-[30px] bg-card" /> : null}
+                </div>
+              ) : (
+                <p className="py-4 text-center text-xs font-bold text-muted-foreground">You are all caught up.</p>
+              )}
+            </div>
           </div>
         ) : (
           <SocialEmptyState title="No feed posts yet" description="Active vendor products will become social shopping posts when vendors publish catalogue items." />

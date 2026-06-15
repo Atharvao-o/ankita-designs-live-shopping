@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Bookmark,
   BookmarkCheck,
@@ -12,7 +12,6 @@ import {
   MessageCircle,
   PackageOpen,
   ReceiptText,
-  Search,
   Settings,
   ShoppingBag,
   Store,
@@ -140,6 +139,8 @@ function postFromVendorPost(post: VendorPost): SocialPost {
 export function useSocialShoppingData(limitProducts = 30) {
   const [data, setData] = useState<SocialData>({ products: [], stalls: [], exhibitions: [], posts: [], realPosts: [] });
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -148,11 +149,17 @@ export function useSocialShoppingData(limitProducts = 30) {
       .then(([feedResult, productResult, stallResult, exhibitionResult]) => {
         if (!active) return;
         const realPosts = feedResult.status === "fulfilled" ? feedResult.value.posts : [];
-        const products = productResult.status === "fulfilled" ? productResult.value.filter((product) => product.status === "active").slice(0, limitProducts) : [];
+        const activeProducts = productResult.status === "fulfilled" ? productResult.value.filter((product) => product.status === "active") : [];
+        const products = activeProducts.slice(0, limitProducts);
         const stalls = stallResult.status === "fulfilled" ? stallResult.value : [];
         const exhibitions = exhibitionResult.status === "fulfilled" ? exhibitionResult.value.filter((item) => item.status !== "draft" && item.status !== "cancelled") : [];
-        const posts = realPosts.length ? realPosts.map(postFromVendorPost) : products.map((product) => postFromProduct(product, stalls));
+        const linkedProductIds = new Set(realPosts.map((post) => post.productId).filter(Boolean));
+        const cataloguePosts = activeProducts
+          .filter((product) => !linkedProductIds.has(product.id))
+          .map((product) => postFromProduct(product, stalls));
+        const posts = [...realPosts.map(postFromVendorPost), ...cataloguePosts];
         setData({ products, stalls, exhibitions, posts, realPosts });
+        setNextCursor(feedResult.status === "fulfilled" ? feedResult.value.nextCursor ?? null : null);
         setError(
           feedResult.status === "rejected" && productResult.status === "rejected" && stallResult.status === "rejected" && exhibitionResult.status === "rejected"
             ? "Social shopping data is unavailable. Start the backend to load vendors, products, and events."
@@ -167,7 +174,29 @@ export function useSocialShoppingData(limitProducts = 30) {
     };
   }, [limitProducts]);
 
-  return { ...data, isLoading, error };
+  const loadMore = useCallback(async () => {
+    if (!nextCursor || isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const response = await getFeed({ cursor: nextCursor, limit: limitProducts });
+      setData((current) => {
+        const knownPostIds = new Set(current.realPosts.map((post) => post.id));
+        const newRealPosts = response.posts.filter((post) => !knownPostIds.has(post.id));
+        return {
+          ...current,
+          realPosts: [...current.realPosts, ...newRealPosts],
+          posts: [...current.posts, ...newRealPosts.map(postFromVendorPost)]
+        };
+      });
+      setNextCursor(response.nextCursor ?? null);
+    } catch (errorValue) {
+      setError(errorValue instanceof Error ? errorValue.message : "Could not load more posts.");
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, limitProducts, nextCursor]);
+
+  return { ...data, isLoading, isLoadingMore, hasMore: Boolean(nextCursor), loadMore, error };
 }
 
 export function SocialShell({ children, rightRail }: { children: React.ReactNode; rightRail?: React.ReactNode }) {
@@ -197,19 +226,15 @@ function SocialTopBar() {
             <span className="block text-[11px] font-black uppercase tracking-[0.14em] text-primary">Social Shopping</span>
           </span>
         </Link>
-        <Link href="/explore" className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <span className="block h-11 rounded-2xl border border-border bg-background py-3 pl-10 pr-3 text-sm font-semibold text-muted-foreground">
-            Search vendors, products, categories
-          </span>
-        </Link>
-        <ThemeToggle />
-        <button type="button" onClick={openCart} className="grid h-10 w-10 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary" aria-label="Open cart">
-          <ShoppingBag className="h-5 w-5" />
-        </button>
-        <Link href="/profile" className="hidden h-10 w-10 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary sm:grid" aria-label="Profile">
-          <UserRound className="h-5 w-5" />
-        </Link>
+        <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
+          <button type="button" onClick={openCart} className="grid h-10 w-10 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary" aria-label="Open cart">
+            <ShoppingBag className="h-5 w-5" />
+          </button>
+          <Link href="/profile" className="hidden h-10 w-10 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary sm:grid" aria-label="Profile">
+            <UserRound className="h-5 w-5" />
+          </Link>
+        </div>
       </div>
     </header>
   );
