@@ -84,8 +84,12 @@ export function GlobalSidebar() {
     pathname.startsWith("/product/") ||
     pathname.startsWith("/v/") ||
     pathname.startsWith("/profile");
+  const hasCustomerPageNavigation =
+    pathname === "/cart" ||
+    pathname === "/orders" ||
+    pathname === "/exhibitions";
 
-  if (pathname.startsWith("/live/") || isSocialShoppingRoute) {
+  if (pathname.startsWith("/live/") || isSocialShoppingRoute || hasCustomerPageNavigation) {
     return null;
   }
 
