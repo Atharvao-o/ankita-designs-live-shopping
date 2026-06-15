@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { ArrowUpRight, BadgeIndianRupee, CalendarClock, CreditCard, Handshake, PackagePlus, Radio, ReceiptText, Store, WalletCards } from "lucide-react";
+import { ArrowUpRight, BadgeIndianRupee, CalendarClock, CreditCard, FilePlus2, Handshake, PackagePlus, Radio, ReceiptText, Store, Trash2, WalletCards } from "lucide-react";
 import { AppImage } from "@/components/ui/app-image";
 import { buttonStyles } from "@/components/ui/button";
-import { Exhibition, LiveSlot, Stall, VendorDashboard, VendorExhibitionRequest, VendorSubscriptionState } from "@/lib/types";
+import { Exhibition, LiveSlot, Stall, VendorDashboard, VendorExhibitionRequest, VendorPost, VendorSubscriptionState } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 
 type Props = {
@@ -15,11 +15,28 @@ type Props = {
   latestRequest?: VendorExhibitionRequest | null;
   subscription?: VendorSubscriptionState | null;
   nextLiveSlot?: LiveSlot | null;
+  posts?: VendorPost[];
+  archivingPostId?: string;
+  onArchivePost?: (postId: string) => Promise<void>;
+  postActionError?: string;
   revenue: number;
   error?: string;
 };
 
-export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequest, subscription, nextLiveSlot, revenue, error }: Props) {
+export function MobileVendorDashboard({
+  dashboard,
+  stall,
+  exhibition,
+  latestRequest,
+  subscription,
+  nextLiveSlot,
+  posts = [],
+  archivingPostId = "",
+  onArchivePost,
+  postActionError,
+  revenue,
+  error
+}: Props) {
   const vendor = dashboard?.vendor;
   const orders = dashboard?.orders ?? [];
   const currentLiveSession = dashboard?.currentLiveSession ?? (dashboard?.liveSession?.status === "live" ? dashboard.liveSession : null);
@@ -50,6 +67,12 @@ export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequ
     });
   }, [orders]);
   const maxTrendValue = Math.max(...salesTrend.map((item) => item.value), 0);
+  const activePosts = posts.filter((post) => post.status !== "archived");
+
+  const confirmArchivePost = async (postId: string) => {
+    if (!onArchivePost || !window.confirm("Delete this post from your active feed?")) return;
+    await onArchivePost(postId);
+  };
 
   return (
     <section className="mobile-vendor-page">
@@ -59,6 +82,7 @@ export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequ
           <div className="grid grid-cols-2 gap-3">
             <ActionCard href="/vendor/exhibitions" icon={Handshake} label="Join Exhibition" featured />
             <ActionCard href="/vendor/products" icon={PackagePlus} label="Add Product" />
+            <ActionCard href="/vendor/posts" icon={FilePlus2} label="Create Post" />
             <ActionCard href="/vendor/stall" icon={Store} label="Manage Stall" />
             <ActionCard href="/vendor/subscription" icon={CreditCard} label="Subscription" />
             <ActionCard href="/vendor/live-slots" icon={CalendarClock} label="Live Slots" />
@@ -119,6 +143,50 @@ export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequ
           <KpiCard icon={BadgeIndianRupee} label="Revenue" value={formatPrice(revenue)} change="Orders" />
           <KpiCard icon={Radio} label="Visitors" value={String(stats?.visitors ?? dashboard?.activeViewers ?? 0)} change={isLive ? "Live" : "Offline"} />
           <KpiCard icon={Store} label="Products" value={String(productCount)} change={`${stats?.productsSold ?? dashboard?.productsSold ?? 0} sold`} />
+        </div>
+
+        <div>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <p className="mobile-vendor-eyebrow text-xs font-bold uppercase tracking-[0.16em]">Social shop</p>
+              <h2 className="mobile-vendor-heading mt-1 text-xl font-black tracking-[-0.04em]">Your posts</h2>
+            </div>
+            <Link href="/vendor/posts" className={buttonStyles("primary", "min-h-10 justify-center px-4 py-2 text-xs")}>
+              <FilePlus2 className="h-4 w-4" />
+              New post
+            </Link>
+          </div>
+          {postActionError ? <p className="mb-3 rounded-[20px] border border-red-300 bg-red-50 p-3 text-sm font-bold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">{postActionError}</p> : null}
+          <div className="grid gap-3">
+            {activePosts.length ? activePosts.slice(0, 3).map((post) => (
+              <article key={post.id} className="mobile-vendor-card flex items-center gap-3 rounded-[24px] p-3">
+                <AppImage
+                  src={post.thumbnailUrl || post.mediaUrls[0] || post.product?.images?.[0] || "/products/product-placeholder.png"}
+                  alt={post.product?.title || post.caption}
+                  className="h-16 w-16 shrink-0 rounded-2xl"
+                  fallbackSrc="/products/product-placeholder.png"
+                />
+                <Link href="/vendor/posts" className="min-w-0 flex-1">
+                  <p className="mobile-vendor-heading line-clamp-1 text-sm font-black">{post.product?.title || post.caption}</p>
+                  <p className="mobile-vendor-muted mt-1 text-xs capitalize">{post.status} · {post.moderationStatus}</p>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => void confirmArchivePost(post.id)}
+                  disabled={archivingPostId === post.id}
+                  className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-red-300 bg-red-50 text-red-600 transition active:scale-95 disabled:opacity-50 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
+                  aria-label={`Delete post ${post.product?.title || post.caption}`}
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </article>
+            )) : (
+              <Link href="/vendor/posts" className="mobile-vendor-card mobile-vendor-muted rounded-[24px] p-5 text-sm">
+                No active posts. Tap here to create your first social shopping post.
+              </Link>
+            )}
+          </div>
+          {activePosts.length > 3 ? <Link href="/vendor/posts" className="mt-3 block text-center text-xs font-black text-[var(--gold)]">Manage all {activePosts.length} posts</Link> : null}
         </div>
 
         <div className="mobile-vendor-card rounded-[30px] p-4">

@@ -47,6 +47,7 @@ import {
   getVendorExhibitions,
   getVendorExhibitionRequests,
   getVendorOrders,
+  getVendorOwnPosts,
   getVendorStall,
   getUserOrders,
   leaveVendorExhibition,
@@ -66,9 +67,10 @@ import {
   closeBargain,
   counterBargain,
   updateCartItem,
-  updateVendorOrderStatus
+  updateVendorOrderStatus,
+  archiveVendorPost
 } from "@/lib/api";
-import { AdminDashboardResponse, AdminRecentActivity, AvatarOption, BargainState, Exhibition, LiveAccessStatus, LiveKitConnection, LiveSlot, Order, Product, Stall, Vendor, VendorExhibitionRequest, VendorSubscriptionState } from "@/lib/types";
+import { AdminDashboardResponse, AdminRecentActivity, AvatarOption, BargainState, Exhibition, LiveAccessStatus, LiveKitConnection, LiveSlot, Order, Product, Stall, Vendor, VendorExhibitionRequest, VendorPost, VendorSubscriptionState } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { LiveKitStage } from "@/components/live/livekit-stage";
 import { LiveChatPanel } from "@/components/live/live-chat-panel";
@@ -1091,6 +1093,9 @@ export function VendorDashboardContent() {
   const [subscriptionState, setSubscriptionState] = useState<VendorSubscriptionState | null>(null);
   const [liveSlots, setLiveSlots] = useState<LiveSlot[]>([]);
   const [liveAccess, setLiveAccess] = useState<LiveAccessStatus | null>(null);
+  const [vendorPosts, setVendorPosts] = useState<VendorPost[]>([]);
+  const [postActionError, setPostActionError] = useState("");
+  const [archivingPostId, setArchivingPostId] = useState("");
   const [error, setError] = useState("");
   const [isLoadingDashboard, setIsLoadingDashboard] = useState(true);
 
@@ -1104,9 +1109,10 @@ export function VendorDashboardContent() {
       getVendorExhibitionRequests(),
       getVendorSubscription().catch(() => null),
       getVendorLiveSlots().catch(() => []),
-      getVendorLiveAccess().catch(() => null)
+      getVendorLiveAccess().catch(() => null),
+      getVendorOwnPosts().catch(() => [])
     ])
-      .then(([dashboardResponse, stallResponse, exhibitionResponse, requestResponse, subscriptionResponse, liveSlotResponse, liveAccessResponse]) => {
+      .then(([dashboardResponse, stallResponse, exhibitionResponse, requestResponse, subscriptionResponse, liveSlotResponse, liveAccessResponse, postResponse]) => {
         if (!active) return;
         const assignedStall = dashboardResponse.assignedStall ?? stallResponse;
         setDashboard(dashboardResponse);
@@ -1115,6 +1121,7 @@ export function VendorDashboardContent() {
         setSubscriptionState(subscriptionResponse);
         setLiveSlots(liveSlotResponse);
         setLiveAccess(liveAccessResponse);
+        setVendorPosts(postResponse);
         setExhibition(assignedStall ? exhibitionResponse.find((item) => item.id === assignedStall.exhibitionId) ?? null : null);
         setError("");
       })
@@ -1153,6 +1160,19 @@ export function VendorDashboardContent() {
       window.clearInterval(intervalId);
     };
   }, [currentVendor?.status, setCurrentUser]);
+
+  const removeVendorPost = async (postId: string) => {
+    setArchivingPostId(postId);
+    setPostActionError("");
+    try {
+      const updated = await archiveVendorPost(postId);
+      setVendorPosts((current) => current.map((post) => (post.id === updated.id ? updated : post)));
+    } catch (errorValue) {
+      setPostActionError(errorValue instanceof Error ? errorValue.message : "Could not delete post.");
+    } finally {
+      setArchivingPostId("");
+    }
+  };
 
   if (currentVendor?.status === "pending") {
     return (
@@ -1234,6 +1254,10 @@ export function VendorDashboardContent() {
             revenue={revenue}
             subscription={subscriptionState}
             nextLiveSlot={nextApprovedSlot}
+            posts={vendorPosts}
+            archivingPostId={archivingPostId}
+            onArchivePost={removeVendorPost}
+            postActionError={postActionError}
             error={error}
           />
         }
@@ -1300,6 +1324,7 @@ export function VendorDashboardContent() {
                     <Link href="/vendor/exhibitions" className={buttonStyles("primary", "justify-between px-5 py-4")}>Join Exhibition <ArrowRight className="h-4 w-4" /></Link>
                     <Link href="/vendor/stall" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Stall <ArrowRight className="h-4 w-4" /></Link>
                     <Link href="/vendor/products" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Products <ArrowRight className="h-4 w-4" /></Link>
+                    <Link href="/vendor/posts" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Posts <ArrowRight className="h-4 w-4" /></Link>
                     <Link href="/vendor/subscription" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Subscription <ArrowRight className="h-4 w-4" /></Link>
                     <Link href="/vendor/live-slots" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Live Slots <ArrowRight className="h-4 w-4" /></Link>
                     <Link data-tour-id="vendor-orders" href="/vendor/orders" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Orders <ArrowRight className="h-4 w-4" /></Link>

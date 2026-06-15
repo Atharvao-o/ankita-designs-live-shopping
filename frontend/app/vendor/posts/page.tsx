@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Archive, Send } from "lucide-react";
+import { Archive, Plus, Send, Trash2 } from "lucide-react";
 import { RoleShell } from "@/components/layout/role-shell";
 import { ImageCropUpload } from "@/components/uploads/image-crop-upload";
 import { archiveVendorPost, createVendorPost, getVendorOwnPosts, getVendorProducts, publishVendorPost } from "@/lib/api";
@@ -66,6 +66,11 @@ export default function VendorPostsPage() {
     }
   };
 
+  const confirmArchivePost = async (postId: string) => {
+    if (!window.confirm("Delete this post from your active feed?")) return;
+    await archivePost(postId);
+  };
+
   const publishPost = async (postId: string) => {
     setMessage("");
     setError("");
@@ -92,11 +97,11 @@ export default function VendorPostsPage() {
 
   return (
     <RoleShell role="vendor" title="Posts">
-      <section className="p-4 sm:p-6 xl:p-8">
+      <section className="px-3 py-4 sm:p-6 xl:p-8">
         <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
-          <aside className="h-fit rounded-[32px] border border-border bg-card p-5 text-card-foreground shadow-soft">
+          <aside id="create-post" className="h-fit rounded-[24px] border border-border bg-card p-4 text-card-foreground shadow-soft sm:rounded-[32px] sm:p-5">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Create post</p>
-            <h1 className="mt-2 text-3xl font-black tracking-[-0.05em] text-foreground">Share a product drop.</h1>
+            <h1 className="mt-2 text-2xl font-black tracking-[-0.05em] text-foreground sm:text-3xl">Share a product drop.</h1>
             <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">
               Drafts are private. Publishing sends the post to admin moderation before it appears in the public feed.
             </p>
@@ -137,12 +142,13 @@ export default function VendorPostsPage() {
                 disabled={isSaving || !caption.trim()}
                 className="min-h-12 rounded-2xl bg-primary px-5 py-3 text-sm font-black text-primary-foreground transition hover:brightness-105 disabled:opacity-60"
               >
+                <Plus className="mr-2 inline h-4 w-4" />
                 {isSaving ? "Creating..." : "Create draft"}
               </button>
             </div>
           </aside>
 
-          <div className="rounded-[32px] border border-border bg-card p-5 text-card-foreground shadow-soft">
+          <div className="rounded-[24px] border border-border bg-card p-4 text-card-foreground shadow-soft sm:rounded-[32px] sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Your posts</p>
@@ -156,8 +162,8 @@ export default function VendorPostsPage() {
             {!isLoading && !posts.length ? <p className="mt-6 rounded-2xl border border-border bg-background p-5 text-sm font-semibold text-muted-foreground">No posts yet. Create your first draft from the left panel.</p> : null}
             <div className="mt-6 grid gap-4">
               {posts.map((post) => (
-                <article key={post.id} className="grid gap-4 rounded-[24px] border border-border bg-background p-4 sm:grid-cols-[120px_minmax(0,1fr)]">
-                  <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted">
+                <article key={post.id} className="grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-[20px] border border-border bg-background p-3 sm:grid-cols-[120px_minmax(0,1fr)] sm:gap-4 sm:rounded-[24px] sm:p-4">
+                  <div className="relative aspect-square overflow-hidden rounded-xl bg-muted sm:rounded-2xl">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={post.thumbnailUrl || post.mediaUrls[0] || post.product?.images?.[0] || "/products/product-placeholder.png"} alt="" className="h-full w-full object-cover" />
                   </div>
@@ -167,7 +173,7 @@ export default function VendorPostsPage() {
                       <Badge label={post.moderationStatus} tone={post.moderationStatus === "approved" ? "success" : post.moderationStatus === "rejected" ? "danger" : "warning"} />
                       <Badge label={post.postType} />
                     </div>
-                    <p className="mt-3 line-clamp-3 text-sm font-semibold leading-6 text-foreground">{post.caption}</p>
+                    <p className="mt-3 line-clamp-2 text-sm font-semibold leading-5 text-foreground sm:line-clamp-3 sm:leading-6">{post.caption}</p>
                     {post.product ? <p className="mt-2 text-sm font-black text-primary">{post.product.title} - {formatPrice(post.product.price)}</p> : null}
                     {post.rejectionReason ? <p className="mt-2 text-xs font-bold text-destructive">{post.rejectionReason}</p> : null}
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -178,9 +184,11 @@ export default function VendorPostsPage() {
                         </button>
                       ) : null}
                       {post.status !== "archived" ? (
-                        <button type="button" onClick={() => archivePost(post.id)} className="inline-flex min-h-10 items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm font-black text-card-foreground">
-                          <Archive className="h-4 w-4" />
-                          Archive
+                        <button type="button" onClick={() => void confirmArchivePost(post.id)} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-xs font-black text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 sm:rounded-2xl sm:px-4 sm:text-sm">
+                          <Trash2 className="h-4 w-4 sm:hidden" />
+                          <Archive className="hidden h-4 w-4 sm:block" />
+                          <span className="sm:hidden">Delete</span>
+                          <span className="hidden sm:inline">Archive</span>
                         </button>
                       ) : null}
                       {post.status === "published" && post.moderationStatus === "approved" ? (
