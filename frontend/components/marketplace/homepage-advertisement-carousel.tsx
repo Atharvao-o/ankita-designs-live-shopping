@@ -41,7 +41,7 @@ export function HomepageAdvertisementCarousel() {
 
   if (!banners.length) {
     return (
-      <section className="overflow-hidden rounded-[28px] border border-border bg-card text-card-foreground shadow-soft">
+      <section className="overflow-hidden border-b border-border bg-card text-card-foreground sm:rounded-[28px] sm:border sm:shadow-soft">
         <div className="relative hidden aspect-[16/5] min-h-[230px] bg-[#101827] text-white sm:block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -101,7 +101,7 @@ export function HomepageAdvertisementCarousel() {
 
   return (
     <div
-      className="group relative overflow-hidden rounded-[28px] border border-border bg-card shadow-soft"
+      className="group relative overflow-hidden border-b border-border bg-card sm:rounded-[28px] sm:border sm:shadow-soft"
       role="region"
       aria-roledescription="carousel"
       aria-label="Featured advertisements"

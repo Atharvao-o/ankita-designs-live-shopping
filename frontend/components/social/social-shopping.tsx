@@ -10,8 +10,10 @@ import {
   Heart,
   Home,
   MessageCircle,
+  MoreHorizontal,
   PackageOpen,
   ReceiptText,
+  Send,
   Settings,
   ShoppingBag,
   Store,
@@ -201,9 +203,9 @@ export function useSocialShoppingData(limitProducts = 30) {
 
 export function SocialShell({ children, rightRail }: { children: React.ReactNode; rightRail?: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-background pb-24 text-foreground md:pb-0">
+    <main className="min-h-screen bg-card pb-[calc(4rem+env(safe-area-inset-bottom))] text-foreground sm:bg-background md:pb-0">
       <SocialTopBar />
-      <div className="mx-auto grid w-full max-w-[1180px] gap-6 px-3 py-4 sm:px-5 lg:grid-cols-[220px_minmax(0,620px)_280px] lg:py-6">
+      <div className="mx-auto grid w-full max-w-[1180px] gap-0 px-0 py-0 sm:gap-6 sm:px-5 sm:py-4 lg:grid-cols-[220px_minmax(0,620px)_280px] lg:py-6">
         <SocialSidebar />
         <section className="min-w-0">{children}</section>
         <aside className="hidden min-w-0 lg:block">{rightRail ?? <SocialSuggestions />}</aside>
@@ -217,19 +219,20 @@ export function SocialShell({ children, rightRail }: { children: React.ReactNode
 function SocialTopBar() {
   const openCart = useExpoStore((state) => state.openCart);
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-card text-card-foreground shadow-soft">
-      <div className="mx-auto flex max-w-[1180px] items-center gap-3 px-3 py-3 sm:px-5">
+    <header className="sticky top-0 z-40 border-b border-border bg-card text-card-foreground sm:shadow-soft">
+      <div className="mx-auto flex h-14 max-w-[1180px] items-center gap-3 px-4 sm:h-auto sm:px-5 sm:py-3">
         <Link href="/" className="flex items-center gap-2" aria-label="Ankita Social Shopping home">
-          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary text-sm font-black text-primary-foreground">AD</span>
-          <span className="hidden leading-tight sm:block">
-            <span className="block text-sm font-black">Ankita Designs</span>
-            <span className="block text-[11px] font-black uppercase tracking-[0.14em] text-primary">Social Shopping</span>
+          <span className="hidden h-10 w-10 place-items-center rounded-2xl bg-primary text-sm font-black text-primary-foreground sm:grid">AD</span>
+          <span className="leading-tight">
+            <span className="block text-xl font-black tracking-[-0.04em] sm:hidden">Ankita</span>
+            <span className="hidden text-sm font-black sm:block">Ankita Designs</span>
+            <span className="hidden text-[11px] font-black uppercase tracking-[0.14em] text-primary sm:block">Social Shopping</span>
           </span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
-          <button type="button" onClick={openCart} className="grid h-10 w-10 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary" aria-label="Open cart">
-            <ShoppingBag className="h-5 w-5" />
+          <ThemeToggle className="h-9 w-9 rounded-full border-0 bg-transparent shadow-none hover:bg-secondary sm:h-10 sm:w-10 sm:rounded-2xl sm:border sm:bg-card sm:shadow-sm" />
+          <button type="button" onClick={openCart} className="grid h-9 w-9 place-items-center rounded-full bg-transparent text-foreground transition hover:bg-secondary sm:h-10 sm:w-10 sm:rounded-2xl sm:border sm:border-border sm:bg-background" aria-label="Open cart">
+            <ShoppingBag className="h-[22px] w-[22px]" />
           </button>
           <Link href="/profile" className="hidden h-10 w-10 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary sm:grid" aria-label="Profile">
             <UserRound className="h-5 w-5" />
@@ -291,12 +294,12 @@ function SocialBottomNav() {
   ];
 
   return (
-    <nav className="fixed inset-x-3 bottom-3 z-50 rounded-[28px] border border-border bg-card p-2 text-card-foreground shadow-strong md:hidden" aria-label="Mobile social navigation">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card px-2 pb-[env(safe-area-inset-bottom)] text-card-foreground md:hidden" aria-label="Mobile social navigation">
       <div className="grid grid-cols-5 gap-1">
         {items.slice(0, 2).map((item) => <SocialBottomLink key={item.href} item={item} active={pathname === item.href} />)}
-        <button type="button" onClick={openCart} className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl text-[11px] font-black text-muted-foreground transition hover:bg-secondary hover:text-secondary-foreground" aria-label="Open cart">
-          <ShoppingBag className="h-5 w-5" />
-          Cart
+        <button type="button" onClick={openCart} className="flex min-h-14 items-center justify-center text-muted-foreground transition active:scale-90 active:text-foreground" aria-label="Open cart">
+          <ShoppingBag className="h-6 w-6" />
+          <span className="sr-only">Cart</span>
         </button>
         {items.slice(2).map((item) => <SocialBottomLink key={item.href} item={item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />)}
       </div>
@@ -307,9 +310,9 @@ function SocialBottomNav() {
 function SocialBottomLink({ item, active }: { item: { label: string; href: string; icon: typeof Home }; active: boolean }) {
   const Icon = item.icon;
   return (
-    <Link href={item.href} className={cn("flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl text-[11px] font-black transition", active ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground")}>
-      <Icon className="h-5 w-5" />
-      {item.label}
+    <Link href={item.href} className={cn("flex min-h-14 items-center justify-center transition active:scale-90", active ? "text-foreground" : "text-muted-foreground")}>
+      <Icon className={cn("h-6 w-6", active && item.href === "/" && "fill-current")} />
+      <span className="sr-only">{item.label}</span>
     </Link>
   );
 }
@@ -335,16 +338,16 @@ export function StoriesRow({ stalls, exhibitions }: { stalls: Stall[]; exhibitio
   if (!stories.length) return null;
 
   return (
-    <section className="rounded-[28px] border border-border bg-card p-3 shadow-soft">
-      <div className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <section className="border-b border-border bg-card px-3 py-3 sm:rounded-[28px] sm:border sm:p-3 sm:shadow-soft">
+      <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {stories.map((story) => (
-          <Link key={`${story.href}-${story.id}`} href={story.href} className="w-[74px] shrink-0 text-center">
-            <span className={cn("mx-auto grid h-16 w-16 place-items-center rounded-full p-[3px]", story.live ? "bg-gradient-to-tr from-primary via-accent to-emerald-400" : "bg-border")}>
+          <Link key={`${story.href}-${story.id}`} href={story.href} className="w-[68px] shrink-0 text-center sm:w-[74px]">
+            <span className={cn("mx-auto grid h-[62px] w-[62px] place-items-center rounded-full p-[3px] sm:h-16 sm:w-16", story.live ? "bg-gradient-to-tr from-primary via-accent to-emerald-400" : "bg-gradient-to-tr from-primary via-accent to-orange-500")}>
               <span className="relative h-full w-full overflow-hidden rounded-full border-2 border-card bg-muted">
                 <AppImage src={story.image} alt={story.title} fallbackSrc="/stalls/stall-placeholder.png" className="h-full w-full object-cover" />
               </span>
             </span>
-            <span className="mt-2 block truncate text-[11px] font-black text-foreground">{story.title}</span>
+            <span className="mt-1.5 block truncate text-[10px] font-semibold text-foreground sm:mt-2 sm:text-[11px] sm:font-black">{story.title}</span>
           </Link>
         ))}
       </div>
@@ -446,61 +449,68 @@ export function FeedCard({ post }: { post: SocialPost }) {
   };
 
   return (
-    <article className="overflow-hidden rounded-[30px] border border-border bg-card text-card-foreground shadow-soft">
-      <div className="flex items-center gap-3 p-4">
-        <Link href={`/v/${viewPost.vendorSlug}`} className="grid h-11 w-11 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-sm font-black text-secondary-foreground">
+    <article className="overflow-hidden border-b border-border bg-card text-card-foreground sm:rounded-[30px] sm:border sm:shadow-soft">
+      <div className="flex min-h-14 items-center gap-3 px-3 py-2.5 sm:p-4">
+        <Link href={`/v/${viewPost.vendorSlug}`} className="grid h-9 w-9 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-xs font-black text-secondary-foreground sm:h-11 sm:w-11 sm:text-sm">
           {viewPost.stall?.vendorLogo ? <AppImage src={viewPost.stall.vendorLogo} alt={viewPost.vendorName} className="h-full w-full object-cover" /> : viewPost.vendorName.slice(0, 1).toUpperCase()}
         </Link>
         <div className="min-w-0 flex-1">
-          <Link href={`/v/${viewPost.vendorSlug}`} className="truncate text-sm font-black text-foreground hover:text-primary">{viewPost.vendorName}</Link>
-          <p className="truncate text-xs font-semibold text-muted-foreground">{viewPost.postType || viewPost.stall?.category || "Small business"} - Verified seller</p>
+          <Link href={`/v/${viewPost.vendorSlug}`} className="block truncate text-[13px] font-black text-foreground hover:text-primary sm:text-sm">{viewPost.vendorName}</Link>
+          <p className="truncate text-[11px] font-medium text-muted-foreground sm:text-xs sm:font-semibold">{viewPost.postType || viewPost.stall?.category || "Small business"} · Verified seller</p>
         </div>
         {viewPost.vendorId ? (
-          <button type="button" onClick={toggleFollow} disabled={busy === "follow"} className="rounded-full border border-border bg-background px-3 py-1 text-xs font-black text-foreground transition hover:border-primary hover:text-primary">
+          <button type="button" onClick={toggleFollow} disabled={busy === "follow"} className="px-1.5 py-1 text-xs font-black text-primary transition hover:opacity-70 sm:rounded-full sm:border sm:border-border sm:bg-background sm:px-3 sm:text-foreground sm:hover:border-primary sm:hover:text-primary">
             {viewPost.followingVendor ? "Following" : "Follow"}
           </button>
         ) : null}
         {(viewPost.stall?.liveStatus === "live" || viewPost.stall?.status === "live") && viewPost.stallId ? (
           <Link href={`/live/${viewPost.stallId}`} className="rounded-full bg-destructive px-3 py-1 text-xs font-black text-destructive-foreground">Live</Link>
         ) : null}
+        <MoreHorizontal className="h-5 w-5 shrink-0 text-foreground sm:hidden" aria-hidden="true" />
       </div>
       <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="block bg-muted">
-        <div className="relative aspect-square">
+        <div className="relative aspect-[4/5] sm:aspect-square">
           <AppImage src={viewPost.mediaUrl} alt={product?.title || viewPost.caption || viewPost.vendorName} fallbackSrc="/products/product-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
           {discount ? <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">{discount}% off</span> : null}
         </div>
       </Link>
-      <div className="p-4">
+      <div className="px-3 pb-4 pt-3 sm:p-4">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-4 text-muted-foreground">
-            <button type="button" onClick={toggleLike} disabled={!viewPost.realPostId || busy === "like"} className={cn("transition hover:text-primary", viewPost.likedByMe && "text-primary")} aria-label="Like post">
-              <Heart className={cn("h-6 w-6", viewPost.likedByMe && "fill-current")} />
+          <div className="flex items-center gap-4 text-foreground">
+            <button type="button" onClick={toggleLike} disabled={!viewPost.realPostId || busy === "like"} className={cn("transition active:scale-90 hover:text-primary", viewPost.likedByMe && "text-primary")} aria-label="Like post">
+              <Heart className={cn("h-[25px] w-[25px]", viewPost.likedByMe && "fill-current")} />
             </button>
-            <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="transition hover:text-primary" aria-label="Open post">
-              <MessageCircle className="h-6 w-6" />
+            <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="transition active:scale-90 hover:text-primary" aria-label="Open post">
+              <MessageCircle className="h-[25px] w-[25px]" />
             </Link>
-            {viewPost.stallId ? <Link href={`/stalls/${viewPost.stallId}/store`} className="transition hover:text-primary" aria-label="Open vendor stall"><Store className="h-6 w-6" /></Link> : null}
+            <Link href={viewPost.stallId ? `/stalls/${viewPost.stallId}/store` : `/v/${viewPost.vendorSlug}`} className="transition active:scale-90 hover:text-primary" aria-label="Share or open vendor">
+              <Send className="h-[24px] w-[24px]" />
+            </Link>
+            {viewPost.stallId ? <Link href={`/stalls/${viewPost.stallId}/store`} className="hidden transition hover:text-primary sm:block" aria-label="Open vendor stall"><Store className="h-6 w-6" /></Link> : null}
           </div>
-          <button type="button" onClick={toggleSave} disabled={busy === "save"} className={cn("text-muted-foreground transition hover:text-primary", viewPost.savedByMe && "text-primary")} aria-label="Save post">
-            {viewPost.savedByMe ? <BookmarkCheck className="h-6 w-6" /> : <Bookmark className="h-6 w-6" />}
+          <button type="button" onClick={toggleSave} disabled={busy === "save"} className={cn("text-foreground transition active:scale-90 hover:text-primary", viewPost.savedByMe && "text-primary")} aria-label="Save post">
+            {viewPost.savedByMe ? <BookmarkCheck className="h-[25px] w-[25px]" /> : <Bookmark className="h-[25px] w-[25px]" />}
           </button>
         </div>
-        <p className="mt-3 text-sm font-black text-foreground">{viewPost.likeCount ? `${viewPost.likeCount} likes` : "Be the first to like this"}</p>
-        <div className="mt-3 flex items-start justify-between gap-4">
+        <p className="mt-2.5 text-[13px] font-black text-foreground sm:mt-3 sm:text-sm">{viewPost.likeCount ? `${viewPost.likeCount} likes` : "Be the first to like this"}</p>
+        <div className="mt-2 flex items-start justify-between gap-4 sm:mt-3">
           <div className="min-w-0">
-            {product ? <Link href={`/product/${product.id}`} className="line-clamp-2 text-lg font-black leading-6 text-foreground hover:text-primary">{product.title}</Link> : null}
-            <p className="mt-1 line-clamp-3 text-sm font-semibold leading-5 text-muted-foreground">{viewPost.caption}</p>
+            <p className="line-clamp-2 text-[13px] leading-5 text-foreground">
+              <Link href={`/v/${viewPost.vendorSlug}`} className="mr-1.5 font-black hover:text-primary">{viewPost.vendorName}</Link>
+              <span className="font-medium">{viewPost.caption}</span>
+            </p>
+            {product ? <Link href={`/product/${product.id}`} className="mt-2 block line-clamp-1 text-sm font-black leading-5 text-foreground hover:text-primary sm:text-lg sm:leading-6">{product.title}</Link> : null}
             {product ? (
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="text-xl font-black text-foreground">{formatPrice(product.price)}</span>
+              <div className="mt-1.5 flex flex-wrap items-center gap-2 sm:mt-2">
+                <span className="text-base font-black text-foreground sm:text-xl">{formatPrice(product.price)}</span>
                 {discount ? <span className="text-sm font-bold text-muted-foreground line-through">{formatPrice(product.compareAtPrice)}</span> : null}
-                <span className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-black text-secondary-foreground">{product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}</span>
+                <span className="hidden rounded-full bg-secondary px-2.5 py-1 text-[11px] font-black text-secondary-foreground sm:inline-flex">{product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}</span>
               </div>
             ) : null}
           </div>
           {product ? (
-            <button type="button" onClick={addToCart} disabled={busy === "cart" || product.stock <= 0} className="shrink-0 rounded-2xl bg-primary px-4 py-3 text-sm font-black text-primary-foreground transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-55">
-              {busy === "cart" ? "Adding" : "Add"}
+            <button type="button" onClick={addToCart} disabled={busy === "cart" || product.stock <= 0} className="shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-black text-primary-foreground transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-55 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
+              {busy === "cart" ? "Adding" : "Add to cart"}
             </button>
           ) : null}
         </div>
@@ -579,7 +589,7 @@ export function SocialEmptyState({ title, description }: { title: string; descri
 
 export function CategoryRail() {
   return (
-    <div className="flex gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="hidden gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex">
       {categoryLinks.map((category) => (
         <Link key={category} href={`/explore?category=${encodeURIComponent(category)}`} className="shrink-0 rounded-full border border-border bg-card px-3 py-2 text-xs font-black text-muted-foreground transition hover:border-primary hover:bg-secondary hover:text-secondary-foreground">
           {category}

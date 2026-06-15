@@ -43,21 +43,21 @@ export default function Home() {
 
   return (
     <SocialShell>
-      <div className="grid gap-4">
+      <div className="grid gap-0 sm:gap-4">
         <StoriesRow stalls={stalls} exhibitions={exhibitions} />
         <CategoryRail />
         {error ? (
-          <div className="rounded-[24px] border border-amber-300 bg-amber-100 px-4 py-3 text-sm font-black text-amber-950 dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-100">
+          <div className="border-b border-amber-300 bg-amber-100 px-4 py-3 text-sm font-black text-amber-950 dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-100 sm:rounded-[24px] sm:border">
             {error}
           </div>
         ) : null}
         <HomepageAdvertisementCarousel />
         {isLoading ? (
-          <div className="grid gap-4">
-            {Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-[520px] animate-pulse rounded-[30px] bg-card" />)}
+          <div className="grid gap-0 sm:gap-4">
+            {Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-[620px] animate-pulse border-b border-border bg-muted sm:h-[520px] sm:rounded-[30px] sm:border-0 sm:bg-card" />)}
           </div>
         ) : posts.length ? (
-          <div className="grid gap-5">
+          <div className="grid gap-0 sm:gap-5">
             {visiblePosts.map((post) => <FeedCard key={`${post.isRealPost ? "post" : "product"}-${post.id}`} post={post} />)}
             <div ref={loadTriggerRef} className="min-h-8" aria-hidden="true">
               {canLoadMore ? (
@@ -65,7 +65,7 @@ export default function Home() {
                   <div className="mx-auto h-1.5 w-16 overflow-hidden rounded-full bg-muted">
                     <span className="block h-full w-1/2 animate-pulse rounded-full bg-primary" />
                   </div>
-                  {isLoadingMore ? <div className="h-[420px] animate-pulse rounded-[30px] bg-card" /> : null}
+                  {isLoadingMore ? <div className="h-[560px] animate-pulse border-y border-border bg-muted sm:h-[420px] sm:rounded-[30px] sm:border-0 sm:bg-card" /> : null}
                 </div>
               ) : (
                 <p className="py-4 text-center text-xs font-bold text-muted-foreground">You are all caught up.</p>
