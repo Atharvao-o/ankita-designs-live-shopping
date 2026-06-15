@@ -22,6 +22,8 @@ UPLOAD_FOLDERS = {
     "stall_banner": "ankita-designs/stalls/banners",
     "vendor_logo": "ankita-designs/vendors/logos",
     "package_photo": "ankita-designs/orders/packages",
+    "subscription_payment_proof": "ankita-designs/subscriptions/proofs",
+    "live_slot_payment_proof": "ankita-designs/live-slots/proofs",
     "advertisement_banner": "ankita-designs/advertisements",
     "exhibition_banner": "ankita-designs/exhibitions/banners",
 }
