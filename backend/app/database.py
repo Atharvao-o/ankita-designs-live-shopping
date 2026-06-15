@@ -1,13 +1,16 @@
 from contextlib import contextmanager
+import logging
 from typing import Generator
 
 from sqlalchemy import create_engine, text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 
 from app.config import get_settings
 
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 def build_engine_connect_args(database_url: str) -> dict:
@@ -69,7 +72,11 @@ def init_database() -> None:
     # Import models before create_all so SQLAlchemy registers every table.
     import app.models  # noqa: F401
 
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except SQLAlchemyError:
+        logger.exception("Database table creation failed during application startup.")
+        raise
     statements = [
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(32) DEFAULT '' NOT NULL",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)",
@@ -162,7 +169,27 @@ def init_database() -> None:
         "ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS bargain_deal_id VARCHAR",
         "ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS agreed_price NUMERIC(10, 2)",
         "ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS discount_amount NUMERIC(10, 2) DEFAULT 0 NOT NULL",
+        "ALTER TABLE vendor_posts ADD COLUMN IF NOT EXISTS is_promoted BOOLEAN DEFAULT FALSE NOT NULL",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_public_profiles_slug ON vendor_public_profiles (slug)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_public_profiles_vendor_id ON vendor_public_profiles (vendor_id)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_posts_vendor_id ON vendor_posts (vendor_id)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_posts_status ON vendor_posts (status)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_posts_moderation_status ON vendor_posts (moderation_status)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_follows_user_id ON vendor_follows (user_id)",
+        "CREATE INDEX IF NOT EXISTS ix_vendor_follows_vendor_id ON vendor_follows (vendor_id)",
+        "CREATE INDEX IF NOT EXISTS ix_post_likes_user_id ON post_likes (user_id)",
+        "CREATE INDEX IF NOT EXISTS ix_post_likes_post_id ON post_likes (post_id)",
+        "CREATE INDEX IF NOT EXISTS ix_saved_posts_user_id ON saved_posts (user_id)",
+        "CREATE INDEX IF NOT EXISTS ix_saved_posts_post_id ON saved_posts (post_id)",
+        "CREATE INDEX IF NOT EXISTS ix_saved_products_user_id ON saved_products (user_id)",
+        "CREATE INDEX IF NOT EXISTS ix_saved_products_product_id ON saved_products (product_id)",
     ]
-    with engine.begin() as connection:
-        for statement in statements:
-            connection.execute(text(statement))
+    try:
+        with engine.begin() as connection:
+            for statement in statements:
+                connection.execute(text(statement))
+    except SQLAlchemyError:
+        logger.exception("Additive database migration failed during application startup.")
+        raise
+
+    logger.info("Database schema initialization completed successfully.")

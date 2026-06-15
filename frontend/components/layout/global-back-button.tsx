@@ -10,6 +10,10 @@ function getFallbackPath(pathname: string) {
   if (pathname.startsWith("/exhibition/")) return "/exhibitions";
   if (pathname.startsWith("/stalls/")) return "/exhibitions";
   if (pathname.startsWith("/live/")) return "/exhibitions";
+  if (pathname.startsWith("/p/")) return "/";
+  if (pathname.startsWith("/product/")) return "/explore";
+  if (pathname.startsWith("/v/")) return "/explore";
+  if (pathname.startsWith("/profile/")) return "/profile";
   if (pathname.startsWith("/settings/")) return "/settings";
   return "/";
 }

@@ -52,20 +52,20 @@ export function HomepageAdvertisementCarousel() {
           />
           <div className="relative z-10 flex h-full max-w-[52%] flex-col justify-center px-7 py-6 lg:px-10">
             <span className="w-fit rounded-full bg-[#FACC15] px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-[#111827]">
-              Shop live · bargain together
+              Social shopping · vendor drops
             </span>
             <h1 className="mt-3 max-w-xl text-3xl font-black leading-[1.05] tracking-[-0.04em] lg:text-4xl">
-              Festive finds from trusted sellers.
+              Discover small vendors through products, posts, and live drops.
             </h1>
             <p className="mt-3 max-w-lg text-sm font-semibold leading-6 text-[#F8E9D2] lg:text-base">
-              Watch product demos, unlock live-only prices, and order securely through Ankita Designs.
+              Follow vendors, explore fresh products, save favorites, and shop securely through Ankita Designs.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Link href="/exhibitions" className="inline-flex min-h-11 items-center rounded-xl bg-[#F97316] px-5 text-sm font-black text-white transition hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#FDBA74]">
-                Shop Live Exhibitions
+              <Link href="/explore" className="inline-flex min-h-11 items-center rounded-xl bg-[#F97316] px-5 text-sm font-black text-white transition hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#FDBA74]">
+                Explore Products
               </Link>
             <Link href="/exhibitions?status=live" className="inline-flex min-h-11 items-center rounded-xl border border-[#F5D878] bg-[#FFFDF8] px-5 text-sm font-black text-[#172554] transition hover:bg-[#FFF2CC] focus:outline-none focus:ring-2 focus:ring-[#F5D878]">
-                View Live Deals
+                Live Events
               </Link>
             </div>
           </div>
@@ -82,16 +82,16 @@ export function HomepageAdvertisementCarousel() {
           </div>
           <div className="bg-card px-5 py-5 text-card-foreground">
             <span className="inline-flex rounded-full bg-[#FACC15] px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-[#111827]">
-              Live shopping deals
+              Social shopping
             </span>
             <h1 className="mt-3 text-2xl font-black leading-tight tracking-[-0.035em] text-foreground">
-              See it live. Bargain together. Buy securely.
+              Discover vendors. Save products. Shop securely.
             </h1>
             <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">
-              Shop sarees, jewellery, decor, cosmetics, and more from verified vendor stalls.
+              Browse products, vendor profiles, live drops, and shopping events in one feed.
             </p>
-            <Link href="/exhibitions" className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[#F97316] px-5 text-sm font-black text-white transition hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#FDBA74]">
-              Shop Live Exhibitions
+            <Link href="/explore" className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[#F97316] px-5 text-sm font-black text-white transition hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#FDBA74]">
+              Explore Products
             </Link>
           </div>
         </div>

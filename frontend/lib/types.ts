@@ -426,3 +426,80 @@ export interface AdvertisementBanner {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+
+export type VendorPostType = "product" | "offer" | "announcement" | "live" | "event";
+export type VendorPostStatus = "draft" | "published" | "archived";
+export type VendorPostModerationStatus = "pending" | "approved" | "rejected";
+
+export interface VendorPublicProfile {
+  id: string;
+  vendorId: string;
+  slug: string;
+  displayName: string;
+  bio?: string | null;
+  category?: string | null;
+  profileImageUrl?: string | null;
+  bannerImageUrl?: string | null;
+  websiteUrl?: string | null;
+  instagramUrl?: string | null;
+  whatsapp?: string | null;
+  isPublic: boolean;
+  followerCount: number;
+  postCount: number;
+  productCount: number;
+  followingByMe: boolean;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+export interface VendorPost {
+  id: string;
+  vendorId: string;
+  productId?: string | null;
+  stallId?: string | null;
+  exhibitionId?: string | null;
+  postType: VendorPostType | string;
+  caption: string;
+  mediaUrls: string[];
+  thumbnailUrl?: string | null;
+  status: VendorPostStatus | string;
+  moderationStatus: VendorPostModerationStatus | string;
+  rejectionReason?: string | null;
+  isFeatured: boolean;
+  isPromoted: boolean;
+  publishedAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  vendor?: VendorPublicProfile | null;
+  product?: Product | null;
+  likeCount: number;
+  saveCount: number;
+  likedByMe: boolean;
+  savedByMe: boolean;
+  followingVendor: boolean;
+}
+
+export interface FeedResponse {
+  posts: VendorPost[];
+  nextCursor?: string | null;
+}
+
+export interface SocialProfile {
+  followedVendors: VendorPublicProfile[];
+  savedPosts: VendorPost[];
+  savedProducts: Product[];
+  counts: {
+    followedVendors: number;
+    savedPosts: number;
+    savedProducts: number;
+  };
+}
+
+export interface FollowStateResponse {
+  following: boolean;
+  followerCount: number;
+}
+
+export interface AdminProductModerationItem extends Product {
+  vendorName?: string;
+}

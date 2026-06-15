@@ -13,6 +13,7 @@ from app.models.vendor_exhibition_request import VendorExhibitionRequest
 from app.models.platform_setting import PlatformSetting
 from app.models.bargain import BargainSession, BargainOffer, BargainDeal
 from app.models.advertisement_banner import AdvertisementBanner
+from app.models.social import PostLike, SavedPost, SavedProduct, VendorFollow, VendorPost, VendorPublicProfile
 
 __all__ = [
     "User",
@@ -34,5 +35,11 @@ __all__ = [
     "BargainOffer",
     "BargainDeal",
     "AdvertisementBanner",
+    "VendorPublicProfile",
+    "VendorPost",
+    "VendorFollow",
+    "PostLike",
+    "SavedPost",
+    "SavedProduct",
 ]
 

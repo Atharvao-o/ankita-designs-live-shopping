@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { BarChart3, Bell, Boxes, ExternalLink, GalleryHorizontal, LayoutDashboard, LogOut, Menu, Search, ShoppingBag, Store, Users } from "lucide-react";
+import { BarChart3, Bell, Boxes, ExternalLink, FileText, GalleryHorizontal, LayoutDashboard, LogOut, Menu, Search, ShoppingBag, Store, UserRound, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,6 +19,8 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 const navByRole: Record<UserRole, Array<{ label: string; href: string; tourId?: string }>> = {
   admin: [
     { label: "Dashboard", href: "/admin" },
+    { label: "Feed", href: "/admin/feed" },
+    { label: "Products", href: "/admin/products" },
     { label: "Exhibitions", href: "/admin/exhibitions" },
     { label: "Advertisements", href: "/admin/advertisements" },
     { label: "Vendors", href: "/admin/vendors" },
@@ -28,6 +30,8 @@ const navByRole: Record<UserRole, Array<{ label: string; href: string; tourId?: 
   ],
   vendor: [
     { label: "Dashboard", href: "/vendor" },
+    { label: "Profile", href: "/vendor/profile" },
+    { label: "Posts", href: "/vendor/posts" },
     { label: "Exhibitions", href: "/vendor/exhibitions" },
     { label: "Stall", href: "/vendor/stall" },
     { label: "Products", href: "/vendor/products" },
@@ -42,6 +46,8 @@ const navByRole: Record<UserRole, Array<{ label: string; href: string; tourId?: 
 
 const adminNavItems: Array<{ label: string; href: string; icon: LucideIcon; tourId?: string }> = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
+  { label: "Feed", href: "/admin/feed", icon: FileText },
+  { label: "Products", href: "/admin/products", icon: Boxes },
   { label: "Exhibitions", href: "/admin/exhibitions", icon: Store },
   { label: "Advertisements", href: "/admin/advertisements", icon: GalleryHorizontal },
   { label: "Stalls", href: "/admin/stalls", icon: Boxes },

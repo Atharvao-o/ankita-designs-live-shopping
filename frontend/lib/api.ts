@@ -1,10 +1,13 @@
 ﻿import {
   AdminAnalytics,
   AdminDashboardResponse,
+  AdminProductModerationItem,
   AdvertisementBanner,
   BargainState,
   CartItem,
   Exhibition,
+  FeedResponse,
+  FollowStateResponse,
   LiveChatMessage,
   LiveJoinResponse,
   LiveKitTokenPayload,
@@ -18,8 +21,13 @@
   User,
   UserRole,
   Vendor,
+  VendorDashboard,
   VendorExhibitionRequest,
-  VendorDashboard
+  VendorPost,
+  VendorPostStatus,
+  VendorPostType,
+  VendorPublicProfile,
+  SocialProfile
 } from "@/lib/types";
 import { API_URL } from "@/lib/constants";
 
@@ -241,6 +249,219 @@ export function deleteVendorProduct(productId: string): Promise<{ ok: boolean }>
 
 export function getProduct(productId: string): Promise<Product> {
   return request<Product>(`/products/${productId}`);
+}
+
+export function getFeed(params?: {
+  cursor?: string | null;
+  limit?: number;
+  category?: string;
+  vendorId?: string;
+  postType?: string;
+}): Promise<FeedResponse> {
+  const query = new URLSearchParams();
+  if (params?.cursor) query.set("cursor", params.cursor);
+  if (params?.limit) query.set("limit", String(params.limit));
+  if (params?.category && params.category !== "all") query.set("category", params.category);
+  if (params?.vendorId) query.set("vendor_id", params.vendorId);
+  if (params?.postType && params.postType !== "all") query.set("post_type", params.postType);
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return request<FeedResponse>(`/feed${suffix}`);
+}
+
+export function getPostById(postId: string): Promise<VendorPost> {
+  return request<VendorPost>(`/posts/${postId}`);
+}
+
+export function getVendorBySlug(slug: string): Promise<VendorPublicProfile> {
+  return request<VendorPublicProfile>(`/vendors/${slug}`);
+}
+
+export function getVendorPostsBySlug(slug: string): Promise<VendorPost[]> {
+  return request<VendorPost[]>(`/vendors/${slug}/posts`);
+}
+
+export function getVendorProductsBySlug(slug: string): Promise<Product[]> {
+  return request<Product[]>(`/vendors/${slug}/products`);
+}
+
+export function getVendorStallsBySlug(slug: string): Promise<Stall[]> {
+  return request<Stall[]>(`/vendors/${slug}/stalls`);
+}
+
+export function getVendorOwnProfile(): Promise<VendorPublicProfile> {
+  return request<VendorPublicProfile>("/vendor/profile");
+}
+
+export function updateVendorOwnProfile(payload: Partial<{
+  displayName: string;
+  slug: string;
+  bio: string;
+  category: string;
+  profileImageUrl: string;
+  bannerImageUrl: string;
+  websiteUrl: string;
+  instagramUrl: string;
+  whatsapp: string;
+  isPublic: boolean;
+}>): Promise<VendorPublicProfile> {
+  return request<VendorPublicProfile>("/vendor/profile", {
+    method: "PATCH",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function getVendorOwnPosts(): Promise<VendorPost[]> {
+  return request<VendorPost[]>("/vendor/posts");
+}
+
+export function createVendorPost(payload: {
+  postType: VendorPostType;
+  caption: string;
+  mediaUrls?: string[];
+  thumbnailUrl?: string | null;
+  productId?: string | null;
+  stallId?: string | null;
+  exhibitionId?: string | null;
+  status?: VendorPostStatus;
+}): Promise<VendorPost> {
+  return request<VendorPost>("/vendor/posts", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function updateVendorPost(postId: string, payload: Partial<{
+  postType: VendorPostType;
+  caption: string;
+  mediaUrls: string[];
+  thumbnailUrl: string | null;
+  productId: string | null;
+  stallId: string | null;
+  exhibitionId: string | null;
+  status: VendorPostStatus;
+}>): Promise<VendorPost> {
+  return request<VendorPost>(`/vendor/posts/${postId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function archiveVendorPost(postId: string): Promise<VendorPost> {
+  return request<VendorPost>(`/vendor/posts/${postId}`, { method: "DELETE" });
+}
+
+export function publishVendorPost(postId: string): Promise<VendorPost> {
+  return request<VendorPost>(`/vendor/posts/${postId}/publish`, {
+    method: "POST",
+    body: JSON.stringify({})
+  });
+}
+
+export function followVendor(vendorId: string): Promise<FollowStateResponse> {
+  return request<FollowStateResponse>(`/vendors/${vendorId}/follow`, {
+    method: "POST",
+    body: JSON.stringify({})
+  });
+}
+
+export function unfollowVendor(vendorId: string): Promise<FollowStateResponse> {
+  return request<FollowStateResponse>(`/vendors/${vendorId}/follow`, { method: "DELETE" });
+}
+
+export function likePost(postId: string): Promise<VendorPost> {
+  return request<VendorPost>(`/posts/${postId}/like`, {
+    method: "POST",
+    body: JSON.stringify({})
+  });
+}
+
+export function unlikePost(postId: string): Promise<VendorPost> {
+  return request<VendorPost>(`/posts/${postId}/like`, { method: "DELETE" });
+}
+
+export function savePost(postId: string): Promise<VendorPost> {
+  return request<VendorPost>(`/posts/${postId}/save`, {
+    method: "POST",
+    body: JSON.stringify({})
+  });
+}
+
+export function unsavePost(postId: string): Promise<VendorPost> {
+  return request<VendorPost>(`/posts/${postId}/save`, { method: "DELETE" });
+}
+
+export function saveProduct(productId: string): Promise<Product> {
+  return request<Product>(`/products/${productId}/save`, {
+    method: "POST",
+    body: JSON.stringify({})
+  });
+}
+
+export function unsaveProduct(productId: string): Promise<Product> {
+  return request<Product>(`/products/${productId}/save`, { method: "DELETE" });
+}
+
+export function getUserSocial(): Promise<SocialProfile> {
+  return request<SocialProfile>("/user/social");
+}
+
+export function getAdminFeedPosts(params?: {
+  status?: string;
+  moderationStatus?: string;
+  postType?: string;
+  vendorId?: string;
+  featured?: boolean;
+  promoted?: boolean;
+  search?: string;
+}): Promise<VendorPost[]> {
+  const query = new URLSearchParams();
+  if (params?.status && params.status !== "all") query.set("status", params.status);
+  if (params?.moderationStatus && params.moderationStatus !== "all") query.set("moderation_status", params.moderationStatus);
+  if (params?.postType && params.postType !== "all") query.set("post_type", params.postType);
+  if (params?.vendorId) query.set("vendor_id", params.vendorId);
+  if (params?.featured !== undefined) query.set("featured", String(params.featured));
+  if (params?.promoted !== undefined) query.set("promoted", String(params.promoted));
+  if (params?.search) query.set("search", params.search);
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return request<VendorPost[]>(`/admin/feed${suffix}`);
+}
+
+export function approveAdminPost(postId: string): Promise<VendorPost> {
+  return request<VendorPost>(`/admin/feed/${postId}/approve`, { method: "PATCH", body: JSON.stringify({}) });
+}
+
+export function rejectAdminPost(postId: string, rejectionReason?: string): Promise<VendorPost> {
+  return request<VendorPost>(`/admin/feed/${postId}/reject`, {
+    method: "PATCH",
+    body: JSON.stringify({ rejectionReason })
+  });
+}
+
+export function featureAdminPost(postId: string, value?: boolean): Promise<VendorPost> {
+  return request<VendorPost>(`/admin/feed/${postId}/feature`, {
+    method: "PATCH",
+    body: JSON.stringify({ value })
+  });
+}
+
+export function promoteAdminPost(postId: string, value?: boolean): Promise<VendorPost> {
+  return request<VendorPost>(`/admin/feed/${postId}/promote`, {
+    method: "PATCH",
+    body: JSON.stringify({ value })
+  });
+}
+
+export function getAdminProducts(): Promise<AdminProductModerationItem[]> {
+  return request<AdminProductModerationItem[]>("/admin/products");
+}
+
+export function updateAdminProductModeration(productId: string, payload: {
+  status?: "active" | "inactive";
+}): Promise<AdminProductModerationItem> {
+  return request<AdminProductModerationItem>(`/admin/products/${productId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload)
+  });
 }
 
 type CreateOrderPayload = {

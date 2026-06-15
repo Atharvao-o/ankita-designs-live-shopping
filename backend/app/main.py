@@ -18,6 +18,7 @@ from app.routes import (
     orders,
     products,
     settings as public_settings,
+    social,
     stalls,
     uploads,
     user,
@@ -117,5 +118,6 @@ app.include_router(user.router)
 app.include_router(vendor.router)
 app.include_router(public_settings.router)
 app.include_router(admin.router)
+app.include_router(social.router)
 
 

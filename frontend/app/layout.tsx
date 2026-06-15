@@ -7,9 +7,9 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { TutorialProvider } from "@/components/tutorial/TutorialProvider";
 
 export const metadata: Metadata = {
-  title: "Ankita Designs Online Live Exhibition",
+  title: "Ankita Designs Social Shopping",
   description:
-    "Ankita Designs Online Live Exhibition is a direct live-commerce marketplace for vendors and customers."
+    "Ankita Designs is a social shopping marketplace for discovering small vendors, products, live streams, and shopping events."
 };
 
 export default function RootLayout({

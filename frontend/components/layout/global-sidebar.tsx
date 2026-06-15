@@ -12,6 +12,7 @@ import {
   Menu,
   Package,
   ReceiptText,
+  Search,
   Settings as SettingsIcon,
   ShoppingBag,
   Store,
@@ -35,7 +36,8 @@ const groups = [
   {
     title: "Customer",
     links: [
-      { label: "Live Stalls", href: "/exhibitions", icon: Store },
+      { label: "Explore", href: "/explore", icon: Search },
+      { label: "Shopping Events", href: "/exhibitions", icon: Store },
       { label: "Cart", href: "/cart", icon: ShoppingBag },
       { label: "Checkout", href: "/checkout", icon: ShoppingBag }
     ]
@@ -75,8 +77,15 @@ export function GlobalSidebar() {
   const logout = useExpoStore((state) => state.logout);
   const openCart = useExpoStore((state) => state.openCart);
   const hideMobileQuickNav = pathname.startsWith("/vendor") || pathname.startsWith("/admin");
+  const isSocialShoppingRoute =
+    pathname === "/" ||
+    pathname === "/explore" ||
+    pathname.startsWith("/p/") ||
+    pathname.startsWith("/product/") ||
+    pathname.startsWith("/v/") ||
+    pathname.startsWith("/profile");
 
-  if (pathname.startsWith("/live/")) {
+  if (pathname.startsWith("/live/") || isSocialShoppingRoute) {
     return null;
   }
 
@@ -97,7 +106,7 @@ export function GlobalSidebar() {
       {!hideMobileQuickNav ? (
         <nav className="fixed inset-x-3 bottom-4 z-[70] grid grid-cols-5 gap-1 rounded-[24px] border border-[color:var(--border)] bg-[var(--bg-soft)] p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] text-[var(--muted)] shadow-[var(--shadow-soft)] md:hidden" aria-label="Mobile quick navigation">
           <MobileNavLink href="/" label="Home" icon={Home} active={pathname === "/"} />
-          <MobileNavLink href="/exhibitions" label="Exhibitions" icon={Store} active={pathname.startsWith("/exhibition")} />
+          <MobileNavLink href="/explore" label="Explore" icon={Search} active={pathname.startsWith("/explore")} />
           <MobileNavLink href="/orders" label="Orders" icon={ReceiptText} active={pathname.startsWith("/orders")} />
           <button
             type="button"
@@ -111,7 +120,7 @@ export function GlobalSidebar() {
             <ShoppingBag className="h-4 w-4" />
             <span className="max-w-full truncate">Cart</span>
           </button>
-          <MobileNavLink href="/settings" label="Settings" icon={SettingsIcon} active={pathname.startsWith("/settings")} />
+          <MobileNavLink href="/profile" label="Profile" icon={UserRound} active={pathname.startsWith("/profile") || pathname.startsWith("/settings")} />
         </nav>
       ) : null}
 
