@@ -1193,8 +1193,14 @@ export function VendorDashboardContent() {
   const productCount = dashboardStats?.productCount ?? dashboard?.products?.length ?? 0;
   const orderCount = dashboardStats?.orderCount ?? dashboard?.orders.length ?? 0;
   const viewerCount = dashboardStats?.visitors ?? dashboard?.activeViewers ?? 0;
-  const liveStatus = currentLiveSession?.status ?? "Offline";
   const liveConsoleUnlocked = Boolean(assignedStall && productCount >= 2);
+  const liveStatus = !assignedStall
+    ? "No assigned stall"
+    : currentLiveSession?.status === "live"
+      ? "Live now"
+      : liveConsoleUnlocked
+        ? "Ready to go live"
+        : "Offline";
 
   return (
     <RoleShell role="vendor" title="Vendor">
@@ -1852,7 +1858,11 @@ export function VendorLivePageContent() {
   ];
   const readinessIssues = liveReadiness.filter((item) => !item.done);
   const isReadyToSell = readinessIssues.length === 0;
-  const isLiveActive = liveSession.status === "live" || vendorStall?.status === "live";
+  const isLiveActive = Boolean(vendorStall) && (
+    liveSession.status === "live"
+    || vendorStall?.status === "live"
+    || vendorStall?.liveStatus === "live"
+  );
   const canAccessLiveConsole = isLiveActive || isReadyToSell;
 
   useEffect(() => {
@@ -1909,6 +1919,13 @@ export function VendorLivePageContent() {
         }
       } catch {
         if (active) {
+          setVendorStall(null);
+          setLivekitConnection(null);
+          setLiveSessionId("");
+          setLiveStartedAt(null);
+          setPinnedProduct(null);
+          endLive();
+          syncLiveSession({ status: "ended", viewerCount: 0 });
           setChatError("Could not load vendor stall. Retrying...");
           setProductError("Could not load assigned stall or products.");
         }
@@ -2128,9 +2145,9 @@ export function VendorLivePageContent() {
           <VendorPanel className="mx-auto max-w-5xl p-5 sm:p-7">
             <VendorSectionTitle
               eyebrow="Live console locked"
-              title="Complete stall setup before going live"
+              title={vendorStall ? "Complete stall setup before going live" : "No assigned stall"}
               description="Vendors can go live in one assigned exhibition only. Request an exhibition, wait for admin stall assignment, customize your stall, and add at least 2 active products."
-              action={<AdminStatusPill status={`${readinessIssues.length} pending`} />}
+              action={<AdminStatusPill status={vendorStall ? `${readinessIssues.length} pending` : "Live unavailable"} />}
             />
             {productError ? <div className="mt-5"><VendorAlert>{productError}</VendorAlert></div> : null}
             <div className="mt-6 grid gap-3">
@@ -2164,7 +2181,7 @@ export function VendorLivePageContent() {
               description={vendorStall ? `Streaming from ${vendorStall.name}` : "A real stall assignment is required before going live."}
               action={
                 <div className="flex flex-wrap items-center gap-2">
-                  <AdminStatusPill status={liveSession.status} />
+                  <AdminStatusPill status={isLiveActive ? "Live now" : isReadyToSell ? "Ready to go live" : "Offline"} />
                   {isLiveActive ? <LiveElapsedCounter startedAt={liveStartedAt} label="You are live for" /> : null}
                   <span
                     title={isReadyToSell ? "All live selling checks are clear." : readinessIssues.map((item) => item.label).join(", ")}

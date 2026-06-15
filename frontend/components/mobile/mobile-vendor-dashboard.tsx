@@ -21,8 +21,8 @@ export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequ
   const vendor = dashboard?.vendor;
   const orders = dashboard?.orders ?? [];
   const currentLiveSession = dashboard?.currentLiveSession ?? (dashboard?.liveSession?.status === "live" ? dashboard.liveSession : null);
-  const liveStatus = currentLiveSession?.status ?? "offline";
-  const isLive = liveStatus === "live";
+  const liveStatus = stall ? currentLiveSession?.status ?? "offline" : "unavailable";
+  const isLive = Boolean(stall) && liveStatus === "live";
   const stats = dashboard?.stats;
   const productCount = stats?.productCount ?? dashboard?.products?.length ?? 0;
   const canOpenLive = Boolean(stall && productCount >= 2);
@@ -90,7 +90,7 @@ export function MobileVendorDashboard({ dashboard, stall, exhibition, latestRequ
             )}
             <div className="mobile-vendor-preview-overlay absolute inset-0" />
             <span className="absolute left-4 top-4 rounded-full bg-[var(--coral)] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-white">
-              {isLive ? "You are LIVE" : "Live status"}
+              {isLive ? "You are LIVE" : stall ? "Offline" : "No assigned stall"}
             </span>
           </div>
           <div className="p-5">
