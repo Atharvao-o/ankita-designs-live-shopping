@@ -93,11 +93,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
           message = responseText.slice(0, 220) || message;
         }
       }
-      if (API_URL.startsWith("/") && response.status === 404) {
-        message =
-          `Backend route ${path} was not found through the Vercel proxy. ` +
-          "Set Vercel BACKEND_API_URL to the public URL of the Render Python backend service, then redeploy.";
-      }
     } catch {
       // Keep the default message if the backend did not return JSON.
     }
