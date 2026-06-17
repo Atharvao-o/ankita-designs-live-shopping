@@ -20,6 +20,13 @@ class Settings(BaseSettings):
     cloudinary_api_secret: str = ""
     enforce_live_slot_gating: bool = False
     live_session_stale_minutes: int = 240
+    otp_expiry_seconds: int = 300
+    otp_resend_cooldown_seconds: int = 45
+    otp_max_attempts: int = 5
+    otp_debug_response: bool = False
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_from_phone: str = ""
 
     model_config = SettingsConfigDict(
         env_file=(".env", "../.env"),

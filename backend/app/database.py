@@ -194,6 +194,9 @@ def init_database() -> None:
         "CREATE INDEX IF NOT EXISTS ix_live_slots_end_time ON live_slots (end_time)",
         "CREATE INDEX IF NOT EXISTS ix_live_slots_exhibition_id ON live_slots (exhibition_id)",
         "CREATE INDEX IF NOT EXISTS ix_live_slots_stall_id ON live_slots (stall_id)",
+        "CREATE INDEX IF NOT EXISTS ix_auth_otp_challenges_user_id ON auth_otp_challenges (user_id)",
+        "CREATE INDEX IF NOT EXISTS ix_auth_otp_challenges_phone ON auth_otp_challenges (phone)",
+        "CREATE INDEX IF NOT EXISTS ix_auth_otp_challenges_expires_at ON auth_otp_challenges (expires_at)",
     ]
     try:
         with engine.begin() as connection:

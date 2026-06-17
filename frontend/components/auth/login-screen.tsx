@@ -220,6 +220,10 @@ export function LoginScreen() {
             </Link>
           </div>
 
+          <Link href="/login/otp" className="mt-3 flex min-h-12 items-center justify-center rounded-2xl border border-[color:var(--gold)] bg-[color:var(--gold)]/12 px-4 text-sm font-black text-[var(--text)] transition hover:bg-[color:var(--gold)]/18">
+            Login with mobile OTP
+          </Link>
+
           <div className="mt-6 grid gap-4">
             <label data-tour-id="auth-email-input" className="grid gap-2 text-sm font-semibold text-[var(--muted)]">
               Email

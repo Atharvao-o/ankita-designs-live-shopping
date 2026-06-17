@@ -11,8 +11,9 @@ from app.database import get_db
 from app.config import get_settings
 from app.models.user import User
 from app.models.vendor import Vendor
-from app.schemas.user import AuthResponse, GoogleLoginRequest, LoginRequest, RegisterRequest, UserResponse
+from app.schemas.user import AuthResponse, GoogleLoginRequest, LoginRequest, OtpRequest, OtpRequestResponse, OtpVerifyRequest, RegisterRequest, UserResponse
 from app.services.auth_context import current_user_from_request, make_token
+from app.services.otp_service import request_login_otp, verify_login_otp
 from app.services.password_service import hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -219,6 +220,18 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> dict:
         "user": serialize_user(user),
         "vendor": serialize_vendor(vendor),
     }
+
+
+@router.post("/otp/request", response_model=OtpRequestResponse)
+def request_otp_login(payload: OtpRequest, db: Session = Depends(get_db)) -> dict:
+    ensure_bootstrap_admin(db)
+    return request_login_otp(db, payload.phone)
+
+
+@router.post("/otp/verify", response_model=AuthResponse)
+def verify_otp_login(payload: OtpVerifyRequest, db: Session = Depends(get_db)) -> dict:
+    ensure_bootstrap_admin(db)
+    return verify_login_otp(db, payload.challenge_id, payload.phone, payload.code)
 
 
 @router.post("/google", response_model=AuthResponse)

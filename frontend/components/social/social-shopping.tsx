@@ -936,9 +936,18 @@ export function CustomerProfileView({ settings = false }: { settings?: boolean }
 
   if (currentUser?.role === "vendor") {
     const vendorName = vendorProfile?.displayName || currentVendor?.displayName || currentVendor?.businessName || currentUser.name;
+    const logoutVendor = () => {
+      logout();
+      window.location.href = "/";
+    };
     return (
       <SocialShell>
         <section className="rounded-[32px] border border-border bg-card p-5 shadow-soft">
+          <div className="mb-4 flex justify-end">
+            <Link href="/profile/settings" className="rounded-full border border-border bg-background px-4 py-2 text-xs font-black text-foreground transition hover:border-primary hover:text-primary">
+              Settings
+            </Link>
+          </div>
           <div className="grid grid-cols-[84px_minmax(0,1fr)] gap-4">
             <span className="grid h-20 w-20 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-2xl font-black text-secondary-foreground">
               {vendorProfile?.profileImageUrl ? <AppImage src={vendorProfile.profileImageUrl} alt={vendorName} className="h-full w-full object-cover" /> : vendorName.slice(0, 1).toUpperCase()}
@@ -963,6 +972,11 @@ export function CustomerProfileView({ settings = false }: { settings?: boolean }
             <Link href="/vendor/live" className="rounded-2xl border border-border bg-background p-4 text-center text-sm font-black text-foreground transition hover:border-primary">Live console</Link>
             {vendorProfile ? <Link href={`/v/${vendorProfile.slug}`} className="rounded-2xl border border-border bg-background p-4 text-center text-sm font-black text-foreground transition hover:border-primary">Public view</Link> : null}
           </div>
+          {!settings ? (
+            <button type="button" onClick={logoutVendor} className="mt-4 w-full rounded-2xl border border-destructive bg-destructive px-5 py-3 text-sm font-black text-destructive-foreground">
+              Log out
+            </button>
+          ) : null}
           {settings ? (
             <div className="mt-5 rounded-2xl border border-border bg-background p-4">
               <div className="flex items-center justify-between gap-3">

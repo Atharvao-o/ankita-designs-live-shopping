@@ -10,6 +10,24 @@ class GoogleLoginRequest(BaseModel):
     id_token: str
 
 
+class OtpRequest(BaseModel):
+    phone: str
+
+
+class OtpVerifyRequest(BaseModel):
+    phone: str
+    challenge_id: str
+    code: str
+
+
+class OtpRequestResponse(BaseModel):
+    ok: bool
+    challengeId: str
+    expiresInSeconds: int
+    message: str
+    devOtp: str | None = None
+
+
 class RegisterRequest(BaseModel):
     name: str | None = None
     email: str

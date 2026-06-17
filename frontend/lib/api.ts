@@ -873,6 +873,32 @@ export function loginWithGoogle(payload: { idToken: string }): Promise<AuthRespo
   });
 }
 
+export type OtpRequestResponse = {
+  ok: boolean;
+  challengeId: string;
+  expiresInSeconds: number;
+  message: string;
+  devOtp?: string | null;
+};
+
+export function requestOtpLogin(payload: { phone: string }): Promise<OtpRequestResponse> {
+  return request<OtpRequestResponse>("/auth/otp/request", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function verifyOtpLogin(payload: { phone: string; challengeId: string; code: string }): Promise<AuthResponse> {
+  return request<AuthResponse>("/auth/otp/verify", {
+    method: "POST",
+    body: JSON.stringify({
+      phone: payload.phone,
+      challenge_id: payload.challengeId,
+      code: payload.code
+    })
+  });
+}
+
 export function getAuthMe(): Promise<AuthResponse> {
   return request<AuthResponse>("/auth/me");
 }
