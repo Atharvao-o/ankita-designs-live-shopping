@@ -11,7 +11,7 @@ from app.models.live_session import LiveChatMessage, LiveSession
 from app.models.product import Product
 from app.models.stall import Stall
 from app.schemas.live_session import LiveSessionPinProductRequest, LiveSessionResponse, LiveSessionStartRequest
-from app.services.db_data_service import now_utc, serialize_live_session, serialize_message, status_payload
+from app.services.db_data_service import end_stale_live_session, is_live_session_current, now_utc, serialize_live_session, serialize_message, status_payload
 from app.services.livekit_service import livekit_service
 from app.services.presence_service import presence_service
 from app.services.realtime_service import realtime_service
@@ -44,6 +44,10 @@ def assert_exhibition_live_for_stall(db: Session, stall: Stall) -> Exhibition:
 
 def close_session_if_exhibition_not_live(db: Session, session: LiveSession) -> LiveSession | None:
     stall = db.get(Stall, session.stall_id)
+    if not is_live_session_current(session):
+        end_stale_live_session(db, session, stall)
+        db.commit()
+        return None
     if stall is None:
         session.status = "ended"
         session.ended_at = session.ended_at or now_utc()

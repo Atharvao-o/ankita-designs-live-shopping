@@ -34,6 +34,7 @@ import {
   getStallProducts,
   getUserSocial,
   getVendorBySlug,
+  getVendorOwnProfile,
   getVendorPostsBySlug,
   getVendorProductsBySlug,
   getVendorStallsBySlug,
@@ -78,6 +79,10 @@ type SocialData = {
 };
 
 const categoryLinks = ["Saree", "Kurti", "Jewellery", "White Metal", "Pooja Material", "Home Decor", "Food Products", "Cosmetics"];
+
+function shuffleList<T>(items: T[]): T[] {
+  return [...items].sort(() => Math.random() - 0.5);
+}
 
 export function slugify(value: string) {
   return value
@@ -152,14 +157,14 @@ export function useSocialShoppingData(limitProducts = 30) {
         if (!active) return;
         const realPosts = feedResult.status === "fulfilled" ? feedResult.value.posts : [];
         const activeProducts = productResult.status === "fulfilled" ? productResult.value.filter((product) => product.status === "active") : [];
-        const products = activeProducts.slice(0, limitProducts);
+        const products = shuffleList(activeProducts).slice(0, limitProducts);
         const stalls = stallResult.status === "fulfilled" ? stallResult.value : [];
         const exhibitions = exhibitionResult.status === "fulfilled" ? exhibitionResult.value.filter((item) => item.status !== "draft" && item.status !== "cancelled") : [];
         const linkedProductIds = new Set(realPosts.map((post) => post.productId).filter(Boolean));
-        const cataloguePosts = activeProducts
+        const cataloguePosts = shuffleList(activeProducts)
           .filter((product) => !linkedProductIds.has(product.id))
           .map((product) => postFromProduct(product, stalls));
-        const posts = [...realPosts.map(postFromVendorPost), ...cataloguePosts];
+        const posts = shuffleList([...realPosts.map(postFromVendorPost), ...cataloguePosts]);
         setData({ products, stalls, exhibitions, posts, realPosts });
         setNextCursor(feedResult.status === "fulfilled" ? feedResult.value.nextCursor ?? null : null);
         setError(
@@ -318,30 +323,37 @@ function SocialBottomLink({ item, active }: { item: { label: string; href: strin
 }
 
 export function StoriesRow({ stalls, exhibitions }: { stalls: Stall[]; exhibitions: Exhibition[] }) {
-  const stories = [
-    ...stalls.slice(0, 8).map((stall) => ({
+  const stories = useMemo(() => {
+    const vendorStories = stalls.map((stall) => ({
       id: stall.id,
       href: `/stalls/${stall.id}/store`,
       title: stall.vendorName || stall.assignedVendorName || stall.name,
       image: stall.vendorLogo || stall.bannerImage || stall.image || "/stalls/stall-placeholder.png",
-      live: stall.liveStatus === "live" || stall.status === "live"
-    })),
-    ...exhibitions.slice(0, 4).map((exhibition) => ({
-      id: exhibition.id,
-      href: `/exhibition/${exhibition.id}`,
-      title: exhibition.title,
-      image: exhibition.bannerImage || "/stalls/stall-placeholder.png",
-      live: exhibition.status === "live"
-    }))
-  ];
+      live: stall.liveStatus === "live" || stall.status === "live",
+      type: "vendor"
+    }));
+    const eventStories = exhibitions
+      .filter((exhibition) => exhibition.status !== "draft" && exhibition.status !== "cancelled")
+      .map((exhibition) => ({
+        id: exhibition.id,
+        href: `/exhibition/${exhibition.id}`,
+        title: exhibition.title,
+        image: exhibition.bannerImage || "/stalls/stall-placeholder.png",
+        live: exhibition.status === "live",
+        type: "event"
+      }));
+    const liveStories = vendorStories.filter((story) => story.live);
+    const otherStories = shuffleList([...vendorStories.filter((story) => !story.live), ...eventStories]);
+    return [...shuffleList(liveStories), ...otherStories].slice(0, 24);
+  }, [exhibitions, stalls]);
 
   if (!stories.length) return null;
 
   return (
     <section className="border-b border-border bg-card px-3 py-3 sm:rounded-[28px] sm:border sm:p-3 sm:shadow-soft">
-      <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex touch-pan-x snap-x gap-3 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {stories.map((story) => (
-          <Link key={`${story.href}-${story.id}`} href={story.href} className="w-[68px] shrink-0 text-center sm:w-[74px]">
+          <Link key={`${story.type}-${story.id}`} href={story.href} className="w-[68px] shrink-0 snap-start text-center sm:w-[74px]">
             <span className={cn("mx-auto grid h-[62px] w-[62px] place-items-center rounded-full p-[3px] sm:h-16 sm:w-16", story.live ? "bg-gradient-to-tr from-primary via-accent to-emerald-400" : "bg-gradient-to-tr from-primary via-accent to-orange-500")}>
               <span className="relative h-full w-full overflow-hidden rounded-full border-2 border-card bg-muted">
                 <AppImage src={story.image} alt={story.title} fallbackSrc="/stalls/stall-placeholder.png" className="h-full w-full object-cover" />
@@ -394,9 +406,17 @@ export function FeedCard({ post }: { post: SocialPost }) {
   };
 
   const toggleLike = async () => {
-    if (!viewPost.realPostId) return;
     if (!currentUser) {
-      requireLogin(`/p/${viewPost.realPostId}`);
+      requireLogin(viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`);
+      return;
+    }
+    if (!viewPost.realPostId) {
+      setViewPost((current) => ({
+        ...current,
+        likedByMe: !current.likedByMe,
+        likeCount: Math.max(0, current.likeCount + (current.likedByMe ? -1 : 1))
+      }));
+      setMessage("");
       return;
     }
     setBusy("like");
@@ -407,6 +427,27 @@ export function FeedCard({ post }: { post: SocialPost }) {
       setMessage(error instanceof Error ? error.message : "Could not update like.");
     } finally {
       setBusy("");
+    }
+  };
+
+  const sharePost = async () => {
+    const path = viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`;
+    const url = typeof window !== "undefined" ? new URL(path, window.location.origin).toString() : path;
+    setMessage("");
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: product?.title || viewPost.vendorName,
+          text: viewPost.caption || "See this vendor on Ankita Designs.",
+          url
+        });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setMessage("Link copied.");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      setMessage("Could not share this post.");
     }
   };
 
@@ -477,15 +518,15 @@ export function FeedCard({ post }: { post: SocialPost }) {
       <div className="px-3 pb-4 pt-3 sm:p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-4 text-foreground">
-            <button type="button" onClick={toggleLike} disabled={!viewPost.realPostId || busy === "like"} className={cn("transition active:scale-90 hover:text-primary", viewPost.likedByMe && "text-primary")} aria-label="Like post">
+            <button type="button" onClick={toggleLike} disabled={busy === "like"} className={cn("transition active:scale-90 hover:text-primary", viewPost.likedByMe && "text-primary")} aria-label="Like post">
               <Heart className={cn("h-[25px] w-[25px]", viewPost.likedByMe && "fill-current")} />
             </button>
             <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="transition active:scale-90 hover:text-primary" aria-label="Open post">
               <MessageCircle className="h-[25px] w-[25px]" />
             </Link>
-            <Link href={viewPost.stallId ? `/stalls/${viewPost.stallId}/store` : `/v/${viewPost.vendorSlug}`} className="transition active:scale-90 hover:text-primary" aria-label="Share or open vendor">
+            <button type="button" onClick={sharePost} className="transition active:scale-90 hover:text-primary" aria-label="Share post">
               <Send className="h-[24px] w-[24px]" />
-            </Link>
+            </button>
             {viewPost.stallId ? <Link href={`/stalls/${viewPost.stallId}/store`} className="hidden transition hover:text-primary sm:block" aria-label="Open vendor stall"><Store className="h-6 w-6" /></Link> : null}
           </div>
           <button type="button" onClick={toggleSave} disabled={busy === "save"} className={cn("text-foreground transition active:scale-90 hover:text-primary", viewPost.savedByMe && "text-primary")} aria-label="Save post">
@@ -734,6 +775,7 @@ export function VendorProfileView({ vendorSlug }: { vendorSlug: string }) {
   const [error, setError] = useState("");
   const [followMessage, setFollowMessage] = useState("");
   const currentUser = useExpoStore((state) => state.currentUser);
+  const currentVendor = useExpoStore((state) => state.currentVendor);
   const fallback = useSocialShoppingData(80);
 
   useEffect(() => {
@@ -762,7 +804,9 @@ export function VendorProfileView({ vendorSlug }: { vendorSlug: string }) {
   const visiblePosts = posts.length ? posts : fallbackPosts;
   const vendorName = profile?.displayName || visiblePosts[0]?.vendorName || fallbackStall?.vendorName || fallbackStall?.assignedVendorName || fallbackStall?.name || "Vendor profile";
   const category = profile?.category || fallbackStall?.category || "Verified small business";
-  const liveStall = stalls.find((stall) => stall.liveStatus === "live" || stall.status === "live") || fallbackStall;
+  const liveStall = stalls.find((stall) => stall.liveStatus === "live" || stall.status === "live");
+  const storeStall = stalls[0] || fallbackStall;
+  const isOwnVendorProfile = Boolean(currentVendor?.id && profile?.vendorId === currentVendor.id);
 
   const toggleFollow = async () => {
     if (!profile) return;
@@ -787,26 +831,42 @@ export function VendorProfileView({ vendorSlug }: { vendorSlug: string }) {
             <AppImage src={profile.bannerImageUrl} alt={vendorName} fallbackSrc="/stalls/stall-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
           </div>
         ) : null}
-        <div className="p-5">
-          <div className="flex items-start gap-4">
-            <span className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-2xl font-black text-secondary-foreground">
+        <div className="p-4 sm:p-5">
+          <div className="grid grid-cols-[86px_minmax(0,1fr)] gap-4 sm:grid-cols-[112px_minmax(0,1fr)]">
+            <span className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-2xl font-black text-secondary-foreground sm:h-24 sm:w-24">
               {profile?.profileImageUrl || fallbackStall?.vendorLogo ? <AppImage src={profile?.profileImageUrl || fallbackStall?.vendorLogo || ""} alt={vendorName} className="h-full w-full object-cover" /> : vendorName.slice(0, 1).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
-              <h1 className="text-2xl font-black tracking-[-0.04em] text-foreground">{vendorName}</h1>
-              <p className="mt-1 text-sm font-semibold text-muted-foreground">{category}</p>
-              {profile?.bio ? <p className="mt-2 text-sm font-semibold leading-6 text-foreground">{profile.bio}</p> : null}
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h1 className="truncate text-xl font-black tracking-[-0.03em] text-foreground sm:text-2xl">{vendorName}</h1>
+                  <p className="mt-1 truncate text-xs font-black uppercase tracking-[0.12em] text-primary">{category}</p>
+                </div>
+                {liveStall ? <Link href={`/live/${liveStall.id}`} className="shrink-0 rounded-full bg-destructive px-3 py-1 text-xs font-black text-destructive-foreground">Live</Link> : null}
+              </div>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <ProfileMetric label="Posts" value={profile?.postCount ?? visiblePosts.length} />
-                <ProfileMetric label="Products" value={profile?.productCount ?? products.length} />
-                <ProfileMetric label="Followers" value={profile?.followerCount ?? 0} />
+                <ProfileMetric label="posts" value={profile?.postCount ?? visiblePosts.length} flat />
+                <ProfileMetric label="products" value={profile?.productCount ?? products.length} flat />
+                <ProfileMetric label="followers" value={profile?.followerCount ?? 0} flat />
               </div>
             </div>
           </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {profile ? <button type="button" onClick={toggleFollow} className="rounded-2xl bg-primary px-5 py-3 text-sm font-black text-primary-foreground">{profile.followingByMe ? "Following" : "Follow"}</button> : null}
-            {liveStall ? <Link href={`/stalls/${liveStall.id}/store`} className="rounded-2xl border border-border bg-secondary px-5 py-3 text-sm font-black text-secondary-foreground">Visit store</Link> : null}
-            {liveStall && (liveStall.liveStatus === "live" || liveStall.status === "live") ? <Link href={`/live/${liveStall.id}`} className="rounded-2xl border border-border bg-secondary px-5 py-3 text-sm font-black text-secondary-foreground">Watch live</Link> : null}
+          <div className="mt-4">
+            <p className="text-sm font-black text-foreground">{vendorName}</p>
+            {profile?.bio ? <p className="mt-1 text-sm font-semibold leading-6 text-foreground">{profile.bio}</p> : null}
+          </div>
+          <div className="mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+            {isOwnVendorProfile ? (
+              <>
+                <Link href="/vendor" className="rounded-2xl bg-primary px-5 py-3 text-center text-sm font-black text-primary-foreground">Dashboard</Link>
+                <Link href="/vendor/profile" className="rounded-2xl border border-border bg-secondary px-5 py-3 text-center text-sm font-black text-secondary-foreground">Edit profile</Link>
+                <Link href="/vendor/posts" className="rounded-2xl border border-border bg-background px-5 py-3 text-center text-sm font-black text-foreground">New post</Link>
+              </>
+            ) : profile ? (
+              <button type="button" onClick={toggleFollow} className="rounded-2xl bg-primary px-5 py-3 text-sm font-black text-primary-foreground">{profile.followingByMe ? "Following" : "Follow"}</button>
+            ) : null}
+            {storeStall ? <Link href={`/stalls/${storeStall.id}/store`} className="rounded-2xl border border-border bg-secondary px-5 py-3 text-center text-sm font-black text-secondary-foreground">Visit store</Link> : null}
+            {liveStall ? <Link href={`/live/${liveStall.id}`} className="rounded-2xl border border-border bg-secondary px-5 py-3 text-center text-sm font-black text-secondary-foreground">Watch live</Link> : null}
           </div>
           {followMessage ? <p className="mt-3 text-sm font-semibold text-muted-foreground">{followMessage}</p> : null}
         </div>
@@ -821,7 +881,15 @@ export function VendorProfileView({ vendorSlug }: { vendorSlug: string }) {
   );
 }
 
-function ProfileMetric({ label, value }: { label: string; value: string | number }) {
+function ProfileMetric({ label, value, flat = false }: { label: string; value: string | number; flat?: boolean }) {
+  if (flat) {
+    return (
+      <div>
+        <p className="text-base font-black text-foreground sm:text-lg">{value}</p>
+        <p className="text-[11px] font-bold text-muted-foreground">{label}</p>
+      </div>
+    );
+  }
   return (
     <div className="rounded-2xl border border-border bg-background p-3">
       <p className="text-lg font-black text-foreground">{value}</p>
@@ -832,12 +900,27 @@ function ProfileMetric({ label, value }: { label: string; value: string | number
 
 export function CustomerProfileView({ settings = false }: { settings?: boolean }) {
   const currentUser = useExpoStore((state) => state.currentUser);
+  const currentVendor = useExpoStore((state) => state.currentVendor);
   const logout = useExpoStore((state) => state.logout);
   const [social, setSocial] = useState<SocialProfile | null>(null);
+  const [vendorProfile, setVendorProfile] = useState<VendorPublicProfile | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!currentUser) return;
+    if (currentUser.role === "vendor") {
+      let active = true;
+      getVendorOwnProfile()
+        .then((response) => {
+          if (active) setVendorProfile(response);
+        })
+        .catch((errorValue) => {
+          if (active) setError(errorValue instanceof Error ? errorValue.message : "Could not load vendor profile.");
+        });
+      return () => {
+        active = false;
+      };
+    }
     let active = true;
     getUserSocial()
       .then((response) => {
@@ -850,6 +933,55 @@ export function CustomerProfileView({ settings = false }: { settings?: boolean }
       active = false;
     };
   }, [currentUser]);
+
+  if (currentUser?.role === "vendor") {
+    const vendorName = vendorProfile?.displayName || currentVendor?.displayName || currentVendor?.businessName || currentUser.name;
+    return (
+      <SocialShell>
+        <section className="rounded-[32px] border border-border bg-card p-5 shadow-soft">
+          <div className="grid grid-cols-[84px_minmax(0,1fr)] gap-4">
+            <span className="grid h-20 w-20 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-2xl font-black text-secondary-foreground">
+              {vendorProfile?.profileImageUrl ? <AppImage src={vendorProfile.profileImageUrl} alt={vendorName} className="h-full w-full object-cover" /> : vendorName.slice(0, 1).toUpperCase()}
+            </span>
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">{settings ? "Vendor settings" : "Vendor profile"}</p>
+              <h1 className="mt-1 truncate text-2xl font-black text-foreground">{vendorName}</h1>
+              <p className="truncate text-sm font-semibold text-muted-foreground">{currentVendor?.businessCategory || vendorProfile?.category || "Vendor account"}</p>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                <ProfileMetric label="posts" value={vendorProfile?.postCount ?? 0} flat />
+                <ProfileMetric label="products" value={vendorProfile?.productCount ?? 0} flat />
+                <ProfileMetric label="followers" value={vendorProfile?.followerCount ?? 0} flat />
+              </div>
+            </div>
+          </div>
+          {vendorProfile?.bio || currentVendor?.businessDescription ? <p className="mt-4 text-sm font-semibold leading-6 text-foreground">{vendorProfile?.bio || currentVendor?.businessDescription}</p> : null}
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <Link href="/vendor" className="rounded-2xl bg-primary p-4 text-center text-sm font-black text-primary-foreground">Dashboard</Link>
+            <Link href="/vendor/profile" className="rounded-2xl border border-border bg-background p-4 text-center text-sm font-black text-foreground transition hover:border-primary">Edit profile</Link>
+            <Link href="/vendor/posts" className="rounded-2xl border border-border bg-background p-4 text-center text-sm font-black text-foreground transition hover:border-primary">Posts</Link>
+            <Link href="/vendor/products" className="rounded-2xl border border-border bg-background p-4 text-center text-sm font-black text-foreground transition hover:border-primary">Products</Link>
+            <Link href="/vendor/live" className="rounded-2xl border border-border bg-background p-4 text-center text-sm font-black text-foreground transition hover:border-primary">Live console</Link>
+            {vendorProfile ? <Link href={`/v/${vendorProfile.slug}`} className="rounded-2xl border border-border bg-background p-4 text-center text-sm font-black text-foreground transition hover:border-primary">Public view</Link> : null}
+          </div>
+          {settings ? (
+            <div className="mt-5 rounded-2xl border border-border bg-background p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-black text-foreground">Appearance</p>
+                  <p className="text-sm font-semibold text-muted-foreground">Switch between light and dark mode.</p>
+                </div>
+                <ThemeToggle />
+              </div>
+              <button type="button" onClick={logout} className="mt-4 w-full rounded-2xl border border-destructive bg-destructive px-5 py-3 text-sm font-black text-destructive-foreground">
+                Log out
+              </button>
+            </div>
+          ) : null}
+          {error ? <p className="mt-4 rounded-2xl border border-destructive bg-destructive/10 px-4 py-3 text-sm font-bold text-destructive">{error}</p> : null}
+        </section>
+      </SocialShell>
+    );
+  }
 
   return (
     <SocialShell>

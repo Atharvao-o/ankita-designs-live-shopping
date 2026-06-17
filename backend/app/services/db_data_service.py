@@ -16,6 +16,7 @@ from app.models.stall import Stall
 from app.models.user import User
 from app.models.vendor import Vendor
 from app.models.vendor_exhibition_request import VendorExhibitionRequest
+from app.config import get_settings
 VALID_EXHIBITION_STATUSES = {"draft", "scheduled", "live", "paused", "ended", "cancelled"}
 
 
@@ -29,6 +30,27 @@ def to_iso(value: datetime | str | None) -> str | None:
     if isinstance(value, str):
         return value
     return value.isoformat()
+
+
+def is_live_session_current(session: LiveSession | None) -> bool:
+    if session is None or session.status != "live" or session.started_at is None:
+        return False
+    stale_minutes = max(0, get_settings().live_session_stale_minutes)
+    if stale_minutes <= 0:
+        return True
+    started_at = session.started_at.replace(tzinfo=None) if session.started_at.tzinfo else session.started_at
+    return now_utc() - started_at <= timedelta(minutes=stale_minutes)
+
+
+def end_stale_live_session(db: Session, session: LiveSession, stall: Stall | None = None) -> None:
+    session.status = "ended"
+    session.ended_at = session.ended_at or now_utc()
+    target_stall = stall or db.get(Stall, session.stall_id)
+    if target_stall is not None:
+        target_stall.status = "assigned" if target_stall.vendor_id else "available"
+        target_stall.live_status = "offline"
+        target_stall.viewer_count = 0
+        target_stall.updated_at = now_utc()
 
 
 def parse_dt(value: str | datetime | None) -> datetime | None:
@@ -264,6 +286,10 @@ def serialize_stall(db: Session, stall: Stall) -> dict:
         live_session = db.scalar(
             select(LiveSession).where(LiveSession.stall_id == stall.id, LiveSession.status == "live").order_by(LiveSession.started_at.desc())
         )
+        if live_session is not None and not is_live_session_current(live_session):
+            end_stale_live_session(db, live_session, stall)
+            db.commit()
+            live_session = None
     display_status = stall.status
     if display_status == "live" and live_session is None:
         display_status = "assigned" if stall.vendor_id else "available"

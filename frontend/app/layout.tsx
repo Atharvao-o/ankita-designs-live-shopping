@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@livekit/components-styles";
 import "@/app/globals.css";
 import { GlobalBackButton } from "@/components/layout/global-back-button";
@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   title: "Ankita Designs Social Shopping",
   description:
     "Ankita Designs is a social shopping marketplace for discovering small vendors, products, live streams, and shopping events."
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover"
 };
 
 export default function RootLayout({

@@ -9,6 +9,8 @@ from app.models.stall import Stall
 from app.models.vendor import Vendor
 from app.models.vendor_exhibition_request import VendorExhibitionRequest
 from app.services.db_data_service import (
+    end_stale_live_session,
+    is_live_session_current,
     serialize_exhibition,
     serialize_live_session,
     serialize_order,
@@ -35,6 +37,10 @@ class AnalyticsService:
             .order_by(LiveSession.started_at.desc().nulls_last(), LiveSession.id.desc())
         )
         stall = db.scalar(select(Stall).where(Stall.vendor_id == vendor_id))
+        if current_live_session is not None and not is_live_session_current(current_live_session):
+            end_stale_live_session(db, current_live_session, stall)
+            db.commit()
+            current_live_session = None
         latest_request = db.scalar(
             select(VendorExhibitionRequest)
             .where(VendorExhibitionRequest.vendor_id == vendor_id)

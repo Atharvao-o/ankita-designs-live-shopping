@@ -183,6 +183,15 @@ export function RegisterScreen() {
             <Tabs tabs={["user", "vendor"]} active={role} onChange={(item) => setRole(item as Exclude<UserRole, "admin">)} />
           </div>
 
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <Link href="/register?role=user" className="rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-3 py-3 text-center text-xs font-black text-[var(--text)] transition hover:border-[var(--gold)]">
+              Customer signup
+            </Link>
+            <Link href="/register?role=vendor" className="rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-3 py-3 text-center text-xs font-black text-[var(--text)] transition hover:border-[var(--gold)]">
+              Vendor signup
+            </Link>
+          </div>
+
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <Field label={role === "vendor" ? "Owner name" : "Full name"} required>
               <input
@@ -313,7 +322,7 @@ export function RegisterScreen() {
           </StatefulButton>
           <p className="mt-5 text-center text-sm text-[var(--muted)]">
             Already registered?{" "}
-            <Link href="/login" data-tour-id="landing-login-button" className="font-semibold text-[var(--gold)]">
+            <Link href={role === "vendor" ? "/login?role=vendor" : "/login?role=user"} data-tour-id="landing-login-button" className="font-semibold text-[var(--gold)]">
               Login
             </Link>
           </p>

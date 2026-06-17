@@ -211,6 +211,15 @@ export function LoginScreen() {
             </p>
           ) : null}
 
+          <div className="mt-5 grid grid-cols-2 gap-2">
+            <Link href="/login?role=user" className="rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-3 py-3 text-center text-xs font-black text-[var(--text)] transition hover:border-[var(--gold)]">
+              Customer login
+            </Link>
+            <Link href="/login?role=vendor" className="rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-3 py-3 text-center text-xs font-black text-[var(--text)] transition hover:border-[var(--gold)]">
+              Vendor login
+            </Link>
+          </div>
+
           <div className="mt-6 grid gap-4">
             <label data-tour-id="auth-email-input" className="grid gap-2 text-sm font-semibold text-[var(--muted)]">
               Email
@@ -269,14 +278,16 @@ export function LoginScreen() {
             ) : null}
           </div>
 
-          <div className="mt-5 flex flex-col items-center justify-center gap-3 text-center text-sm text-[var(--muted)] sm:flex-row sm:gap-4">
+          <div className="mt-5 grid gap-2 text-center text-sm text-[var(--muted)]">
             <span>
               New here?{" "}
-              <Link href="/register" data-tour-id="landing-register-button" className="font-bold text-[var(--gold)] transition hover:text-[var(--coral)]">
-                Create account
+              <Link href="/register?role=user" data-tour-id="landing-register-button" className="font-bold text-[var(--gold)] transition hover:text-[var(--coral)]">
+                Create customer account
               </Link>
             </span>
-            <span className="hidden h-4 w-px bg-[var(--border)] sm:block" aria-hidden="true" />
+            <Link href="/register?role=vendor" className="font-bold text-[var(--gold)] transition hover:text-[var(--coral)]">
+              Register as vendor
+            </Link>
             <Link href="/" className="font-bold text-[var(--muted)] transition hover:text-[var(--gold)]">
               Back to home
             </Link>

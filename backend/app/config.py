@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     cloudinary_api_key: str = ""
     cloudinary_api_secret: str = ""
     enforce_live_slot_gating: bool = False
+    live_session_stale_minutes: int = 240
 
     model_config = SettingsConfigDict(
         env_file=(".env", "../.env"),
