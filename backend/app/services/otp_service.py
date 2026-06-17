@@ -89,8 +89,35 @@ def _send_sms(phone: str, code: str, purpose: str = "login") -> None:
         timeout=12,
     )
     if response.status_code >= 400:
+        try:
+            error_body = response.json()
+        except ValueError:
+            error_body = {}
+        twilio_code = str(error_body.get("code") or "")
+        twilio_message = str(error_body.get("message") or response.text[:180] or "Twilio rejected the OTP SMS.")
         logger.error("Twilio OTP send failed: %s %s", response.status_code, response.text[:300])
-        raise HTTPException(status_code=502, detail={"code": "OTP_SEND_FAILED", "message": "Could not send OTP. Try again shortly."})
+
+        user_message = "Could not send OTP. Check Twilio SMS configuration."
+        if twilio_code == "21608":
+            user_message = "Twilio trial accounts can send OTP only to verified recipient numbers. Verify this phone number in Twilio or upgrade the account."
+        elif twilio_code == "21408":
+            user_message = "Twilio is not allowed to send SMS to this country yet. Enable SMS geo permissions for India in Twilio."
+        elif twilio_code == "21614":
+            user_message = "Twilio says this is not a valid mobile number for SMS."
+        elif twilio_code == "20003":
+            user_message = "Twilio authentication failed. Check TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN on the backend."
+        elif twilio_code == "21212":
+            user_message = "Twilio sender number is invalid. Check TWILIO_FROM_PHONE on the backend."
+
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "code": "OTP_SEND_FAILED",
+                "message": user_message,
+                "providerCode": twilio_code or None,
+                "providerMessage": twilio_message[:220],
+            },
+        )
 
 
 def request_login_otp(db: Session, raw_phone: str) -> dict:
