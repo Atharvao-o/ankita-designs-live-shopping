@@ -208,7 +208,7 @@ export function useSocialShoppingData(limitProducts = 30) {
 
 export function SocialShell({ children, rightRail }: { children: React.ReactNode; rightRail?: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-card pb-[calc(4rem+env(safe-area-inset-bottom))] text-foreground sm:bg-background md:pb-0">
+    <main className="min-h-screen overflow-x-hidden bg-card pb-[calc(3.5rem+env(safe-area-inset-bottom))] text-foreground sm:bg-background md:pb-0">
       <SocialTopBar />
       <div className="mx-auto grid w-full max-w-[1180px] gap-0 px-0 py-0 sm:gap-6 sm:px-5 sm:py-4 lg:grid-cols-[220px_minmax(0,620px)_280px] lg:py-6">
         <SocialSidebar />
@@ -225,19 +225,19 @@ function SocialTopBar() {
   const openCart = useExpoStore((state) => state.openCart);
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card text-card-foreground sm:shadow-soft">
-      <div className="mx-auto flex h-14 max-w-[1180px] items-center gap-3 px-4 sm:h-auto sm:px-5 sm:py-3">
+      <div className="mx-auto flex h-[52px] max-w-[1180px] items-center gap-2.5 px-3 sm:h-auto sm:px-5 sm:py-3">
         <Link href="/" className="flex items-center gap-2" aria-label="Ankita Social Shopping home">
           <span className="hidden h-10 w-10 place-items-center rounded-2xl bg-primary text-sm font-black text-primary-foreground sm:grid">AD</span>
           <span className="leading-tight">
-            <span className="block text-xl font-black tracking-[-0.04em] sm:hidden">Ankita</span>
+            <span className="block text-lg font-black tracking-[-0.03em] sm:hidden">Ankita</span>
             <span className="hidden text-sm font-black sm:block">Ankita Designs</span>
             <span className="hidden text-[11px] font-black uppercase tracking-[0.14em] text-primary sm:block">Social Shopping</span>
           </span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle className="h-9 w-9 rounded-full border-0 bg-transparent shadow-none hover:bg-secondary sm:h-10 sm:w-10 sm:rounded-2xl sm:border sm:bg-card sm:shadow-sm" />
-          <button type="button" onClick={openCart} className="grid h-9 w-9 place-items-center rounded-full bg-transparent text-foreground transition hover:bg-secondary sm:h-10 sm:w-10 sm:rounded-2xl sm:border sm:border-border sm:bg-background" aria-label="Open cart">
-            <ShoppingBag className="h-[22px] w-[22px]" />
+          <ThemeToggle className="h-8 w-8 rounded-full border-0 bg-transparent shadow-none hover:bg-secondary sm:h-10 sm:w-10 sm:rounded-2xl sm:border sm:bg-card sm:shadow-sm" />
+          <button type="button" onClick={openCart} className="grid h-8 w-8 place-items-center rounded-full bg-transparent text-foreground transition hover:bg-secondary sm:h-10 sm:w-10 sm:rounded-2xl sm:border sm:border-border sm:bg-background" aria-label="Open cart">
+            <ShoppingBag className="h-5 w-5 sm:h-[22px] sm:w-[22px]" />
           </button>
           <Link href="/profile" className="hidden h-10 w-10 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary sm:grid" aria-label="Profile">
             <UserRound className="h-5 w-5" />
@@ -302,8 +302,8 @@ function SocialBottomNav() {
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card px-2 pb-[env(safe-area-inset-bottom)] text-card-foreground md:hidden" aria-label="Mobile social navigation">
       <div className="grid grid-cols-5 gap-1">
         {items.slice(0, 2).map((item) => <SocialBottomLink key={item.href} item={item} active={pathname === item.href} />)}
-        <button type="button" onClick={openCart} className="flex min-h-14 items-center justify-center text-muted-foreground transition active:scale-90 active:text-foreground" aria-label="Open cart">
-          <ShoppingBag className="h-6 w-6" />
+        <button type="button" onClick={openCart} className="flex min-h-12 items-center justify-center text-muted-foreground transition active:scale-90 active:text-foreground" aria-label="Open cart">
+          <ShoppingBag className="h-5 w-5" />
           <span className="sr-only">Cart</span>
         </button>
         {items.slice(2).map((item) => <SocialBottomLink key={item.href} item={item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />)}
@@ -315,8 +315,8 @@ function SocialBottomNav() {
 function SocialBottomLink({ item, active }: { item: { label: string; href: string; icon: typeof Home }; active: boolean }) {
   const Icon = item.icon;
   return (
-    <Link href={item.href} className={cn("flex min-h-14 items-center justify-center transition active:scale-90", active ? "text-foreground" : "text-muted-foreground")}>
-      <Icon className={cn("h-6 w-6", active && item.href === "/" && "fill-current")} />
+    <Link href={item.href} className={cn("flex min-h-12 items-center justify-center transition active:scale-90", active ? "text-foreground" : "text-muted-foreground")}>
+      <Icon className={cn("h-5 w-5", active && item.href === "/" && "fill-current")} />
       <span className="sr-only">{item.label}</span>
     </Link>
   );
@@ -350,16 +350,16 @@ export function StoriesRow({ stalls, exhibitions }: { stalls: Stall[]; exhibitio
   if (!stories.length) return null;
 
   return (
-    <section className="border-b border-border bg-card px-3 py-3 sm:rounded-[28px] sm:border sm:p-3 sm:shadow-soft">
-      <div className="flex touch-pan-x snap-x gap-3 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <section className="border-b border-border bg-card px-2.5 py-2.5 sm:rounded-[28px] sm:border sm:p-3 sm:shadow-soft">
+      <div className="flex touch-pan-x snap-x gap-2.5 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {stories.map((story) => (
-          <Link key={`${story.type}-${story.id}`} href={story.href} className="w-[68px] shrink-0 snap-start text-center sm:w-[74px]">
-            <span className={cn("mx-auto grid h-[62px] w-[62px] place-items-center rounded-full p-[3px] sm:h-16 sm:w-16", story.live ? "bg-gradient-to-tr from-primary via-accent to-emerald-400" : "bg-gradient-to-tr from-primary via-accent to-orange-500")}>
+          <Link key={`${story.type}-${story.id}`} href={story.href} className="w-[58px] shrink-0 snap-start text-center sm:w-[74px]">
+            <span className={cn("mx-auto grid h-14 w-14 place-items-center rounded-full p-[2.5px] sm:h-16 sm:w-16 sm:p-[3px]", story.live ? "bg-gradient-to-tr from-primary via-accent to-emerald-400" : "bg-gradient-to-tr from-primary via-accent to-orange-500")}>
               <span className="relative h-full w-full overflow-hidden rounded-full border-2 border-card bg-muted">
                 <AppImage src={story.image} alt={story.title} fallbackSrc="/stalls/stall-placeholder.png" className="h-full w-full object-cover" />
               </span>
             </span>
-            <span className="mt-1.5 block truncate text-[10px] font-semibold text-foreground sm:mt-2 sm:text-[11px] sm:font-black">{story.title}</span>
+            <span className="mt-1 block truncate text-[9px] font-semibold text-foreground sm:mt-2 sm:text-[11px] sm:font-black">{story.title}</span>
           </Link>
         ))}
       </div>
@@ -491,8 +491,8 @@ export function FeedCard({ post }: { post: SocialPost }) {
 
   return (
     <article className="overflow-hidden border-b border-border bg-card text-card-foreground sm:rounded-[30px] sm:border sm:shadow-soft">
-      <div className="flex min-h-14 items-center gap-3 px-3 py-2.5 sm:p-4">
-        <Link href={`/v/${viewPost.vendorSlug}`} className="grid h-9 w-9 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-xs font-black text-secondary-foreground sm:h-11 sm:w-11 sm:text-sm">
+      <div className="flex min-h-12 items-center gap-2.5 px-3 py-2 sm:min-h-14 sm:gap-3 sm:p-4">
+        <Link href={`/v/${viewPost.vendorSlug}`} className="grid h-8 w-8 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-[11px] font-black text-secondary-foreground sm:h-11 sm:w-11 sm:text-sm">
           {viewPost.stall?.vendorLogo ? <AppImage src={viewPost.stall.vendorLogo} alt={viewPost.vendorName} className="h-full w-full object-cover" /> : viewPost.vendorName.slice(0, 1).toUpperCase()}
         </Link>
         <div className="min-w-0 flex-1">
@@ -510,30 +510,30 @@ export function FeedCard({ post }: { post: SocialPost }) {
         <MoreHorizontal className="h-5 w-5 shrink-0 text-foreground sm:hidden" aria-hidden="true" />
       </div>
       <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="block bg-muted">
-        <div className="relative aspect-[4/5] sm:aspect-square">
+        <div className="relative aspect-square">
           <AppImage src={viewPost.mediaUrl} alt={product?.title || viewPost.caption || viewPost.vendorName} fallbackSrc="/products/product-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
           {discount ? <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">{discount}% off</span> : null}
         </div>
       </Link>
-      <div className="px-3 pb-4 pt-3 sm:p-4">
+      <div className="px-3 pb-3 pt-2.5 sm:p-4">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-4 text-foreground">
+          <div className="flex items-center gap-3.5 text-foreground sm:gap-4">
             <button type="button" onClick={toggleLike} disabled={busy === "like"} className={cn("transition active:scale-90 hover:text-primary", viewPost.likedByMe && "text-primary")} aria-label="Like post">
-              <Heart className={cn("h-[25px] w-[25px]", viewPost.likedByMe && "fill-current")} />
+              <Heart className={cn("h-[22px] w-[22px] sm:h-[25px] sm:w-[25px]", viewPost.likedByMe && "fill-current")} />
             </button>
             <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="transition active:scale-90 hover:text-primary" aria-label="Open post">
-              <MessageCircle className="h-[25px] w-[25px]" />
+              <MessageCircle className="h-[22px] w-[22px] sm:h-[25px] sm:w-[25px]" />
             </Link>
             <button type="button" onClick={sharePost} className="transition active:scale-90 hover:text-primary" aria-label="Share post">
-              <Send className="h-[24px] w-[24px]" />
+              <Send className="h-[21px] w-[21px] sm:h-[24px] sm:w-[24px]" />
             </button>
             {viewPost.stallId ? <Link href={`/stalls/${viewPost.stallId}/store`} className="hidden transition hover:text-primary sm:block" aria-label="Open vendor stall"><Store className="h-6 w-6" /></Link> : null}
           </div>
           <button type="button" onClick={toggleSave} disabled={busy === "save"} className={cn("text-foreground transition active:scale-90 hover:text-primary", viewPost.savedByMe && "text-primary")} aria-label="Save post">
-            {viewPost.savedByMe ? <BookmarkCheck className="h-[25px] w-[25px]" /> : <Bookmark className="h-[25px] w-[25px]" />}
+            {viewPost.savedByMe ? <BookmarkCheck className="h-[22px] w-[22px] sm:h-[25px] sm:w-[25px]" /> : <Bookmark className="h-[22px] w-[22px] sm:h-[25px] sm:w-[25px]" />}
           </button>
         </div>
-        <p className="mt-2.5 text-[13px] font-black text-foreground sm:mt-3 sm:text-sm">{viewPost.likeCount ? `${viewPost.likeCount} likes` : "Be the first to like this"}</p>
+        <p className="mt-2 text-xs font-black text-foreground sm:mt-3 sm:text-sm">{viewPost.likeCount ? `${viewPost.likeCount} likes` : "Be the first to like this"}</p>
         <div className="mt-2 flex items-start justify-between gap-4 sm:mt-3">
           <div className="min-w-0">
             <p className="line-clamp-2 text-[13px] leading-5 text-foreground">

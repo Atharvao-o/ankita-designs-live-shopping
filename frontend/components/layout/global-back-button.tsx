@@ -22,8 +22,9 @@ export function GlobalBackButton() {
   const pathname = usePathname();
   const router = useRouter();
   const fallbackPath = useMemo(() => getFallbackPath(pathname), [pathname]);
+  const topLevelRoutes = new Set(["/", "/explore", "/exhibitions", "/orders", "/cart", "/profile", "/profile/settings", "/settings"]);
 
-  if (pathname === "/") {
+  if (topLevelRoutes.has(pathname)) {
     return null;
   }
 
@@ -40,7 +41,7 @@ export function GlobalBackButton() {
     <button
       type="button"
       onClick={goBack}
-      className="fixed left-3 top-20 z-[65] inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-black text-card-foreground shadow-strong transition hover:-translate-y-0.5 hover:border-primary hover:bg-secondary hover:text-secondary-foreground focus:outline-none focus:ring-2 focus:ring-ring sm:left-5 sm:top-24"
+      className="fixed left-5 top-24 z-[65] hidden min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-black text-card-foreground shadow-strong transition hover:-translate-y-0.5 hover:border-primary hover:bg-secondary hover:text-secondary-foreground focus:outline-none focus:ring-2 focus:ring-ring md:inline-flex"
       aria-label="Go back"
     >
       <ArrowLeft className="h-4 w-4" aria-hidden />
