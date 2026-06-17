@@ -899,6 +899,25 @@ export function verifyOtpLogin(payload: { phone: string; challengeId: string; co
   });
 }
 
+export function requestOtpRegistration(payload: { phone: string; name?: string }): Promise<OtpRequestResponse> {
+  return request<OtpRequestResponse>("/auth/otp/register/request", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function verifyOtpRegistration(payload: { phone: string; challengeId: string; code: string; name: string }): Promise<AuthResponse> {
+  return request<AuthResponse>("/auth/otp/register/verify", {
+    method: "POST",
+    body: JSON.stringify({
+      phone: payload.phone,
+      challenge_id: payload.challengeId,
+      code: payload.code,
+      name: payload.name
+    })
+  });
+}
+
 export function getAuthMe(): Promise<AuthResponse> {
   return request<AuthResponse>("/auth/me");
 }

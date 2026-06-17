@@ -192,6 +192,12 @@ export function RegisterScreen() {
             </Link>
           </div>
 
+          {role === "user" ? (
+            <Link href="/register/mobile" className="mt-3 flex min-h-12 items-center justify-center rounded-2xl border border-[color:var(--gold)] bg-[color:var(--gold)]/12 px-4 py-3 text-center text-sm font-black text-[var(--text)] transition hover:bg-[color:var(--gold)]/20">
+              Register using mobile phone
+            </Link>
+          ) : null}
+
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <Field label={role === "vendor" ? "Owner name" : "Full name"} required>
               <input

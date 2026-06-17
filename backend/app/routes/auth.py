@@ -11,9 +11,9 @@ from app.database import get_db
 from app.config import get_settings
 from app.models.user import User
 from app.models.vendor import Vendor
-from app.schemas.user import AuthResponse, GoogleLoginRequest, LoginRequest, OtpRequest, OtpRequestResponse, OtpVerifyRequest, RegisterRequest, UserResponse
+from app.schemas.user import AuthResponse, GoogleLoginRequest, LoginRequest, OtpRegisterRequest, OtpRegisterVerifyRequest, OtpRequest, OtpRequestResponse, OtpVerifyRequest, RegisterRequest, UserResponse
 from app.services.auth_context import current_user_from_request, make_token
-from app.services.otp_service import request_login_otp, verify_login_otp
+from app.services.otp_service import request_login_otp, request_registration_otp, verify_login_otp, verify_registration_otp
 from app.services.password_service import hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -232,6 +232,18 @@ def request_otp_login(payload: OtpRequest, db: Session = Depends(get_db)) -> dic
 def verify_otp_login(payload: OtpVerifyRequest, db: Session = Depends(get_db)) -> dict:
     ensure_bootstrap_admin(db)
     return verify_login_otp(db, payload.challenge_id, payload.phone, payload.code)
+
+
+@router.post("/otp/register/request", response_model=OtpRequestResponse)
+def request_otp_register(payload: OtpRegisterRequest, db: Session = Depends(get_db)) -> dict:
+    ensure_bootstrap_admin(db)
+    return request_registration_otp(db, payload.phone)
+
+
+@router.post("/otp/register/verify", response_model=AuthResponse)
+def verify_otp_register(payload: OtpRegisterVerifyRequest, db: Session = Depends(get_db)) -> dict:
+    ensure_bootstrap_admin(db)
+    return verify_registration_otp(db, payload.challenge_id, payload.phone, payload.code, payload.name)
 
 
 @router.post("/google", response_model=AuthResponse)

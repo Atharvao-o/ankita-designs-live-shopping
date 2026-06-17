@@ -131,7 +131,7 @@ export function OtpLoginScreen() {
 
           <div className="mt-6 grid gap-2 text-center text-sm text-[var(--muted)]">
             <Link href="/login?role=user" className="font-bold text-[var(--gold)] transition hover:text-[var(--coral)]">Use email and password</Link>
-            <Link href="/register?role=user" className="font-bold text-[var(--muted)] transition hover:text-[var(--gold)]">Create customer account</Link>
+            <Link href="/register/mobile" className="font-bold text-[var(--muted)] transition hover:text-[var(--gold)]">Create mobile customer account</Link>
           </div>
         </motion.div>
       </section>

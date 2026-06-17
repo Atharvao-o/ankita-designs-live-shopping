@@ -20,6 +20,18 @@ class OtpVerifyRequest(BaseModel):
     code: str
 
 
+class OtpRegisterRequest(BaseModel):
+    phone: str
+    name: str | None = None
+
+
+class OtpRegisterVerifyRequest(BaseModel):
+    phone: str
+    challenge_id: str
+    code: str
+    name: str
+
+
 class OtpRequestResponse(BaseModel):
     ok: bool
     challengeId: str
