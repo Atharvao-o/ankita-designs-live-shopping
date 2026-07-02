@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Delete, MessageSquareText, Phone, ShieldCheck, U
 import { requestOtpRegistration, verifyOtpRegistration } from "@/lib/api";
 import { useExpoStore } from "@/lib/cart-store";
 import { AuroraBackground, StatefulButton } from "@/components/ui/aceternity";
+import { OtpCodeInput } from "@/components/auth/otp-code-input";
 
 const keypadKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "+", "0", "*"];
 const phonePattern = /^[+0-9*]{8,18}$/;
@@ -169,10 +170,7 @@ export function MobileRegisterScreen() {
             </StatefulButton>
 
             {challengeId ? (
-              <label className="grid gap-2 text-sm font-bold text-[var(--muted)]">
-                6-digit OTP
-                <input value={code} onChange={(event) => setCode(cleanOtp(event.target.value))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000" className="min-h-14 rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-4 text-center text-2xl font-black tracking-[0.35em] text-[var(--text)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--gold)] focus:ring-2 focus:ring-[color:var(--gold)]/20" />
-              </label>
+              <OtpCodeInput value={code} onChange={setCode} />
             ) : null}
           </div>
 

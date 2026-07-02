@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { requestOtpLogin, verifyOtpLogin } from "@/lib/api";
 import { useExpoStore } from "@/lib/cart-store";
 import { AuroraBackground, StatefulButton } from "@/components/ui/aceternity";
+import { OtpCodeInput } from "@/components/auth/otp-code-input";
 
 const phonePattern = /^[+0-9\s()-]{8,18}$/;
 
@@ -111,10 +112,7 @@ export function OtpLoginScreen() {
             </StatefulButton>
 
             {challengeId ? (
-              <label className="grid gap-2 text-sm font-bold text-[var(--muted)]">
-                6-digit OTP
-                <input value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000" className="min-h-14 rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-4 text-center text-2xl font-black tracking-[0.35em] text-[var(--text)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--gold)] focus:ring-2 focus:ring-[color:var(--gold)]/20" />
-              </label>
+              <OtpCodeInput value={code} onChange={setCode} />
             ) : null}
           </div>
 
