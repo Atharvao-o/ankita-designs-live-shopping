@@ -87,6 +87,13 @@ Copy `.env.example` and set values as needed.
 - `LIVEKIT_URL`
 - `FRONTEND_URL`
 - `ALLOWED_ORIGINS`
+- `OTP_PROVIDER` (`twilio` or `fast2sms`)
+- `OTP_DEBUG_RESPONSE`
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_FROM_PHONE`
+- `FAST2SMS_API_KEY`
+- `FAST2SMS_OTP_ID`
 
 ### Frontend
 - `NEXT_PUBLIC_API_URL`
@@ -141,6 +148,17 @@ To reset a user's password safely:
 cd backend
 python scripts/reset_user_password.py
 ```
+
+### OTP SMS setup
+
+Local OTP testing can use `OTP_DEBUG_RESPONSE=true`, which returns the generated code in the API response and skips SMS delivery.
+
+Production SMS delivery supports two providers:
+
+- Twilio: set `OTP_PROVIDER=twilio`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_PHONE`.
+- Fast2SMS Smart OTP: set `OTP_PROVIDER=fast2sms`, `FAST2SMS_API_KEY`, and `FAST2SMS_OTP_ID`.
+
+Fast2SMS numbers are sent as Indian 10-digit mobile numbers. Complete DLT entity, header, content template, and Smart OTP template approval in Fast2SMS before enabling it in production.
 
 ## Run the frontend
 

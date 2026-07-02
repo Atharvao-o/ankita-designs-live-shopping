@@ -51,9 +51,21 @@ LIVEKIT_API_SECRET=your_livekit_api_secret
 BOOTSTRAP_ADMIN_EMAIL=admin@ankitadesigns.in
 BOOTSTRAP_ADMIN_PASSWORD=set_a_strong_password
 BOOTSTRAP_ADMIN_NAME=Ankita Admin
+
+OTP_PROVIDER=fast2sms
+OTP_DEBUG_RESPONSE=false
+FAST2SMS_API_KEY=your_fast2sms_api_key
+FAST2SMS_OTP_ID=your_fast2sms_smart_otp_template_id
+
+# Optional Twilio fallback if OTP_PROVIDER=twilio
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_FROM_PHONE=
 ```
 
 LiveKit can stay empty if live video is not ready for production. The app will keep catalogue, chat, cart, checkout, vendor, and admin flows running.
+
+For local OTP testing, use `OTP_DEBUG_RESPONSE=true` so SMS delivery is skipped and the development OTP is returned by the backend.
 
 ## 3. Deploy Frontend On Vercel
 

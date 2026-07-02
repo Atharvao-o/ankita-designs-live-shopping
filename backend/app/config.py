@@ -24,9 +24,13 @@ class Settings(BaseSettings):
     otp_resend_cooldown_seconds: int = 45
     otp_max_attempts: int = 5
     otp_debug_response: bool = False
+    otp_provider: str = "twilio"
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""
     twilio_from_phone: str = ""
+    fast2sms_api_key: str = ""
+    fast2sms_otp_id: str = ""
+    fast2sms_api_url: str = "https://www.fast2sms.com/dev/bulkV2"
 
     model_config = SettingsConfigDict(
         env_file=(".env", "../.env"),

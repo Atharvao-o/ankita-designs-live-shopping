@@ -64,11 +64,84 @@ def _otp_email_for_phone(phone: str) -> str:
     return f"phone-{digits}@otp.ankita.local"
 
 
-def _send_sms(phone: str, code: str, purpose: str = "login") -> None:
+def _fast2sms_number(phone: str) -> str:
+    digits = "".join(char for char in phone if char.isdigit())
+    if digits.startswith("91") and len(digits) == 12:
+        return digits[2:]
+    if len(digits) == 10:
+        return digits
+    raise HTTPException(
+        status_code=400,
+        detail={
+            "code": "FAST2SMS_REQUIRES_INDIAN_MOBILE",
+            "message": "Fast2SMS OTP supports Indian 10-digit mobile numbers. Enter a valid India mobile number.",
+        },
+    )
+
+
+def _send_fast2sms_otp(phone: str, code: str) -> None:
     settings = get_settings()
-    if settings.otp_debug_response:
-        logger.warning("OTP debug mode enabled. OTP for %s is %s", phone, code)
-        return
+    if not (settings.fast2sms_api_key and settings.fast2sms_otp_id):
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "code": "OTP_SMS_NOT_CONFIGURED",
+                "message": "Fast2SMS OTP is not configured. Set FAST2SMS_API_KEY and FAST2SMS_OTP_ID on the backend.",
+            },
+        )
+
+    response = requests.post(
+        settings.fast2sms_api_url,
+        headers={
+            "authorization": settings.fast2sms_api_key,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        data={
+            "route": "otp",
+            "otp_id": settings.fast2sms_otp_id,
+            "variables_values": code,
+            "numbers": _fast2sms_number(phone),
+            "flash": "0",
+        },
+        timeout=12,
+    )
+    if response.status_code >= 400:
+        try:
+            error_body = response.json()
+        except ValueError:
+            error_body = {}
+        provider_message = str(error_body.get("message") or error_body.get("error") or response.text[:180] or "Fast2SMS rejected the OTP SMS.")
+        logger.error("Fast2SMS OTP send failed: %s %s", response.status_code, response.text[:300])
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "code": "OTP_SEND_FAILED",
+                "message": "Could not send OTP. Check Fast2SMS API key, Smart OTP template, DLT header, and template approval.",
+                "providerCode": str(response.status_code),
+                "providerMessage": provider_message[:220],
+            },
+        )
+
+    try:
+        body = response.json()
+    except ValueError:
+        body = {}
+    if isinstance(body, dict) and body.get("return") is False:
+        provider_message = str(body.get("message") or "Fast2SMS rejected the OTP SMS.")
+        logger.error("Fast2SMS OTP send failed: %s", body)
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "code": "OTP_SEND_FAILED",
+                "message": "Could not send OTP. Check Fast2SMS API key, Smart OTP template, DLT header, and template approval.",
+                "providerCode": str(body.get("status_code") or body.get("request_id") or ""),
+                "providerMessage": provider_message[:220],
+            },
+        )
+
+
+def _send_twilio_otp(phone: str, code: str, purpose: str = "login") -> None:
+    settings = get_settings()
     if not (settings.twilio_account_sid and settings.twilio_auth_token and settings.twilio_from_phone):
         raise HTTPException(
             status_code=503,
@@ -118,6 +191,28 @@ def _send_sms(phone: str, code: str, purpose: str = "login") -> None:
                 "providerMessage": twilio_message[:220],
             },
         )
+
+
+def _send_sms(phone: str, code: str, purpose: str = "login") -> None:
+    settings = get_settings()
+    if settings.otp_debug_response:
+        logger.warning("OTP debug mode enabled. OTP for %s is %s", phone, code)
+        return
+
+    provider = settings.otp_provider.strip().lower()
+    if provider == "fast2sms":
+        _send_fast2sms_otp(phone, code)
+        return
+    if provider in {"twilio", ""}:
+        _send_twilio_otp(phone, code, purpose)
+        return
+    raise HTTPException(
+        status_code=503,
+        detail={
+            "code": "OTP_PROVIDER_NOT_SUPPORTED",
+            "message": "OTP_PROVIDER must be either twilio or fast2sms.",
+        },
+    )
 
 
 def request_login_otp(db: Session, raw_phone: str) -> dict:
