@@ -56,6 +56,7 @@ OTP_PROVIDER=fast2sms
 OTP_DEBUG_RESPONSE=false
 FAST2SMS_API_KEY=your_fast2sms_api_key
 FAST2SMS_OTP_ID=your_fast2sms_smart_otp_template_id
+FAST2SMS_VARIABLES_VALUES=
 
 # Optional Twilio fallback if OTP_PROVIDER=twilio
 TWILIO_ACCOUNT_SID=

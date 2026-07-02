@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import math
 import random
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -94,17 +95,30 @@ def _send_fast2sms_otp(phone: str, code: str) -> None:
         settings.fast2sms_api_url,
         headers={
             "authorization": settings.fast2sms_api_key,
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json",
         },
-        data={
-            "route": "otp",
+        json={
+            "mobile": _fast2sms_number(phone),
             "otp_id": settings.fast2sms_otp_id,
-            "variables_values": code,
-            "numbers": _fast2sms_number(phone),
-            "flash": "0",
+            "otp_expiry": max(1, math.ceil(settings.otp_expiry_seconds / 60)),
+            "otp_length": len(code),
+            "otp": code,
+            "variables_values": settings.fast2sms_variables_values,
         },
         timeout=12,
     )
+    def raise_fast2sms_error(provider_code: str, provider_message: str) -> None:
+        clean_message = provider_message[:220] or "Fast2SMS rejected the OTP SMS."
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "code": "OTP_SEND_FAILED",
+                "message": f"Fast2SMS rejected the OTP request: {clean_message}",
+                "providerCode": provider_code or None,
+                "providerMessage": clean_message,
+            },
+        )
+
     if response.status_code >= 400:
         try:
             error_body = response.json()
@@ -112,15 +126,7 @@ def _send_fast2sms_otp(phone: str, code: str) -> None:
             error_body = {}
         provider_message = str(error_body.get("message") or error_body.get("error") or response.text[:180] or "Fast2SMS rejected the OTP SMS.")
         logger.error("Fast2SMS OTP send failed: %s %s", response.status_code, response.text[:300])
-        raise HTTPException(
-            status_code=502,
-            detail={
-                "code": "OTP_SEND_FAILED",
-                "message": "Could not send OTP. Check Fast2SMS API key, Smart OTP template, DLT header, and template approval.",
-                "providerCode": str(response.status_code),
-                "providerMessage": provider_message[:220],
-            },
-        )
+        raise_fast2sms_error(str(response.status_code), provider_message)
 
     try:
         body = response.json()
@@ -129,15 +135,7 @@ def _send_fast2sms_otp(phone: str, code: str) -> None:
     if isinstance(body, dict) and body.get("return") is False:
         provider_message = str(body.get("message") or "Fast2SMS rejected the OTP SMS.")
         logger.error("Fast2SMS OTP send failed: %s", body)
-        raise HTTPException(
-            status_code=502,
-            detail={
-                "code": "OTP_SEND_FAILED",
-                "message": "Could not send OTP. Check Fast2SMS API key, Smart OTP template, DLT header, and template approval.",
-                "providerCode": str(body.get("status_code") or body.get("request_id") or ""),
-                "providerMessage": provider_message[:220],
-            },
-        )
+        raise_fast2sms_error(str(body.get("status_code") or body.get("request_id") or ""), provider_message)
 
 
 def _send_twilio_otp(phone: str, code: str, purpose: str = "login") -> None:

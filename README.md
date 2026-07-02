@@ -158,7 +158,7 @@ Production SMS delivery supports two providers:
 - Twilio: set `OTP_PROVIDER=twilio`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_PHONE`.
 - Fast2SMS Smart OTP: set `OTP_PROVIDER=fast2sms`, `FAST2SMS_API_KEY`, and `FAST2SMS_OTP_ID`.
 
-Fast2SMS numbers are sent as Indian 10-digit mobile numbers. Complete DLT entity, header, content template, and Smart OTP template approval in Fast2SMS before enabling it in production.
+Fast2SMS uses the Smart OTP JSON endpoint at `https://www.fast2sms.com/dev/otp/send`. Numbers are sent as Indian 10-digit mobile numbers. Complete DLT entity, header, content template, and Smart OTP template approval in Fast2SMS before enabling it in production. If your Fast2SMS template has extra variables besides the OTP itself, set `FAST2SMS_VARIABLES_VALUES` with pipe-separated values; otherwise keep it empty.
 
 ## Run the frontend
 

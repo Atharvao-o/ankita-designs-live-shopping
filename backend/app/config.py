@@ -30,7 +30,8 @@ class Settings(BaseSettings):
     twilio_from_phone: str = ""
     fast2sms_api_key: str = ""
     fast2sms_otp_id: str = ""
-    fast2sms_api_url: str = "https://www.fast2sms.com/dev/bulkV2"
+    fast2sms_api_url: str = "https://www.fast2sms.com/dev/otp/send"
+    fast2sms_variables_values: str = ""
 
     model_config = SettingsConfigDict(
         env_file=(".env", "../.env"),
