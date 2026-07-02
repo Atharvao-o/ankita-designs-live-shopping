@@ -86,6 +86,7 @@ def init_database() -> None:
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_version VARCHAR(32)",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_completed_at TIMESTAMP",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_skipped_at TIMESTAMP",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_verified_at TIMESTAMP",
         "ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP",
         "ALTER TABLE exhibitions ADD COLUMN IF NOT EXISTS category VARCHAR(120)",
         "ALTER TABLE exhibitions ADD COLUMN IF NOT EXISTS stall_count INTEGER DEFAULT 0 NOT NULL",

@@ -65,6 +65,45 @@ def _otp_email_for_phone(phone: str) -> str:
     return f"phone-{digits}@otp.ankita.local"
 
 
+def _pending_phone_user_id(phone: str) -> str:
+    return f"pending-phone-{phone.lstrip('+')}"
+
+
+def _customer_name_for_phone(phone: str) -> str:
+    digits = "".join(char for char in phone if char.isdigit())
+    return f"Customer {digits[-4:]}" if len(digits) >= 4 else "Customer"
+
+
+def _ensure_phone_customer(db: Session, phone: str, verified_at: datetime) -> User:
+    existing = db.scalar(select(User).where(User.role == "user", User.phone.in_(_phone_variants(phone))))
+    if existing is not None:
+        existing.phone = phone
+        existing.phone_verified_at = verified_at
+        return existing
+
+    email = _otp_email_for_phone(phone)
+    email_owner = db.scalar(select(User).where(User.email == email))
+    if email_owner is not None:
+        if email_owner.role != "user":
+            raise HTTPException(status_code=409, detail={"code": "PHONE_EMAIL_CONFLICT", "message": "This mobile number is already linked to another account."})
+        email_owner.phone = phone
+        email_owner.phone_verified_at = verified_at
+        return email_owner
+
+    user = User(
+        id=f"user-{uuid4()}",
+        name=_customer_name_for_phone(phone),
+        email=email,
+        phone=phone,
+        role="user",
+        password_hash=None,
+        avatar=None,
+        phone_verified_at=verified_at,
+    )
+    db.add(user)
+    return user
+
+
 def _fast2sms_number(phone: str) -> str:
     digits = "".join(char for char in phone if char.isdigit())
     if digits.startswith("91") and len(digits) == 12:
@@ -217,12 +256,10 @@ def request_login_otp(db: Session, raw_phone: str) -> dict:
     settings = get_settings()
     phone = normalize_phone(raw_phone)
     user = db.scalar(select(User).where(User.role == "user", User.phone.in_(_phone_variants(phone))))
-    if user is None:
-        raise HTTPException(status_code=404, detail={"code": "PHONE_NOT_REGISTERED", "message": "No customer account is registered with this mobile number."})
     now = datetime.utcnow()
     recent = db.scalar(
         select(AuthOtpChallenge)
-        .where(AuthOtpChallenge.user_id == user.id, AuthOtpChallenge.consumed_at.is_(None))
+        .where(AuthOtpChallenge.phone == phone, AuthOtpChallenge.purpose == "login", AuthOtpChallenge.consumed_at.is_(None))
         .order_by(AuthOtpChallenge.created_at.desc())
     )
     if recent and recent.created_at and now - recent.created_at < timedelta(seconds=settings.otp_resend_cooldown_seconds):
@@ -234,7 +271,7 @@ def request_login_otp(db: Session, raw_phone: str) -> dict:
     code = _generate_code()
     challenge = AuthOtpChallenge(
         id=str(uuid4()),
-        user_id=user.id,
+        user_id=user.id if user is not None else _pending_phone_user_id(phone),
         phone=phone,
         code_hash=hash_password(code),
         purpose="login",
@@ -335,6 +372,7 @@ def verify_registration_otp(db: Session, challenge_id: str, raw_phone: str, code
         role="user",
         password_hash=None,
         avatar=None,
+        phone_verified_at=now,
     )
     challenge.consumed_at = now
     db.add(user)
@@ -366,13 +404,18 @@ def verify_login_otp(db: Session, challenge_id: str, raw_phone: str, code: str) 
         db.commit()
         raise HTTPException(status_code=401, detail={"code": "INVALID_OTP", "message": "Invalid OTP."})
     user = db.get(User, challenge.user_id)
+    if user is None and challenge.user_id.startswith("pending-phone-"):
+        user = _ensure_phone_customer(db, phone, now)
     if user is None or user.role != "user":
         raise HTTPException(status_code=404, detail={"code": "USER_NOT_FOUND", "message": "Customer account not found."})
+    user.phone = phone
+    user.phone_verified_at = now
     challenge.consumed_at = now
     db.commit()
+    db.refresh(user)
     return {
         "token": make_token(user),
         "user": _serialize_user(user),
         "vendor": None,
-        "message": "OTP login successful.",
+        "message": "OTP sign in successful.",
     }

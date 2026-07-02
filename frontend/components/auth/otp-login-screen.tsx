@@ -76,7 +76,7 @@ export function OtpLoginScreen() {
             <span className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--gold)]/50 bg-[color:var(--gold)]/10 font-semibold text-[var(--gold)]">AD</span>
             <span>
               <span className="block text-sm font-bold leading-tight">Ankita Designs</span>
-              <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--gold)]">Customer OTP Login</span>
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--gold)]">Customer OTP Sign In</span>
             </span>
           </Link>
         </motion.div>
@@ -93,9 +93,9 @@ export function OtpLoginScreen() {
           </div>
 
           <div className="mt-6">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--gold)]">Quick customer login</p>
-            <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.045em] text-[var(--text)]">Login with OTP</h1>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Enter the mobile number on your customer account. We will send a 6-digit code to verify your login.</p>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--gold)]">Customer only</p>
+            <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.045em] text-[var(--text)]">Sign in with OTP</h1>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Enter your mobile number. We will send a 6-digit code and save the verified number to your customer account.</p>
           </div>
 
           <div className="mt-6 grid gap-4">
@@ -107,7 +107,7 @@ export function OtpLoginScreen() {
               </div>
             </label>
             <StatefulButton type="button" loading={isRequesting} disabled={isRequesting || !canRequest} onClick={requestOtp} className="w-full px-8 py-4 text-base">
-              {challengeId ? "Resend OTP" : "Send OTP"}
+              {challengeId ? "Resend OTP" : "Send sign in OTP"}
               <MessageSquareText className="ml-2 h-4 w-4" />
             </StatefulButton>
 
@@ -122,14 +122,14 @@ export function OtpLoginScreen() {
 
           {challengeId ? (
             <StatefulButton type="button" loading={isVerifying} disabled={isVerifying || !canVerify} onClick={verifyOtp} className="mt-6 w-full px-8 py-4 text-base">
-              Verify and login
+              Verify and sign in
               <ArrowRight className="ml-2 h-4 w-4" />
             </StatefulButton>
           ) : null}
 
           <div className="mt-6 grid gap-2 text-center text-sm text-[var(--muted)]">
             <Link href="/login?role=user" className="font-bold text-[var(--gold)] transition hover:text-[var(--coral)]">Use email and password</Link>
-            <Link href="/register/mobile" className="font-bold text-[var(--muted)] transition hover:text-[var(--gold)]">Create mobile customer account</Link>
+            <Link href="/register?role=vendor" className="font-bold text-[var(--muted)] transition hover:text-[var(--gold)]">Register as vendor</Link>
           </div>
         </motion.div>
       </section>

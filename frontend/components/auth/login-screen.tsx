@@ -221,7 +221,7 @@ export function LoginScreen() {
           </div>
 
           <Link href="/login/otp" className="mt-3 flex min-h-12 items-center justify-center rounded-2xl border border-[color:var(--gold)] bg-[color:var(--gold)]/12 px-4 text-sm font-black text-[var(--text)] transition hover:bg-[color:var(--gold)]/18">
-            Login with mobile OTP
+            Customer mobile OTP
           </Link>
 
           <div className="mt-6 grid gap-4">

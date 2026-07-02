@@ -21,5 +21,6 @@ class User(Base):
     onboarding_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
     onboarding_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     onboarding_skipped_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    phone_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
