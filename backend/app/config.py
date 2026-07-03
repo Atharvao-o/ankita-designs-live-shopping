@@ -32,6 +32,19 @@ class Settings(BaseSettings):
     fast2sms_otp_id: str = ""
     fast2sms_api_url: str = "https://www.fast2sms.com/dev/otp/send"
     fast2sms_variables_values: str = ""
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = ""
+    smtp_from_name: str = "Ankita Designs"
+    smtp_use_tls: bool = True
+    smtp_use_ssl: bool = False
+    email_otp_expiry_seconds: int = 600
+    email_otp_resend_cooldown_seconds: int = 60
+    email_otp_max_attempts: int = 5
+    email_verification_valid_seconds: int = 7200
+    email_otp_debug_response: bool = False
 
     model_config = SettingsConfigDict(
         env_file=(".env", "../.env"),

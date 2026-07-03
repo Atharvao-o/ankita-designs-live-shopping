@@ -18,6 +18,7 @@ class Vendor(Base):
     product_categories: Mapped[list | None] = mapped_column(JSON, nullable=True)
     phone: Mapped[str | None] = mapped_column(String(32), nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     instagram: Mapped[str | None] = mapped_column(String(500), nullable=True)
     website: Mapped[str | None] = mapped_column(String(500), nullable=True)
     whatsapp: Mapped[str | None] = mapped_column(String(120), nullable=True)

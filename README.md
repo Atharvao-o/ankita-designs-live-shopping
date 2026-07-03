@@ -94,6 +94,12 @@ Copy `.env.example` and set values as needed.
 - `TWILIO_FROM_PHONE`
 - `FAST2SMS_API_KEY`
 - `FAST2SMS_OTP_ID`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USERNAME`
+- `SMTP_PASSWORD`
+- `SMTP_FROM_EMAIL`
+- `EMAIL_OTP_DEBUG_RESPONSE`
 
 ### Frontend
 - `NEXT_PUBLIC_API_URL`
@@ -159,6 +165,24 @@ Production SMS delivery supports two providers:
 - Fast2SMS Smart OTP: set `OTP_PROVIDER=fast2sms`, `FAST2SMS_API_KEY`, and `FAST2SMS_OTP_ID`.
 
 Fast2SMS uses the Smart OTP JSON endpoint at `https://www.fast2sms.com/dev/otp/send`. Numbers are sent as Indian 10-digit mobile numbers. Complete DLT entity, header, content template, and Smart OTP template approval in Fast2SMS before enabling it in production. If your Fast2SMS template has extra variables besides the OTP itself, set `FAST2SMS_VARIABLES_VALUES` with pipe-separated values; otherwise keep it empty.
+
+### Vendor email verification setup
+
+Vendor registration sends its six-digit email code directly from the FastAPI backend through SMTP. Use the SMTP server for a mailbox or domain you control; SMTP credentials are never sent to the frontend.
+
+```text
+SMTP_HOST=mail.your-domain.com
+SMTP_PORT=587
+SMTP_USERNAME=verification@your-domain.com
+SMTP_PASSWORD=your_mailbox_password
+SMTP_FROM_EMAIL=verification@your-domain.com
+SMTP_FROM_NAME=Ankita Designs
+SMTP_USE_TLS=true
+SMTP_USE_SSL=false
+EMAIL_OTP_DEBUG_RESPONSE=false
+```
+
+Use port `465` with `SMTP_USE_SSL=true` and `SMTP_USE_TLS=false` when your mail server requires implicit SSL. For local testing only, set `EMAIL_OTP_DEBUG_RESPONSE=true`; the backend skips email delivery and returns the development code to the vendor form. Keep this flag `false` in production.
 
 ## Run the frontend
 

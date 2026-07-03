@@ -62,11 +62,24 @@ FAST2SMS_VARIABLES_VALUES=
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_FROM_PHONE=
+
+# Vendor email verification through your own SMTP mailbox
+SMTP_HOST=mail.your-domain.com
+SMTP_PORT=587
+SMTP_USERNAME=verification@your-domain.com
+SMTP_PASSWORD=set_your_mailbox_password
+SMTP_FROM_EMAIL=verification@your-domain.com
+SMTP_FROM_NAME=Ankita Designs
+SMTP_USE_TLS=true
+SMTP_USE_SSL=false
+EMAIL_OTP_DEBUG_RESPONSE=false
 ```
 
 LiveKit can stay empty if live video is not ready for production. The app will keep catalogue, chat, cart, checkout, vendor, and admin flows running.
 
 For local OTP testing, use `OTP_DEBUG_RESPONSE=true` so SMS delivery is skipped and the development OTP is returned by the backend.
+
+For local vendor email testing, use `EMAIL_OTP_DEBUG_RESPONSE=true`. Keep it `false` in production and configure the SMTP variables above.
 
 ## 3. Deploy Frontend On Vercel
 

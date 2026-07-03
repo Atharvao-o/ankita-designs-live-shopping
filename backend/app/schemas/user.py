@@ -40,6 +40,33 @@ class OtpRequestResponse(BaseModel):
     devOtp: str | None = None
 
 
+class VendorEmailOtpRequest(BaseModel):
+    email: str
+
+
+class VendorEmailOtpVerifyRequest(BaseModel):
+    email: str
+    challenge_id: str
+    code: str
+
+
+class VendorEmailOtpRequestResponse(BaseModel):
+    ok: bool
+    challengeId: str
+    expiresInSeconds: int
+    resendAfterSeconds: int
+    message: str
+    devOtp: str | None = None
+
+
+class VendorEmailOtpVerifyResponse(BaseModel):
+    ok: bool
+    verificationToken: str
+    verifiedEmail: str
+    validForSeconds: int
+    message: str
+
+
 class RegisterRequest(BaseModel):
     name: str | None = None
     email: str
@@ -64,6 +91,7 @@ class RegisterRequest(BaseModel):
     pincode: str | None = None
     product_categories: list[str] = []
     address: str | None = None
+    email_verification_token: str | None = None
 
 
 class UserResponse(BaseModel):

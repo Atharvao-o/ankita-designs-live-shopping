@@ -16,6 +16,7 @@ from app.models.advertisement_banner import AdvertisementBanner
 from app.models.social import PostLike, SavedPost, SavedProduct, VendorFollow, VendorPost, VendorPublicProfile
 from app.models.subscription import LiveSlot, SubscriptionPlan, VendorSubscription
 from app.models.auth_otp import AuthOtpChallenge
+from app.models.email_verification import EmailVerificationChallenge
 
 __all__ = [
     "User",
@@ -47,5 +48,6 @@ __all__ = [
     "VendorSubscription",
     "LiveSlot",
     "AuthOtpChallenge",
+    "EmailVerificationChallenge",
 ]
 

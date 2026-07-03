@@ -11,8 +11,28 @@ from app.database import get_db
 from app.config import get_settings
 from app.models.user import User
 from app.models.vendor import Vendor
-from app.schemas.user import AuthResponse, GoogleLoginRequest, LoginRequest, OtpRegisterRequest, OtpRegisterVerifyRequest, OtpRequest, OtpRequestResponse, OtpVerifyRequest, RegisterRequest, UserResponse
+from app.schemas.user import (
+    AuthResponse,
+    GoogleLoginRequest,
+    LoginRequest,
+    OtpRegisterRequest,
+    OtpRegisterVerifyRequest,
+    OtpRequest,
+    OtpRequestResponse,
+    OtpVerifyRequest,
+    RegisterRequest,
+    UserResponse,
+    VendorEmailOtpRequest,
+    VendorEmailOtpRequestResponse,
+    VendorEmailOtpVerifyRequest,
+    VendorEmailOtpVerifyResponse,
+)
 from app.services.auth_context import current_user_from_request, make_token
+from app.services.email_verification_service import (
+    consume_vendor_email_verification,
+    request_vendor_email_otp,
+    verify_vendor_email_otp,
+)
 from app.services.otp_service import request_login_otp, request_registration_otp, verify_login_otp, verify_registration_otp
 from app.services.password_service import hash_password, verify_password
 
@@ -55,6 +75,8 @@ def serialize_vendor(vendor: Vendor | None) -> dict | None:
         "image": None,
         "ownerName": vendor.owner_name,
         "email": vendor.email,
+        "emailVerified": vendor.email_verified_at is not None,
+        "emailVerifiedAt": _iso(vendor.email_verified_at),
         "businessCategory": vendor.business_category,
         "productCategories": vendor.product_categories or [],
         "instagram": vendor.instagram,
@@ -201,6 +223,7 @@ def _validate_registration(payload: RegisterRequest) -> None:
             "business name": payload.business_name,
             "business category": payload.business_category,
             "business description": payload.business_description,
+            "phone number": payload.phone,
         }
         missing = [label for label, value in required.items() if not (value or "").strip()]
         if missing:
@@ -244,6 +267,18 @@ def request_otp_register(payload: OtpRegisterRequest, db: Session = Depends(get_
 def verify_otp_register(payload: OtpRegisterVerifyRequest, db: Session = Depends(get_db)) -> dict:
     ensure_bootstrap_admin(db)
     return verify_registration_otp(db, payload.challenge_id, payload.phone, payload.code, payload.name)
+
+
+@router.post("/vendor/email-otp/request", response_model=VendorEmailOtpRequestResponse)
+def request_vendor_email_verification(payload: VendorEmailOtpRequest, db: Session = Depends(get_db)) -> dict:
+    ensure_bootstrap_admin(db)
+    return request_vendor_email_otp(db, payload.email)
+
+
+@router.post("/vendor/email-otp/verify", response_model=VendorEmailOtpVerifyResponse)
+def verify_vendor_email_verification(payload: VendorEmailOtpVerifyRequest, db: Session = Depends(get_db)) -> dict:
+    ensure_bootstrap_admin(db)
+    return verify_vendor_email_otp(db, payload.challenge_id, payload.email, payload.code)
 
 
 @router.post("/google", response_model=AuthResponse)
@@ -336,6 +371,10 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> dict:
     if db.scalar(select(User).where(User.email == email)) is not None:
         raise HTTPException(status_code=409, detail={"code": "EMAIL_ALREADY_EXISTS", "message": "Email already exists."})
 
+    email_verified_at = None
+    if payload.role == "vendor":
+        email_verified_at = consume_vendor_email_verification(db, payload.email_verification_token, email)
+
     name = (payload.owner_name if payload.role == "vendor" else payload.name) or payload.email.split("@")[0]
     user = User(
         id=f"{payload.role}-{uuid4()}",
@@ -364,6 +403,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> dict:
             product_categories=payload.product_categories or ([payload.business_category] if payload.business_category else []),
             phone=payload.phone,
             email=email,
+            email_verified_at=email_verified_at,
             instagram=payload.instagram,
             website=payload.website,
             whatsapp=payload.whatsapp,

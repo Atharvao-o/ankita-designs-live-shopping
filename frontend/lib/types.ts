@@ -28,6 +28,8 @@ export interface Vendor {
   image?: string;
   ownerName?: string;
   email?: string;
+  emailVerified?: boolean;
+  emailVerifiedAt?: string;
   businessCategory?: string;
   instagram?: string;
   website?: string;

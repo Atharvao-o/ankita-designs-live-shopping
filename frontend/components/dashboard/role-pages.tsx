@@ -4,7 +4,7 @@ import { FormEvent, HTMLAttributes, ReactNode, useEffect, useState } from "react
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
-import { Activity, AlertCircle, ArrowRight, BarChart3, Boxes, CalendarClock, CalendarDays, CheckCircle2, ClipboardList, Database, Filter, Gavel, MessageCircleMore, MousePointer2, PlusCircle, Radio, RefreshCw, Search, ShieldCheck, ShoppingBag, Sparkles, Store, UserPlus, Users } from "lucide-react";
+import { Activity, AlertCircle, ArrowRight, AtSign, BarChart3, Boxes, Building2, CalendarClock, CalendarDays, CheckCircle2, ChevronDown, ClipboardList, Database, ExternalLink, FileCheck2, Filter, Gavel, MapPin, MessageCircleMore, MousePointer2, PlusCircle, Radio, RefreshCw, Search, ShieldCheck, ShoppingBag, Sparkles, Store, UserPlus, Users, Wallet } from "lucide-react";
 import { RoleShell } from "@/components/layout/role-shell";
 import { AppImage } from "@/components/ui/app-image";
 import { AppCard, AppEmptyState, AppLoadingState, AppStatCard, AppStatusPill } from "@/components/ui/app-primitives";
@@ -4256,16 +4256,89 @@ export function AdminExhibitionsPageContent() {
   );
 }
 
+function VendorApplicationField({
+  label,
+  value,
+  href,
+  wide = false,
+  mono = false
+}: {
+  label: string;
+  value?: string | number | null;
+  href?: string;
+  wide?: boolean;
+  mono?: boolean;
+}) {
+  const hasValue = value !== undefined && value !== null && String(value).trim().length > 0;
+  const displayValue = hasValue ? String(value) : "Not provided";
+  const isExternal = Boolean(href?.startsWith("http"));
+
+  return (
+    <div className={cn("min-w-0 py-2", wide && "sm:col-span-2")}>
+      <p className="text-[11px] font-bold uppercase text-[#8A8175] dark:text-white/42">{label}</p>
+      {href && hasValue ? (
+        <a
+          href={href}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noreferrer" : undefined}
+          className="mt-1 inline-flex max-w-full items-start gap-1.5 break-all text-sm font-semibold text-[#9A631E] underline-offset-4 hover:underline dark:text-[#F4C879]"
+        >
+          <span>{displayValue}</span>
+          {isExternal ? <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0" /> : null}
+        </a>
+      ) : (
+        <p className={cn("mt-1 break-words text-sm font-semibold leading-6", hasValue ? "text-[#1B1A17] dark:text-[#FFF8EA]" : "text-[#9B948A] dark:text-white/35", mono && "font-mono")}>
+          {displayValue}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function VendorApplicationSection({
+  icon: Icon,
+  title,
+  description,
+  children
+}: {
+  icon: typeof UserPlus;
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="border-b border-[#E8DDCC] py-5 last:border-b-0 dark:border-white/10">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#B88A3D]/10 text-[#9A631E] dark:bg-[#D6AC63]/12 dark:text-[#F4C879]">
+          <Icon className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-base font-black text-[#1B1A17] dark:text-[#FFF8EA]">{title}</h2>
+          <p className="mt-1 text-xs font-semibold leading-5 text-[#6F675C] dark:text-white/52">{description}</p>
+        </div>
+      </div>
+      <div className="mt-3 grid gap-x-6 sm:grid-cols-2">{children}</div>
+    </section>
+  );
+}
+
 export function AdminVendorsPageContent() {
   const [vendors, setVendors] = useState<Awaited<ReturnType<typeof getAdminVendors>>>([]);
+  const [selectedVendorId, setSelectedVendorId] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdatingVendor, setIsUpdatingVendor] = useState(false);
 
   const loadVendors = async () => {
     setIsLoading(true);
     try {
       const response = await getAdminVendors();
       setVendors(response);
+      setSelectedVendorId((current) => {
+        if (response.some((vendor) => vendor.id === current)) return current;
+        return response.find((vendor) => vendor.status === "pending")?.id ?? response[0]?.id ?? "";
+      });
       setError("");
     } catch (errorValue) {
       setError(errorValue instanceof Error ? errorValue.message : "Could not load vendors.");
@@ -4278,19 +4351,40 @@ export function AdminVendorsPageContent() {
     loadVendors();
   }, []);
 
-  const updateVendor = async (vendorId: string, status: "approved" | "rejected") => {
+  const selectedVendor = vendors.find((vendor) => vendor.id === selectedVendorId) ?? null;
+
+  useEffect(() => {
+    setRejectionReason(selectedVendor?.rejectionReason ?? "");
+  }, [selectedVendor?.id, selectedVendor?.rejectionReason]);
+
+  const updateVendor = async (status: "approved" | "rejected") => {
+    if (!selectedVendor) return;
+    if (status === "rejected" && !rejectionReason.trim()) {
+      setError("Add a clear rejection reason so the vendor knows what must be corrected.");
+      return;
+    }
+    setIsUpdatingVendor(true);
+    setError("");
     try {
-      setError("");
-      await (status === "approved" ? approveAdminVendor(vendorId) : rejectAdminVendor(vendorId));
-      await loadVendors();
+      const updated = status === "approved"
+        ? await approveAdminVendor(selectedVendor.id)
+        : await rejectAdminVendor(selectedVendor.id, rejectionReason);
+      setVendors((current) => current.map((vendor) => vendor.id === updated.id ? updated : vendor));
     } catch (errorValue) {
       setError(errorValue instanceof Error ? errorValue.message : "Could not update vendor.");
+    } finally {
+      setIsUpdatingVendor(false);
     }
   };
 
   const pendingVendors = vendors.filter((vendor) => vendor.status === "pending").length;
   const approvedVendors = vendors.filter((vendor) => vendor.status === "approved").length;
   const rejectedVendors = vendors.filter((vendor) => vendor.status === "rejected").length;
+  const whatsappHref = selectedVendor?.whatsapp?.startsWith("http")
+    ? selectedVendor.whatsapp
+    : selectedVendor?.whatsapp
+      ? `https://wa.me/${selectedVendor.whatsapp.replace(/\D/g, "")}`
+      : undefined;
 
   return (
     <RoleShell role="admin" title="Vendors">
@@ -4298,10 +4392,10 @@ export function AdminVendorsPageContent() {
         <AdminPanel className="min-h-[calc(100vh-104px)] p-5 sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#B88A3D] dark:text-[#D6AC63]">Vendor approvals</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-[-0.06em] sm:text-4xl">Vendor Operations</h1>
+              <p className="text-xs font-bold uppercase text-[#B88A3D] dark:text-[#D6AC63]">Vendor approvals</p>
+              <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Vendor Applications</h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6F675C] dark:text-white/56">
-                Review database vendor accounts. Approved vendors can be assigned only after their exhibition request is accepted.
+                Select a vendor to inspect the complete submitted application before making an approval decision.
               </p>
             </div>
             <button type="button" onClick={loadVendors} className={buttonStyles("primary", "justify-center px-4 py-3 text-sm")} disabled={isLoading}>
@@ -4309,47 +4403,170 @@ export function AdminVendorsPageContent() {
               Refresh
             </button>
           </div>
-          {error ? <p className="mt-4 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-700 dark:text-red-200">{error}</p> : null}
+
+          {error ? <p role="alert" className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-700 dark:text-red-200">{error}</p> : null}
+
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <AdminMiniStat label="Pending" value={isLoading ? "Loading" : String(pendingVendors)} />
             <AdminMiniStat label="Approved" value={isLoading ? "Loading" : String(approvedVendors)} />
             <AdminMiniStat label="Rejected" value={isLoading ? "Loading" : String(rejectedVendors)} />
           </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
-            {isLoading ? (
-              Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="min-h-44 animate-pulse rounded-[26px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-[#1d1d27]" />
-              ))
-            ) : vendors.length ? vendors.map((vendor) => {
-              const contactDetails = [vendor.ownerName, vendor.email].filter(Boolean).join(" | ");
-              const hasProfileDetails = Boolean(contactDetails || vendor.businessCategory || vendor.phone);
-              return (
-                <div key={vendor.id} className="rounded-[26px] border border-[#E8DDCC] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#171720]">
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="min-w-0 truncate text-lg font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{vendor.displayName || vendor.businessName}</p>
-                    <AdminStatusPill status={vendor.status} />
-                  </div>
-                  <p className="mt-1 text-sm text-[#6F675C] dark:text-white/56">{vendor.businessName || "Business name not submitted"}</p>
-                  {contactDetails ? <p className="mt-1 text-sm text-[#6F675C] dark:text-white/56">{contactDetails}</p> : null}
-                  {vendor.businessCategory ? <p className="mt-1 text-sm text-[#6F675C] dark:text-white/56">{vendor.businessCategory}</p> : null}
-                  {vendor.phone ? <p className="mt-1 text-sm text-[#6F675C] dark:text-white/56">{vendor.phone}</p> : null}
-                  {!hasProfileDetails ? (
-                    <p className="mt-3 rounded-2xl border border-[#D6AC63]/25 bg-[#D6AC63]/10 px-4 py-3 text-sm text-[#8A5A24] dark:text-[#F4C879]">
-                      Vendor profile details have not been submitted.
-                    </p>
-                  ) : null}
-                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                    <button type="button" onClick={() => updateVendor(vendor.id, "approved")} disabled={vendor.status === "approved"} className={buttonStyles("secondary", "justify-center px-4 py-2.5 text-sm disabled:opacity-50")}>Approve</button>
-                    <button type="button" onClick={() => updateVendor(vendor.id, "rejected")} disabled={vendor.status === "rejected"} className={buttonStyles("secondary", "justify-center px-4 py-2.5 text-sm disabled:opacity-50")}>Reject</button>
-                  </div>
-                </div>
-              );
-            }) : (
-              <div className="md:col-span-2 2xl:col-span-3">
-                <AdminEmptyState icon={UserPlus} title="No vendors found" description="Vendor registrations will appear here after businesses sign up." />
+
+          {isLoading ? (
+            <div className="mt-6 grid gap-4">
+              <div className="app-skeleton h-20 rounded-xl" />
+              <div className="app-skeleton h-[520px] rounded-xl" />
+            </div>
+          ) : vendors.length ? (
+            <>
+              <div className="mt-6 border-y border-[#E8DDCC] py-5 dark:border-white/10">
+                <label className="block max-w-2xl">
+                  <span className="text-xs font-black uppercase text-[#6F675C] dark:text-white/52">Choose vendor application</span>
+                  <span className="relative mt-2 block">
+                    <select
+                      value={selectedVendorId}
+                      onChange={(event) => setSelectedVendorId(event.target.value)}
+                      className="min-h-12 w-full appearance-none rounded-xl border border-[#D9CEBD] bg-white px-4 py-3 pr-11 text-sm font-black text-[#1B1A17] outline-none transition focus:border-[#B88A3D] focus:ring-2 focus:ring-[#B88A3D]/20 dark:border-white/12 dark:bg-[#171720] dark:text-[#FFF8EA] dark:focus:border-[#D6AC63]"
+                    >
+                      {vendors.map((vendor) => (
+                        <option key={vendor.id} value={vendor.id}>
+                          {vendor.displayName || vendor.businessName} - {vendor.status}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#6F675C] dark:text-white/52" />
+                  </span>
+                </label>
               </div>
-            )}
-          </div>
+
+              {selectedVendor ? (
+                <div className="grid min-w-0 xl:grid-cols-[minmax(0,1fr)_320px]">
+                  <div className="min-w-0 xl:pr-7">
+                    <div className="flex flex-col gap-3 border-b border-[#E8DDCC] py-5 dark:border-white/10 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="break-words text-2xl font-black text-[#1B1A17] dark:text-[#FFF8EA]">{selectedVendor.displayName || selectedVendor.businessName}</h2>
+                          <AdminStatusPill status={selectedVendor.status} />
+                        </div>
+                        <p className="mt-2 text-sm font-semibold text-[#6F675C] dark:text-white/52">
+                          Application ID: <span className="break-all font-mono text-xs">{selectedVendor.id}</span>
+                        </p>
+                      </div>
+                      <div className={cn(
+                        "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs font-black",
+                        selectedVendor.emailVerified
+                          ? "border-emerald-600/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                          : "border-amber-600/25 bg-amber-500/10 text-amber-800 dark:text-amber-200"
+                      )}>
+                        {selectedVendor.emailVerified ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                        Email {selectedVendor.emailVerified ? "verified" : "not verified"}
+                      </div>
+                    </div>
+
+                    <VendorApplicationSection icon={Building2} title="Business identity" description="Ownership, trading identity, catalogue category, and the vendor's submitted description.">
+                      <VendorApplicationField label="Owner name" value={selectedVendor.ownerName} />
+                      <VendorApplicationField label="Business name" value={selectedVendor.businessName} />
+                      <VendorApplicationField label="Display name" value={selectedVendor.displayName} />
+                      <VendorApplicationField label="Business category" value={selectedVendor.businessCategory} />
+                      <VendorApplicationField label="Product categories" value={selectedVendor.productCategories?.join(", ")} wide />
+                      <VendorApplicationField label="Business description" value={selectedVendor.businessDescription} wide />
+                    </VendorApplicationSection>
+
+                    <VendorApplicationSection icon={AtSign} title="Contact and online presence" description="Verified contact channels and links supplied with the application.">
+                      <VendorApplicationField label="Email" value={selectedVendor.email} href={selectedVendor.email ? `mailto:${selectedVendor.email}` : undefined} />
+                      <VendorApplicationField label="Email verification" value={selectedVendor.emailVerified ? "Verified" : "Not verified"} />
+                      <VendorApplicationField label="Verified at" value={selectedVendor.emailVerifiedAt ? formatDateTime(selectedVendor.emailVerifiedAt) : null} />
+                      <VendorApplicationField label="Phone number" value={selectedVendor.phone} href={selectedVendor.phone ? `tel:${selectedVendor.phone}` : undefined} />
+                      <VendorApplicationField label="WhatsApp" value={selectedVendor.whatsapp} href={whatsappHref} />
+                      <VendorApplicationField label="Instagram" value={selectedVendor.instagram} href={selectedVendor.instagram} />
+                      <VendorApplicationField label="Website" value={selectedVendor.website} href={selectedVendor.website} wide />
+                    </VendorApplicationSection>
+
+                    <VendorApplicationSection icon={MapPin} title="Business address" description="Location information provided for business and exhibition review.">
+                      <VendorApplicationField label="Address" value={selectedVendor.address} wide />
+                      <VendorApplicationField label="City" value={selectedVendor.city} />
+                      <VendorApplicationField label="State" value={selectedVendor.state} />
+                      <VendorApplicationField label="Pincode" value={selectedVendor.pincode} />
+                    </VendorApplicationSection>
+
+                    <VendorApplicationSection icon={FileCheck2} title="Compliance information" description="Government and category-specific registration identifiers supplied by the vendor.">
+                      <VendorApplicationField label="GST number" value={selectedVendor.gstNumber} mono />
+                      <VendorApplicationField label="PAN number" value={selectedVendor.panNumber} mono />
+                      <VendorApplicationField label="FSSAI number" value={selectedVendor.fssaiNumber} mono />
+                    </VendorApplicationSection>
+
+                    <VendorApplicationSection icon={Wallet} title="Payout information" description="Settlement details visible only to authorized administrators.">
+                      <VendorApplicationField label="UPI ID" value={selectedVendor.upiId} />
+                      <VendorApplicationField label="Bank account number" value={selectedVendor.bankAccountNumber} mono />
+                      <VendorApplicationField label="IFSC code" value={selectedVendor.ifsc} mono />
+                      <VendorApplicationField label="Platform commission" value={`${selectedVendor.commissionRate}%`} />
+                    </VendorApplicationSection>
+
+                    <VendorApplicationSection icon={ClipboardList} title="Application record" description="Submission and previous review information stored with this account.">
+                      <VendorApplicationField label="Submitted at" value={selectedVendor.createdAt ? formatDateTime(selectedVendor.createdAt) : null} />
+                      <VendorApplicationField label="Current status" value={selectedVendor.status} />
+                      <VendorApplicationField label="Approved at" value={selectedVendor.approvedAt ? formatDateTime(selectedVendor.approvedAt) : null} />
+                      <VendorApplicationField label="Approved by admin" value={selectedVendor.approvedByAdminId} mono />
+                      <VendorApplicationField label="Previous rejection reason" value={selectedVendor.rejectionReason} wide />
+                    </VendorApplicationSection>
+                  </div>
+
+                  <aside className="border-t border-[#E8DDCC] py-6 dark:border-white/10 xl:border-l xl:border-t-0 xl:py-5 xl:pl-7">
+                    <div className="sticky top-24">
+                      <div className="flex items-center gap-3">
+                        <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#F36B4F]/10 text-[#C64F38] dark:text-[#FF8A72]">
+                          <ShieldCheck className="h-5 w-5" />
+                        </span>
+                        <div>
+                          <h2 className="text-base font-black text-[#1B1A17] dark:text-[#FFF8EA]">Review decision</h2>
+                          <p className="mt-0.5 text-xs font-semibold text-[#6F675C] dark:text-white/52">Approve or return with a reason.</p>
+                        </div>
+                      </div>
+
+                      <label className="mt-5 block">
+                        <span className="text-xs font-black uppercase text-[#6F675C] dark:text-white/52">Rejection reason</span>
+                        <textarea
+                          value={rejectionReason}
+                          onChange={(event) => setRejectionReason(event.target.value)}
+                          placeholder="Explain exactly what must be corrected."
+                          className="mt-2 min-h-32 w-full resize-y rounded-xl border border-[#D9CEBD] bg-white px-4 py-3 text-sm font-semibold leading-6 text-[#1B1A17] outline-none transition placeholder:text-[#9B948A] focus:border-[#B88A3D] focus:ring-2 focus:ring-[#B88A3D]/20 dark:border-white/12 dark:bg-[#171720] dark:text-[#FFF8EA] dark:placeholder:text-white/32"
+                        />
+                      </label>
+
+                      <div className="mt-4 grid gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateVendor("approved")}
+                          disabled={isUpdatingVendor || selectedVendor.status === "approved"}
+                          className={buttonStyles("primary", "justify-center px-4 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50")}
+                        >
+                          <CheckCircle2 className="mr-2 h-4 w-4" />
+                          {isUpdatingVendor ? "Updating..." : "Approve vendor"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateVendor("rejected")}
+                          disabled={isUpdatingVendor || selectedVendor.status === "rejected"}
+                          className="app-press inline-flex min-h-11 items-center justify-center rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm font-black text-red-700 transition hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-200"
+                        >
+                          <AlertCircle className="mr-2 h-4 w-4" />
+                          Reject application
+                        </button>
+                      </div>
+
+                      <p className="mt-4 text-xs font-semibold leading-5 text-[#6F675C] dark:text-white/46">
+                        Approval unlocks vendor operations. Exhibition participation and stall assignment remain separate admin decisions.
+                      </p>
+                    </div>
+                  </aside>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="mt-6">
+              <AdminEmptyState icon={UserPlus} title="No vendors found" description="Vendor registrations will appear here after businesses sign up." />
+            </div>
+          )}
         </AdminPanel>
       </section>
     </RoleShell>

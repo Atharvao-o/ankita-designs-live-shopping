@@ -881,6 +881,23 @@ export type OtpRequestResponse = {
   devOtp?: string | null;
 };
 
+export type VendorEmailOtpRequestResponse = {
+  ok: boolean;
+  challengeId: string;
+  expiresInSeconds: number;
+  resendAfterSeconds: number;
+  message: string;
+  devOtp?: string | null;
+};
+
+export type VendorEmailOtpVerifyResponse = {
+  ok: boolean;
+  verificationToken: string;
+  verifiedEmail: string;
+  validForSeconds: number;
+  message: string;
+};
+
 export function requestOtpLogin(payload: { phone: string }): Promise<OtpRequestResponse> {
   return request<OtpRequestResponse>("/auth/otp/request", {
     method: "POST",
@@ -922,6 +939,24 @@ export function getAuthMe(): Promise<AuthResponse> {
   return request<AuthResponse>("/auth/me");
 }
 
+export function requestVendorEmailOtp(payload: { email: string }): Promise<VendorEmailOtpRequestResponse> {
+  return request<VendorEmailOtpRequestResponse>("/auth/vendor/email-otp/request", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function verifyVendorEmailOtp(payload: { email: string; challengeId: string; code: string }): Promise<VendorEmailOtpVerifyResponse> {
+  return request<VendorEmailOtpVerifyResponse>("/auth/vendor/email-otp/verify", {
+    method: "POST",
+    body: JSON.stringify({
+      email: payload.email,
+      challenge_id: payload.challengeId,
+      code: payload.code
+    })
+  });
+}
+
 export function registerWithBackend(payload: {
   role: UserRole;
   name?: string;
@@ -946,6 +981,7 @@ export function registerWithBackend(payload: {
     pincode?: string;
     product_categories?: string[];
     address?: string;
+    email_verification_token?: string;
 }): Promise<AuthResponse> {
   return request<AuthResponse>("/auth/register", {
     method: "POST",
@@ -961,8 +997,11 @@ export function approveAdminVendor(vendorId: string): Promise<Vendor> {
   return request<Vendor>(`/admin/vendors/${vendorId}/approve`, { method: "PATCH" });
 }
 
-export function rejectAdminVendor(vendorId: string): Promise<Vendor> {
-  return request<Vendor>(`/admin/vendors/${vendorId}/reject`, { method: "PATCH" });
+export function rejectAdminVendor(vendorId: string, rejectionReason?: string): Promise<Vendor> {
+  return request<Vendor>(`/admin/vendors/${vendorId}/reject`, {
+    method: "PATCH",
+    body: JSON.stringify({ reason: rejectionReason?.trim() || null })
+  });
 }
 
 export function getAdminOrders(): Promise<Order[]> {

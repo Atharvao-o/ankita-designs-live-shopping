@@ -16,6 +16,8 @@ class VendorResponse(BaseModel):
     image: str | None = None
     ownerName: str | None = None
     email: str | None = None
+    emailVerified: bool = False
+    emailVerifiedAt: str | None = None
     businessCategory: str | None = None
     productCategories: list[str] | None = None
     instagram: str | None = None

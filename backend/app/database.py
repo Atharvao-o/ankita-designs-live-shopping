@@ -140,6 +140,7 @@ def init_database() -> None:
         "ALTER TABLE vendors ADD COLUMN IF NOT EXISTS product_categories JSON",
         "ALTER TABLE vendors ADD COLUMN IF NOT EXISTS phone VARCHAR(32)",
         "ALTER TABLE vendors ADD COLUMN IF NOT EXISTS email VARCHAR(255)",
+        "ALTER TABLE vendors ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP",
         "ALTER TABLE vendors ADD COLUMN IF NOT EXISTS instagram VARCHAR(500)",
         "ALTER TABLE vendors ADD COLUMN IF NOT EXISTS website VARCHAR(500)",
         "ALTER TABLE vendors ADD COLUMN IF NOT EXISTS whatsapp VARCHAR(120)",
@@ -198,6 +199,8 @@ def init_database() -> None:
         "CREATE INDEX IF NOT EXISTS ix_auth_otp_challenges_user_id ON auth_otp_challenges (user_id)",
         "CREATE INDEX IF NOT EXISTS ix_auth_otp_challenges_phone ON auth_otp_challenges (phone)",
         "CREATE INDEX IF NOT EXISTS ix_auth_otp_challenges_expires_at ON auth_otp_challenges (expires_at)",
+        "CREATE INDEX IF NOT EXISTS ix_email_verification_challenges_email ON email_verification_challenges (email)",
+        "CREATE INDEX IF NOT EXISTS ix_email_verification_challenges_expires_at ON email_verification_challenges (expires_at)",
     ]
     try:
         with engine.begin() as connection:

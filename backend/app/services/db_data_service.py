@@ -228,6 +228,8 @@ def serialize_vendor(vendor: Vendor | None) -> dict | None:
         "image": None,
         "ownerName": vendor.owner_name,
         "email": vendor.email,
+        "emailVerified": vendor.email_verified_at is not None,
+        "emailVerifiedAt": to_iso(vendor.email_verified_at),
         "businessCategory": vendor.business_category,
         "productCategories": vendor.product_categories or [],
         "instagram": vendor.instagram,
