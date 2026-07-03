@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { ArrowUpRight, BadgeIndianRupee, CalendarClock, CreditCard, FilePlus2, Handshake, PackagePlus, Radio, ReceiptText, Store, Trash2, WalletCards } from "lucide-react";
+import { Activity, AlertCircle, ArrowRight, ArrowUpRight, BadgeIndianRupee, Boxes, CalendarClock, CheckCircle2, CreditCard, FilePlus2, Handshake, PackagePlus, Radio, ReceiptText, Store, Trash2, WalletCards } from "lucide-react";
 import { AppImage } from "@/components/ui/app-image";
 import { buttonStyles } from "@/components/ui/button";
-import { Exhibition, LiveSlot, Stall, VendorDashboard, VendorExhibitionRequest, VendorPost, VendorSubscriptionState } from "@/lib/types";
+import { Exhibition, LiveSlot, Product, Stall, VendorDashboard, VendorExhibitionRequest, VendorPost, VendorSubscriptionState } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 
 type Props = {
@@ -68,6 +68,29 @@ export function MobileVendorDashboard({
   }, [orders]);
   const maxTrendValue = Math.max(...salesTrend.map((item) => item.value), 0);
   const activePosts = posts.filter((post) => post.status !== "archived");
+  const attentionOrders = orders.filter((order) => !["delivered", "fulfilled", "cancelled"].includes(order.orderStatus)).slice(0, 3);
+  const productPerformance = [...(dashboard?.products ?? [])]
+    .sort((left, right) => left.stock - right.stock || right.price - left.price)
+    .slice(0, 3);
+  const readinessItems = [
+    { label: "Approved vendor", complete: true },
+    { label: "Stall assigned", complete: Boolean(stall) },
+    { label: "Two active products", complete: productCount >= 2 },
+    { label: "Live slot approved", complete: Boolean(nextLiveSlot) }
+  ];
+  const readinessComplete = readinessItems.filter((item) => item.complete).length;
+  const readinessPercent = Math.round((readinessComplete / readinessItems.length) * 100);
+  const todayAction = isLive
+    ? { eyebrow: "Live now", title: "Keep your live room moving", description: `${stats?.visitors ?? dashboard?.activeViewers ?? 0} viewers are connected.`, href: "/vendor/live", label: "Open console", icon: Radio }
+    : !stall
+      ? { eyebrow: "Today first", title: "Request an exhibition stall", description: "A stall unlocks your boutique, products, and live selling.", href: "/vendor/exhibitions", label: "Find exhibition", icon: Store }
+      : productCount < 2
+        ? { eyebrow: "Catalog readiness", title: "Add products for live selling", description: `${Math.max(0, 2 - productCount)} more active product${2 - productCount === 1 ? "" : "s"} needed.`, href: "/vendor/products", label: "Add products", icon: Boxes }
+        : attentionOrders.length
+          ? { eyebrow: "Orders need attention", title: `Move ${attentionOrders.length} active order${attentionOrders.length === 1 ? "" : "s"} forward`, description: "Review packing and fulfillment before your next live slot.", href: "/vendor/orders", label: "Review orders", icon: ReceiptText }
+          : nextLiveSlot
+            ? { eyebrow: "Next live slot", title: new Date(nextLiveSlot.startTime).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }), description: nextLiveSlot.title || "Your approved selling window is ready.", href: "/vendor/live", label: "Prepare room", icon: CalendarClock }
+            : { eyebrow: "Live schedule", title: "Request your next live slot", description: "Your stall and catalog are ready for the next event.", href: "/vendor/live-slots", label: "Request slot", icon: CalendarClock };
 
   const confirmArchivePost = async (postId: string) => {
     if (!onArchivePost || !window.confirm("Delete this post from your active feed?")) return;
@@ -78,7 +101,14 @@ export function MobileVendorDashboard({
     <section className="mobile-vendor-page">
       <div className="space-y-5">
         <div>
-          <h2 className="mb-3 text-xl font-black tracking-[-0.04em]">Quick actions</h2>
+          <p className="mobile-vendor-muted text-sm">Vendor dashboard</p>
+          <h1 className="mobile-vendor-heading mt-1 text-3xl font-black">{vendor?.displayName ?? "Vendor"}</h1>
+        </div>
+
+        <MobileTodayAction action={todayAction} readinessPercent={readinessPercent} />
+
+        <div>
+          <h2 className="mb-3 text-xl font-black">Quick actions</h2>
           <div className="grid grid-cols-2 gap-3">
             <ActionCard href="/vendor/exhibitions" icon={Handshake} label="Join Exhibition" featured />
             <ActionCard href="/vendor/products" icon={PackagePlus} label="Add Product" />
@@ -91,19 +121,14 @@ export function MobileVendorDashboard({
           </div>
         </div>
 
-        <div>
-          <p className="mobile-vendor-muted text-sm">Good morning</p>
-          <h1 className="mobile-vendor-heading mt-1 text-3xl font-black tracking-[-0.06em]">{vendor?.displayName ?? "Vendor"}</h1>
-        </div>
-
         {error ? <p className="rounded-[22px] border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p> : null}
 
         <div className="mobile-vendor-card relative overflow-hidden rounded-[34px] p-5">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(255,120,92,0.18),transparent_34%),radial-gradient(circle_at_10%_100%,rgba(214,172,99,0.14),transparent_34%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,120,92,0.12),transparent_58%)]" />
           <div className="relative">
             <p className="mobile-vendor-eyebrow text-xs font-bold uppercase tracking-[0.18em]">Order revenue</p>
             <div className="mt-3 flex items-end justify-between gap-3">
-              <p className="text-4xl font-black tracking-[-0.06em]">{formatPrice(revenue)}</p>
+              <p className="break-words text-4xl font-black">{formatPrice(revenue)}</p>
               <span className="rounded-full bg-emerald-500/14 px-3 py-1 text-xs font-bold text-emerald-500">{paidOrders.length} paid</span>
             </div>
           </div>
@@ -123,7 +148,7 @@ export function MobileVendorDashboard({
           </div>
           <div className="p-5">
             <p className="mobile-vendor-eyebrow text-xs font-bold uppercase tracking-[0.18em]">{exhibition?.title ?? "No active exhibition"}</p>
-            <h2 className="mobile-vendor-heading mt-2 text-2xl font-black tracking-[-0.05em]">{stall?.name ?? "No stall assigned"}</h2>
+            <h2 className="mobile-vendor-heading mt-2 text-2xl font-black">{stall?.name ?? "No stall assigned"}</h2>
             <p className="mobile-vendor-muted mt-2 text-sm leading-6">
               {stall ? "Your stall is connected to exhibition operations and live selling tools." : "Participate in an exhibition before going live."}
             </p>
@@ -145,11 +170,14 @@ export function MobileVendorDashboard({
           <KpiCard icon={Store} label="Products" value={String(productCount)} change={`${stats?.productsSold ?? dashboard?.productsSold ?? 0} sold`} />
         </div>
 
+        <MobileReadinessChecklist items={readinessItems} percent={readinessPercent} />
+        <MobileProductPerformance products={productPerformance} />
+
         <div>
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <p className="mobile-vendor-eyebrow text-xs font-bold uppercase tracking-[0.16em]">Social shop</p>
-              <h2 className="mobile-vendor-heading mt-1 text-xl font-black tracking-[-0.04em]">Your posts</h2>
+              <h2 className="mobile-vendor-heading mt-1 text-xl font-black">Your posts</h2>
             </div>
             <Link href="/vendor/posts" className={buttonStyles("primary", "min-h-10 justify-center px-4 py-2 text-xs")}>
               <FilePlus2 className="h-4 w-4" />
@@ -168,7 +196,7 @@ export function MobileVendorDashboard({
                 />
                 <Link href="/vendor/posts" className="min-w-0 flex-1">
                   <p className="mobile-vendor-heading line-clamp-1 text-sm font-black">{post.product?.title || post.caption}</p>
-                  <p className="mobile-vendor-muted mt-1 text-xs capitalize">{post.status} · {post.moderationStatus}</p>
+                  <p className="mobile-vendor-muted mt-1 text-xs capitalize">{post.status} | {post.moderationStatus}</p>
                 </Link>
                 <button
                   type="button"
@@ -189,17 +217,7 @@ export function MobileVendorDashboard({
           {activePosts.length > 3 ? <Link href="/vendor/posts" className="mt-3 block text-center text-xs font-black text-[var(--gold)]">Manage all {activePosts.length} posts</Link> : null}
         </div>
 
-        <div className="mobile-vendor-card rounded-[30px] p-4">
-          <p className="mobile-vendor-eyebrow text-xs font-bold uppercase tracking-[0.16em]">Plan & live slot</p>
-          <h3 className="mobile-vendor-heading mt-2 text-xl font-black">{subscription?.currentSubscription?.plan?.name ?? "No active subscription"}</h3>
-          <p className="mobile-vendor-muted mt-1 text-sm">
-            {nextLiveSlot ? `Next slot: ${new Date(nextLiveSlot.startTime).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "No approved live slot yet."}
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <Link href="/vendor/subscription" className={buttonStyles("secondary", "min-h-11 justify-center px-3 py-2 text-xs")}>Plan</Link>
-            <Link href="/vendor/live-slots" className={buttonStyles("primary", "min-h-11 justify-center px-3 py-2 text-xs")}>Slots</Link>
-          </div>
-        </div>
+        <MobileLiveTimeline subscription={subscription} nextLiveSlot={nextLiveSlot} />
 
         <div className="mobile-vendor-card rounded-[30px] p-4">
           <div className="flex items-center justify-between">
@@ -227,11 +245,14 @@ export function MobileVendorDashboard({
 
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-xl font-black tracking-[-0.04em]">Recent orders</h2>
+            <div>
+              <p className="mobile-vendor-eyebrow text-xs font-bold uppercase">Needs attention</p>
+              <h2 className="mobile-vendor-heading mt-1 text-xl font-black">Active orders</h2>
+            </div>
             <Link href="/vendor/orders" className="text-xs font-bold text-[var(--gold)]">View all</Link>
           </div>
           <div className="grid gap-3">
-            {orders.length ? orders.slice(0, 3).map((order) => (
+            {attentionOrders.length ? attentionOrders.map((order) => (
               <Link key={order.id} href="/vendor/orders" className="mobile-vendor-card flex items-center gap-3 rounded-[24px] p-3 transition active:scale-[0.99]">
                 <AppImage src={order.items[0]?.image || "/products/product-placeholder.png"} alt={order.items[0]?.title ?? "Order product"} className="h-14 w-14 rounded-2xl" fallbackSrc="/products/product-placeholder.png" />
                 <div className="min-w-0 flex-1">
@@ -242,7 +263,7 @@ export function MobileVendorDashboard({
               </Link>
             )) : (
               <div className="mobile-vendor-card mobile-vendor-muted rounded-[24px] p-5 text-sm">
-                No orders yet. Orders from live shopping and checkout will appear here.
+                No orders need attention right now.
               </div>
             )}
           </div>
@@ -258,6 +279,140 @@ export function MobileVendorDashboard({
   );
 }
 
+function MobileTodayAction({
+  action,
+  readinessPercent
+}: {
+  action: { eyebrow: string; title: string; description: string; href: string; label: string; icon: typeof Store };
+  readinessPercent: number;
+}) {
+  const Icon = action.icon;
+  return (
+    <article className="mobile-vendor-card overflow-hidden rounded-[30px] border border-[var(--coral)]/20 p-5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="inline-flex items-center gap-2 rounded-full bg-[var(--coral)]/12 px-3 py-1.5 text-xs font-black uppercase text-[var(--coral)]">
+          <Icon className="h-4 w-4" />
+          {action.eyebrow}
+        </span>
+        <span className="mobile-vendor-pill rounded-full px-3 py-1 text-xs font-black">{readinessPercent}% ready</span>
+      </div>
+      <h2 className="mobile-vendor-heading mt-4 text-2xl font-black leading-tight">{action.title}</h2>
+      <p className="mobile-vendor-muted mt-2 text-sm font-semibold leading-6">{action.description}</p>
+      <Link href={action.href} className={buttonStyles("primary", "mt-5 w-full justify-center px-5 py-3")}>
+        {action.label}
+        <ArrowRight className="ml-2 h-4 w-4" />
+      </Link>
+    </article>
+  );
+}
+
+function MobileReadinessChecklist({ items, percent }: { items: Array<{ label: string; complete: boolean }>; percent: number }) {
+  return (
+    <article className="mobile-vendor-card rounded-[30px] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="mobile-vendor-eyebrow text-xs font-bold uppercase">Readiness</p>
+          <h2 className="mobile-vendor-heading mt-1 text-xl font-black">Live selling checklist</h2>
+        </div>
+        <span className="mobile-vendor-pill rounded-full px-3 py-1 text-xs font-black">{percent}%</span>
+      </div>
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--surface)]">
+        <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--coral),var(--gold))]" style={{ width: `${percent}%` }} />
+      </div>
+      <div className="mt-4 grid gap-2">
+        {items.map((item) => (
+          <div key={item.label} className="mobile-vendor-soft flex items-center gap-3 rounded-2xl p-3">
+            <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${item.complete ? "bg-emerald-500/12 text-emerald-600 dark:text-emerald-200" : "bg-[var(--gold)]/12 text-[var(--gold)]"}`}>
+              {item.complete ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+            </span>
+            <p className="mobile-vendor-heading text-sm font-black">{item.label}</p>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function MobileProductPerformance({ products }: { products: Product[] }) {
+  return (
+    <section>
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <p className="mobile-vendor-eyebrow text-xs font-bold uppercase">Product performance</p>
+          <h2 className="mobile-vendor-heading mt-1 text-xl font-black">Catalog health</h2>
+        </div>
+        <Link href="/vendor/products" className="text-xs font-black text-[var(--gold)]">Manage</Link>
+      </div>
+      {products.length ? (
+        <div className="grid gap-3">
+          {products.map((product) => {
+            const discount = product.compareAtPrice > product.price ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100) : 0;
+            return (
+              <article key={product.id} className="mobile-vendor-card flex items-center gap-3 rounded-[24px] p-3">
+                <AppImage src={product.images[0] || "/products/product-placeholder.png"} alt={product.title} fallbackSrc="/products/product-placeholder.png" className="h-16 w-16 shrink-0 rounded-2xl" />
+                <div className="min-w-0 flex-1">
+                  <p className="mobile-vendor-heading line-clamp-1 text-sm font-black">{product.title}</p>
+                  <p className="mt-1 text-sm font-black text-[var(--coral)]">{formatPrice(product.price)}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${product.stock <= 5 ? "bg-red-500/10 text-red-600 dark:text-red-300" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"}`}>{product.stock} stock</span>
+                    {discount ? <span className="rounded-full bg-[var(--gold)]/12 px-2 py-0.5 text-[10px] font-black text-[var(--gold)]">{discount}% offer</span> : null}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="mobile-vendor-card mobile-vendor-muted rounded-[24px] p-5 text-sm">
+          Add products to track inventory and offer health.
+        </div>
+      )}
+    </section>
+  );
+}
+
+function MobileLiveTimeline({
+  subscription,
+  nextLiveSlot
+}: {
+  subscription?: VendorSubscriptionState | null;
+  nextLiveSlot?: LiveSlot | null;
+}) {
+  const timeline = [
+    { label: "Plan", value: subscription?.currentSubscription?.plan?.name ?? "No active plan", complete: Boolean(subscription?.currentSubscription) },
+    { label: "Slot approval", value: nextLiveSlot?.status ?? "Not requested", complete: nextLiveSlot?.status === "approved" },
+    { label: "Next live", value: nextLiveSlot ? new Date(nextLiveSlot.startTime).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "No slot scheduled", complete: Boolean(nextLiveSlot) }
+  ];
+
+  return (
+    <article className="mobile-vendor-card rounded-[30px] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="mobile-vendor-eyebrow text-xs font-bold uppercase">Live timeline</p>
+          <h2 className="mobile-vendor-heading mt-1 text-xl font-black">Schedule readiness</h2>
+        </div>
+        <Activity className="h-5 w-5 text-[var(--gold)]" />
+      </div>
+      <div className="mt-4 grid gap-0">
+        {timeline.map((item, index) => (
+          <div key={item.label} className="relative grid grid-cols-[24px_1fr] gap-3 pb-4 last:pb-0">
+            {index < timeline.length - 1 ? <span className="absolute left-[11px] top-6 h-[calc(100%-0.5rem)] w-px bg-[color:var(--border)]" /> : null}
+            <span className={`relative z-10 mt-1 h-6 w-6 rounded-full border-4 border-[var(--card)] ${item.complete ? "bg-emerald-500" : "bg-[var(--gold)]"}`} />
+            <div className="mobile-vendor-soft rounded-2xl p-3">
+              <p className="mobile-vendor-muted text-[10px] font-black uppercase">{item.label}</p>
+              <p className="mobile-vendor-heading mt-1 text-sm font-black">{item.value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Link href="/vendor/subscription" className={buttonStyles("secondary", "min-h-11 justify-center px-3 py-2 text-xs")}>Plan</Link>
+        <Link href="/vendor/live-slots" className={buttonStyles("primary", "min-h-11 justify-center px-3 py-2 text-xs")}>Live slots</Link>
+      </div>
+    </article>
+  );
+}
+
 function KpiCard({ icon: Icon, label, value, change }: { icon: typeof Store; label: string; value: string; change: string }) {
   return (
     <div className="mobile-vendor-card rounded-[26px] p-4">
@@ -265,7 +420,7 @@ function KpiCard({ icon: Icon, label, value, change }: { icon: typeof Store; lab
         <Icon className="mobile-vendor-eyebrow h-5 w-5" />
         <span className="mobile-vendor-pill rounded-full px-2 py-1 text-[10px] font-bold text-emerald-600">{change}</span>
       </div>
-      <p className="mobile-vendor-heading mt-5 text-2xl font-black tracking-[-0.05em]">{value}</p>
+      <p className="mobile-vendor-heading mt-5 break-words text-2xl font-black">{value}</p>
       <p className="mobile-vendor-muted mt-1 text-xs font-bold uppercase tracking-[0.14em]">{label}</p>
     </div>
   );

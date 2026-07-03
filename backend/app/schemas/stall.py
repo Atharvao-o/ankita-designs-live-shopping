@@ -37,6 +37,8 @@ class StallResponse(BaseModel):
     activeFrom: str | None = None
     activeTo: str | None = None
     productCount: int | None = None
+    followerCount: int | None = None
+    postCount: int | None = None
     proximityRadius: int | None = None
     route: str | None = None
     socialLinks: dict | None = None

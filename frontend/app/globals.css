@@ -42,6 +42,16 @@
   --gold: #b9913f;
   --coral: #ef6b4d;
   --coral-hover: #db553b;
+  --brand-black: #18131f;
+  --brand-cream: #fff8ea;
+  --brand-coral: #ef6b4d;
+  --brand-gold: #b9913f;
+  --brand-rose: #c2185b;
+  --live: #e11d48;
+  --live-foreground: #fff8ea;
+  --fabric-weave:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--gold) 10%, transparent) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(135deg, color-mix(in srgb, var(--coral) 7%, transparent) 0 1px, transparent 1px 14px);
   --purple: #c2185b;
   --success: #168a54;
   --warning: #b7791f;
@@ -53,16 +63,16 @@
   --feed-card: #fffdf8;
   --radius-card: 24px;
   --radius-control: 16px;
-  --shadow-card: 0 18px 46px rgba(80, 52, 20, 0.10);
-  --shadow-hover: 0 24px 70px rgba(80, 52, 20, 0.16);
+  --shadow-card: 0 18px 46px rgba(80, 52, 20, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.62);
+  --shadow-hover: 0 28px 80px rgba(80, 52, 20, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --shadow-stage: 0 32px 110px rgba(24, 19, 31, 0.16);
   --shadow-soft: 0 18px 46px rgba(80, 52, 20, 0.10);
   --shadow-strong: 0 34px 90px rgba(80, 52, 20, 0.16);
   --hero-image: url("/images/home/hero-expo-bg-light.webp");
   --hero-overlay: linear-gradient(90deg, rgba(251, 246, 234, 0.96) 0%, rgba(251, 246, 234, 0.86) 34%, rgba(251, 246, 234, 0.4) 62%, rgba(251, 246, 234, 0.12) 100%);
   --hero-glow: radial-gradient(circle at 70% 45%, rgba(216, 183, 106, 0.22), transparent 40%);
   --body-bg:
-    radial-gradient(circle at 15% 8%, rgba(185, 145, 63, 0.16), transparent 24%),
-    radial-gradient(circle at 86% 10%, rgba(239, 107, 77, 0.12), transparent 22%),
+    var(--fabric-weave),
     linear-gradient(180deg, #fbf4e8 0%, #fffaf0 52%, #f6ead8 100%);
   --nav-bg: #fffdf8;
   --footer-bg: #161425;
@@ -111,6 +121,16 @@
   --gold: #f4ca64;
   --coral: #ff765c;
   --coral-hover: #f25c45;
+  --brand-black: #07070d;
+  --brand-cream: #fff8ea;
+  --brand-coral: #ff765c;
+  --brand-gold: #f4ca64;
+  --brand-rose: #ff4d9a;
+  --live: #fb2f5f;
+  --live-foreground: #fff8ea;
+  --fabric-weave:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--gold) 8%, transparent) 0 1px, transparent 1px 13px),
+    repeating-linear-gradient(135deg, color-mix(in srgb, var(--coral) 8%, transparent) 0 1px, transparent 1px 15px);
   --purple: #ff4d9a;
   --success: #22c55e;
   --warning: #f4ca64;
@@ -122,16 +142,16 @@
   --feed-card: #171720;
   --radius-card: 24px;
   --radius-control: 16px;
-  --shadow-card: 0 24px 70px rgba(0, 0, 0, 0.30);
-  --shadow-hover: 0 30px 90px rgba(0, 0, 0, 0.42);
+  --shadow-card: 0 24px 70px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-hover: 0 36px 110px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --shadow-stage: 0 38px 130px rgba(0, 0, 0, 0.56);
   --shadow-soft: 0 30px 90px rgba(0, 0, 0, 0.32);
   --shadow-strong: 0 50px 140px rgba(0, 0, 0, 0.5);
   --hero-image: url("/images/home/hero-expo-bg-dark.webp");
   --hero-overlay: linear-gradient(90deg, rgba(5, 6, 18, 0.96) 0%, rgba(5, 6, 18, 0.86) 34%, rgba(5, 6, 18, 0.45) 62%, rgba(5, 6, 18, 0.22) 100%);
   --hero-glow: radial-gradient(circle at 70% 45%, rgba(124, 58, 237, 0.28), transparent 38%);
   --body-bg:
-    radial-gradient(circle at 18% 0%, rgba(124, 58, 237, 0.18), transparent 26%),
-    radial-gradient(circle at 82% 12%, rgba(244, 111, 80, 0.16), transparent 24%),
+    var(--fabric-weave),
     linear-gradient(180deg, #0b0b11 0%, #101019 48%, #0b0b11 100%);
   --nav-bg: #11111a;
   --footer-bg: #0b0b11;
@@ -257,8 +277,8 @@ svg {
   min-height: 100dvh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--gold) 12%, transparent), transparent 28%),
-    radial-gradient(circle at 95% 12%, color-mix(in srgb, var(--coral) 10%, transparent), transparent 26%),
+    var(--fabric-weave),
+    linear-gradient(180deg, color-mix(in srgb, var(--dashboard-bg) 92%, var(--brand-cream)) 0%, var(--dashboard-bg) 100%),
     var(--dashboard-bg);
   color: var(--foreground);
 }
@@ -271,9 +291,15 @@ svg {
 .app-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: var(--feed-card);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--feed-card) 92%, white) 0%, var(--feed-card) 100%);
   color: var(--card-foreground);
   box-shadow: var(--shadow-card);
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background-color 220ms ease;
 }
 
 .app-card-flat {
@@ -281,6 +307,11 @@ svg {
   border-radius: var(--radius-card);
   background: var(--surface);
   color: var(--foreground);
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    background-color 220ms ease;
 }
 
 .app-sidebar {
@@ -391,6 +422,208 @@ svg {
 
 .app-no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.ad-monogram {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--gold) 48%, var(--border));
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--brand-black) 86%, transparent), var(--brand-black)),
+    var(--fabric-weave);
+  color: var(--brand-cream);
+  box-shadow:
+    0 12px 30px color-mix(in srgb, var(--brand-black) 24%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.ad-monogram::after {
+  content: "";
+  position: absolute;
+  inset: -35% 34% auto auto;
+  width: 56%;
+  height: 160%;
+  transform: rotate(24deg);
+  background: linear-gradient(180deg, var(--coral), var(--gold));
+  opacity: 0.92;
+}
+
+.ad-monogram > span {
+  position: relative;
+  z-index: 1;
+}
+
+.app-hover-lift {
+  transform: translateZ(0);
+}
+
+.app-hover-lift:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  box-shadow: var(--shadow-hover);
+}
+
+.app-press {
+  transition:
+    transform 150ms ease,
+    filter 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.app-press:active {
+  transform: scale(0.97);
+  filter: saturate(1.08);
+}
+
+.app-slide-in {
+  animation: appSlideIn 420ms cubic-bezier(0.21, 0.74, 0.24, 1) both;
+}
+
+.app-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 74%, var(--muted-surface));
+}
+
+.app-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, white 34%, transparent), transparent);
+  animation: appSkeleton 1.45s ease-in-out infinite;
+}
+
+.live-badge {
+  position: relative;
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--live) 38%, white);
+  border-radius: 999px;
+  background: var(--live);
+  color: var(--live-foreground);
+  padding-inline: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--live) 28%, transparent);
+}
+
+.live-badge::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: currentColor;
+  animation: appLivePulse 1.5s ease-out infinite;
+}
+
+.story-ring {
+  background:
+    linear-gradient(var(--feed-card), var(--feed-card)) padding-box,
+    conic-gradient(from 180deg, var(--brand-rose), var(--coral), var(--gold), var(--brand-rose)) border-box;
+  border: 2px solid transparent;
+}
+
+.story-ring-live {
+  background:
+    linear-gradient(var(--feed-card), var(--feed-card)) padding-box,
+    conic-gradient(from 180deg, var(--live), var(--coral), var(--gold), #22c55e, var(--live)) border-box;
+  border: 2px solid transparent;
+  animation: appLiveGlow 2.2s ease-in-out infinite;
+}
+
+.premium-product-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--feed-card) 94%, white), var(--feed-card));
+  box-shadow: var(--shadow-card);
+}
+
+.premium-product-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  box-shadow: var(--shadow-hover);
+}
+
+.boutique-header {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius-card) + 8px);
+  background:
+    var(--fabric-weave),
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-black) 92%, var(--coral)), var(--brand-black));
+  color: var(--brand-cream);
+  box-shadow: var(--shadow-stage);
+}
+
+.floating-action-bar {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--topbar);
+  color: var(--foreground);
+  box-shadow: var(--shadow-hover);
+  backdrop-filter: blur(18px) saturate(1.1);
+}
+
+@keyframes appLivePulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 42%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes appLiveGlow {
+  0%,
+  100% {
+    filter: saturate(1);
+  }
+  50% {
+    filter: saturate(1.3) brightness(1.05);
+  }
+}
+
+@keyframes appSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes appSkeleton {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-slide-in,
+  .app-skeleton::after,
+  .live-badge::before,
+  .story-ring-live {
+    animation: none;
+  }
+
+  .app-hover-lift:hover,
+  .premium-product-card:hover,
+  .app-press:active {
+    transform: none;
+  }
 }
 
 .theme-transition,

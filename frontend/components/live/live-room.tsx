@@ -2,18 +2,39 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Gavel, Heart, MessageCircleMore, Minus, Plus, Send, Share2, ShoppingBag, Star } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  BadgeCheck,
+  CheckCircle2,
+  Clock3,
+  Eye,
+  Flame,
+  Gavel,
+  Gift,
+  Heart,
+  MessageCircleMore,
+  Minus,
+  Plus,
+  Radio,
+  Send,
+  Share2,
+  ShoppingBag,
+  Sparkles,
+  Star,
+  TrendingUp,
+  Users,
+  Zap
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Screen } from "@/components/layout/screen";
 import { AppImage } from "@/components/ui/app-image";
 import { Button, buttonStyles } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { useExpoStore } from "@/lib/cart-store";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { addCartItem, getBargainState, getLiveMessages, getLiveSessionState, getStall, getStallProducts, joinLiveSession, placeBargainOffer, postLiveMessage } from "@/lib/api";
 import { BargainState, LiveKitConnection, Product, Stall } from "@/lib/types";
 import { UserLiveKitViewer } from "@/components/live/user-livekit-viewer";
-import { ViewerPresenceStrip } from "@/components/live/viewer-presence-strip";
 import { MobileLiveActionsMenu } from "@/components/live/mobile-live-actions-menu";
 import { LiveChatPanel } from "@/components/live/live-chat-panel";
 import { LiveElapsedCounter } from "@/components/marketplace/live-timers";
@@ -62,8 +83,12 @@ export function LiveRoom({ stallId }: { stallId: string }) {
   const vendorName = stall?.vendorName ?? "Vendor";
   const featured = pinnedProduct;
   const relatedProducts = useMemo(
-    () => productCatalog.filter((item) => item.id !== featured?.id).slice(0, 2),
+    () => productCatalog.filter((item) => item.id !== featured?.id).slice(0, 5),
     [featured?.id, productCatalog]
+  );
+  const productQueue = useMemo(
+    () => [featured, ...relatedProducts].filter((item): item is Product => Boolean(item)).slice(0, 6),
+    [featured, relatedProducts]
   );
   const recentMessages = chatMessages.slice(-6);
   const viewerCount = liveSession.viewerCount ?? 0;
@@ -301,6 +326,7 @@ export function LiveRoom({ stallId }: { stallId: string }) {
             liveStartedAt={liveStartedAt}
             featured={featured}
             relatedProducts={relatedProducts}
+            productQueue={productQueue}
             quantity={quantity}
             setQuantity={setQuantity}
             cartPulse={cartPulse}
@@ -331,20 +357,19 @@ export function LiveRoom({ stallId }: { stallId: string }) {
           />
         }
         desktop={
-      <section className="min-h-[100dvh] w-full overflow-x-hidden bg-[#06080E] xl:h-[100dvh] xl:overflow-hidden">
-        <header className="sticky top-0 z-40 border-b border-white/10 bg-[#06080E] px-3 py-3 text-white sm:px-5 xl:static">
+      <section className="min-h-[100dvh] w-full overflow-x-hidden bg-[#05040A] text-white xl:h-[100dvh] xl:overflow-hidden">
+        <header className="sticky top-0 z-40 border-b border-white/10 bg-[#05040A]/92 px-3 py-3 text-white backdrop-blur-xl sm:px-5 xl:static">
           <div className="flex min-w-0 items-center justify-between gap-3">
             <div className="min-w-0">
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="inline-flex h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-[#E95F45]" aria-hidden />
-                <span className="rounded-full bg-[#E95F45]/18 px-2.5 py-1 text-xs font-bold text-[#FFB9A4]">LIVE</span>
-                <LiveElapsedCounter startedAt={liveStartedAt} className="border-white/10 bg-[#1d1d27] text-white dark:border-white/10 dark:bg-[#23232d] dark:text-white" />
-                <p className="truncate text-sm font-semibold text-white sm:text-base">{vendorName}</p>
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <LiveEventStatusPill isJoining={isJoining} livekitConnection={livekitConnection} />
+                <LiveElapsedCounter startedAt={liveStartedAt} className="border-white/10 bg-white/10 text-white dark:border-white/10 dark:bg-white/10 dark:text-white" />
+                <p className="truncate text-sm font-black text-white sm:text-base">{vendorName}</p>
               </div>
-              <p className="mt-1 truncate text-xs text-slate-400 sm:text-sm">{stall?.name ?? stallId}</p>
+              <p className="mt-1 truncate text-xs font-semibold text-white/52 sm:text-sm">{stall?.name ?? stallId}</p>
             </div>
             <div className="hidden items-center gap-3 md:flex">
-              <ViewerPresenceStrip viewerCount={viewerCount} />
+              <AnimatedViewerCount viewerCount={viewerCount} />
             </div>
             <div className="flex items-center gap-2">
               <button type="button" className={buttonStyles("secondary", "hidden px-4 py-2 xl:inline-flex")}>
@@ -365,9 +390,15 @@ export function LiveRoom({ stallId }: { stallId: string }) {
           </div>
         </header>
 
-        <div className="grid min-h-[calc(100dvh-69px)] w-full gap-0 xl:h-[calc(100dvh-69px)] xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.58fr)_minmax(360px,0.72fr)] xl:overflow-hidden">
+        <div className="grid min-h-[calc(100dvh-69px)] w-full gap-0 xl:h-[calc(100dvh-69px)] xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.58fr)_minmax(380px,0.62fr)] xl:overflow-hidden">
           <div className="flex min-w-0 flex-col gap-3 p-3 sm:gap-4 sm:p-5 xl:h-full xl:overflow-hidden">
-            <div data-tour-id="live-video" className="relative aspect-video w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#171720] p-2 shadow-darkGlow sm:rounded-[34px] sm:p-3">
+            <div data-tour-id="live-video" className="relative aspect-video w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#0B0B11] p-2 shadow-[0_30px_90px_rgba(0,0,0,0.42)] sm:rounded-[34px] sm:p-3">
+              <div className="pointer-events-none absolute inset-0 z-10 rounded-[28px] bg-[radial-gradient(circle_at_18%_12%,rgba(244,200,121,0.18),transparent_30%),linear-gradient(180deg,rgba(5,4,10,0.18),rgba(5,4,10,0)_42%,rgba(5,4,10,0.76))] sm:rounded-[34px]" />
+              <div className="absolute left-4 top-4 z-20 flex flex-wrap items-center gap-2">
+                <LiveEventStatusPill isJoining={isJoining} livekitConnection={livekitConnection} compact />
+                <AnimatedViewerCount viewerCount={viewerCount} compact />
+              </div>
+              <LiveReactionRail />
               {livekitConnection?.mode === "real" ? (
                 <UserLiveKitViewer connection={livekitConnection} className="h-full w-full overflow-hidden rounded-[24px] bg-slate-950" />
               ) : (
@@ -376,18 +407,17 @@ export function LiveRoom({ stallId }: { stallId: string }) {
                   message={isJoining ? "Connecting to the LiveKit room..." : streamError || "Vendor is not live right now."}
                 />
               )}
+              {featured ? <FloatingPinnedProductCard product={featured} onAddToCart={pushCart} /> : null}
             </div>
 
-            <div className="rounded-[24px] border border-white/10 bg-[#171720] p-4 shadow-darkGlow">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <ViewerPresenceStrip viewerCount={viewerCount} />
-                <LiveElapsedCounter startedAt={liveStartedAt} size="md" className="border-white/10 bg-[#1d1d27] text-white dark:border-white/10 dark:bg-[#23232d] dark:text-white" />
-              </div>
-            </div>
+            <ProductQueue products={productQueue} pinnedProductId={featured?.id} />
 
             <div className="grid gap-3">
-              <div className="rounded-[24px] border border-white/10 bg-[#171720] p-4 text-white shadow-darkGlow">
-                <p className="text-xs uppercase tracking-[0.18em] text-[#C59A4A]">Now presenting</p>
+              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(135deg,rgba(23,23,32,0.98),rgba(36,27,46,0.84))] p-4 text-white shadow-darkGlow">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F4C879]">Now presenting</p>
+                  <LiveElapsedCounter startedAt={liveStartedAt} size="md" className="border-white/10 bg-white/10 text-white dark:border-white/10 dark:bg-white/10 dark:text-white" />
+                </div>
                 <h1 className="mt-2 truncate text-xl font-semibold tracking-[-0.04em] text-white sm:text-2xl">
                   {featured?.title ?? "No product showcased yet"}
                 </h1>
@@ -412,20 +442,23 @@ export function LiveRoom({ stallId }: { stallId: string }) {
             </div>
           </div>
 
-          <LiveChatPanel
-            open={mobileChatOpen}
-            messages={recentMessages}
-            message={message}
-            setMessage={setMessage}
-            onSubmit={submitMessage}
-            onClose={() => setMobileChatOpen(false)}
-            className="m-3 min-h-[420px] sm:m-5 xl:m-5 xl:h-[calc(100%-40px)] xl:min-h-0"
-            disabled={!canChat}
-            helperText={!canChat ? "Please login as a customer to chat." : undefined}
-            errorText={chatError}
-            isSending={isSendingMessage}
-            tone="dark"
-          />
+          <div className="m-3 grid min-h-[420px] gap-3 sm:m-5 xl:h-[calc(100%-40px)] xl:min-h-0 xl:grid-rows-[auto_minmax(0,1fr)]">
+            <LiveChatEventHeader viewerCount={viewerCount} />
+            <LiveChatPanel
+              open={mobileChatOpen}
+              messages={recentMessages}
+              message={message}
+              setMessage={setMessage}
+              onSubmit={submitMessage}
+              onClose={() => setMobileChatOpen(false)}
+              className="min-h-[360px] xl:h-full xl:min-h-0"
+              disabled={!canChat}
+              helperText={!canChat ? "Please login as a customer to chat." : undefined}
+              errorText={chatError}
+              isSending={isSendingMessage}
+              tone="dark"
+            />
+          </div>
 
           <ProductPanel
             featured={featured}
@@ -450,6 +483,228 @@ export function LiveRoom({ stallId }: { stallId: string }) {
       />
       <CartDrawer />
     </Screen>
+  );
+}
+
+function LiveEventStatusPill({
+  isJoining,
+  livekitConnection,
+  compact = false
+}: {
+  isJoining: boolean;
+  livekitConnection: LiveKitConnection | null;
+  compact?: boolean;
+}) {
+  const isVideoLive = livekitConnection?.mode === "real";
+  const label = isJoining ? "Connecting" : isVideoLive ? "Live video" : "Live room";
+
+  return (
+    <span className={cn(
+      "inline-flex shrink-0 items-center gap-2 rounded-full border border-[#FF7A59]/35 bg-[#FF7A59]/16 font-black uppercase text-[#FFB9A4] shadow-[0_0_30px_rgba(255,122,89,0.18)]",
+      compact ? "px-3 py-1.5 text-[10px]" : "px-3.5 py-2 text-xs"
+    )}>
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF7A59] opacity-70" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#FF7A59]" />
+      </span>
+      {label}
+    </span>
+  );
+}
+
+function AnimatedViewerCount({ viewerCount, compact = false }: { viewerCount: number; compact?: boolean }) {
+  return (
+    <motion.span
+      key={viewerCount}
+      initial={{ scale: 0.94, opacity: 0.72 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.24 }}
+      className={cn(
+        "inline-flex shrink-0 items-center gap-2 rounded-full border border-white/12 bg-white/10 font-black text-white backdrop-blur",
+        compact ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"
+      )}
+    >
+      <Eye className={compact ? "h-3.5 w-3.5 text-[#F4C879]" : "h-4 w-4 text-[#F4C879]"} />
+      {viewerCount} watching
+    </motion.span>
+  );
+}
+
+function LiveReactionRail() {
+  const reactions = [
+    { label: "Love", icon: Heart, tone: "text-[#FFB9A4]" },
+    { label: "Hype", icon: Flame, tone: "text-[#F4C879]" },
+    { label: "Wow", icon: Sparkles, tone: "text-[#A7F3D0]" }
+  ];
+
+  return (
+    <div className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 flex-col gap-2 lg:flex" aria-label="Live reactions">
+      {reactions.map((reaction, index) => {
+        const Icon = reaction.icon;
+        return (
+          <motion.button
+            key={reaction.label}
+            type="button"
+            initial={{ y: 8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.08 * index }}
+            whileHover={{ y: -3, scale: 1.04 }}
+            className="grid h-12 w-12 place-items-center rounded-full border border-white/14 bg-black/42 text-white shadow-[0_18px_46px_rgba(0,0,0,0.28)] backdrop-blur"
+            aria-label={`${reaction.label} reaction`}
+          >
+            <Icon className={cn("h-5 w-5", reaction.tone)} />
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+}
+
+function FloatingPinnedProductCard({ product, onAddToCart }: { product: Product; onAddToCart: () => void }) {
+  const discount = productDiscount(product);
+
+  return (
+    <motion.article
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="absolute bottom-4 left-4 z-20 hidden w-[min(380px,calc(100%-2rem))] rounded-[26px] border border-white/14 bg-black/58 p-3 text-white shadow-[0_24px_70px_rgba(0,0,0,0.42)] backdrop-blur-xl md:block"
+    >
+      <div className="flex gap-3">
+        <AppImage src={product.images[0] ?? "/products/product-placeholder.png"} alt={product.title} fallbackSrc="/products/product-placeholder.png" className="h-24 w-24 rounded-[20px]" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-[#FF7A59]/18 px-2.5 py-1 text-[10px] font-black uppercase text-[#FFB9A4]">Pinned product</span>
+            {discount ? <span className="rounded-full bg-emerald-500/12 px-2.5 py-1 text-[10px] font-black text-emerald-200">{discount}% off</span> : null}
+          </div>
+          <h2 className="mt-2 line-clamp-2 text-base font-black leading-5 text-white">{product.title}</h2>
+          <div className="mt-2 flex flex-wrap items-end gap-2">
+            <p className="text-xl font-black text-[#FFB9A4]">{formatPrice(product.price)}</p>
+            {discount ? <p className="pb-1 text-xs font-bold text-white/48 line-through">{formatPrice(product.compareAtPrice)}</p> : null}
+          </div>
+        </div>
+      </div>
+      <button type="button" onClick={onAddToCart} className={buttonStyles("primary", "mt-3 w-full justify-center px-4 py-3 text-sm")}>
+        <ShoppingBag className="mr-2 h-4 w-4" />
+        Quick add during live
+      </button>
+    </motion.article>
+  );
+}
+
+function ProductQueue({ products, pinnedProductId }: { products: Product[]; pinnedProductId?: string }) {
+  if (!products.length) {
+    return (
+      <div className="rounded-[24px] border border-white/10 bg-[#11131D] p-4 text-sm font-semibold text-white/54">
+        Product queue appears here when the vendor pins catalogue items.
+      </div>
+    );
+  }
+
+  return (
+    <section className="rounded-[24px] border border-white/10 bg-[#11131D]/92 p-3 shadow-darkGlow">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F4C879]">Product queue</p>
+          <p className="mt-1 text-xs font-semibold text-white/50">Pinned and upcoming products under the live stage</p>
+        </div>
+        <span className="rounded-full bg-white/8 px-3 py-1 text-xs font-black text-white/72">{products.length} items</span>
+      </div>
+      <div className="app-no-scrollbar flex gap-3 overflow-x-auto pb-1">
+        {products.map((product) => {
+          const active = product.id === pinnedProductId;
+          return (
+            <article key={product.id} className={cn(
+              "min-w-[190px] overflow-hidden rounded-[20px] border bg-[#171720] transition",
+              active ? "border-[#FF7A59] shadow-[0_0_0_1px_rgba(255,122,89,0.34)]" : "border-white/10"
+            )}>
+              <div className="relative h-24">
+                <AppImage src={product.images[0] ?? "/products/product-placeholder.png"} alt={product.title} fallbackSrc="/products/product-placeholder.png" className="h-full w-full rounded-none object-cover" />
+                {active ? <span className="absolute left-2 top-2 rounded-full bg-[#FF7A59] px-2 py-1 text-[10px] font-black text-white">On stage</span> : null}
+              </div>
+              <div className="p-3">
+                <h3 className="line-clamp-2 min-h-9 text-xs font-black leading-4 text-white">{product.title}</h3>
+                <p className="mt-2 text-sm font-black text-[#FFB9A4]">{formatPrice(product.price)}</p>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function LiveChatEventHeader({ viewerCount }: { viewerCount: number }) {
+  const reactions = [
+    { label: "Love", icon: Heart },
+    { label: "Deal", icon: Gift },
+    { label: "Hype", icon: Zap }
+  ];
+
+  return (
+    <div className="rounded-[24px] border border-white/10 bg-[#11131D] p-3 text-white shadow-darkGlow">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#F4C879]">Live chat</p>
+          <p className="mt-1 text-xs font-semibold text-white/52">{viewerCount} viewers can react and ask questions</p>
+        </div>
+        <Radio className="h-5 w-5 animate-pulse text-[#FF7A59]" />
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        {reactions.map((reaction) => {
+          const Icon = reaction.icon;
+          return (
+            <button key={reaction.label} type="button" className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-white/10 bg-white/8 text-xs font-black text-white transition hover:bg-white/12">
+              <Icon className="h-3.5 w-3.5 text-[#F4C879]" />
+              {reaction.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function LiveMiniMetric({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
+  return (
+    <div className="rounded-[18px] border border-white/10 bg-[#171720] px-3 py-2 text-center">
+      <Icon className="mx-auto h-4 w-4 text-[#F4C879]" />
+      <p className="mt-1 truncate text-xs font-black text-white">{value}</p>
+      <p className="text-[9px] font-black uppercase text-white/42">{label}</p>
+    </div>
+  );
+}
+
+function LiveDealMeter({ bargainState }: { bargainState: BargainState | null }) {
+  const session = bargainState?.session;
+  const groups = bargainState?.offerGroups ?? [];
+  const topGroup = groups[0];
+  const target = session?.quantityLimit ?? 0;
+  const currentCustomers = groups.reduce((total, group) => total + group.customers, 0);
+  const progress = target > 0 ? Math.min(100, Math.round((currentCustomers / target) * 100)) : groups.length ? 58 : 0;
+
+  return (
+    <div className="mt-5 rounded-[24px] border border-[#F4C879]/18 bg-[linear-gradient(135deg,rgba(244,200,121,0.12),rgba(255,122,89,0.08))] p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#F4C879]">Group-buy heat</p>
+          <h3 className="mt-1 text-lg font-black text-white">
+            {topGroup ? `${topGroup.customers} buyers at ${formatPrice(topGroup.offerPrice)}` : "Waiting for customer offers"}
+          </h3>
+        </div>
+        <TrendingUp className="h-5 w-5 text-[#FFB9A4]" />
+      </div>
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.45 }}
+          className="h-full rounded-full bg-[linear-gradient(90deg,#FF7A59,#F4C879)]"
+        />
+      </div>
+      <p className="mt-2 text-xs font-semibold text-white/52">
+        {session ? `${currentCustomers} customer offers against ${target || "open"} live slots.` : "Vendor can open a bargain to turn viewers into a buying group."}
+      </p>
+    </div>
   );
 }
 
@@ -526,6 +781,12 @@ function ProductPanel({
         </div>
       </div>
 
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <LiveMiniMetric icon={BadgeCheck} label="Verified" value="AD" />
+        <LiveMiniMetric icon={Users} label="Group buy" value={`${bargainState?.offerGroups.length ?? 0} bids`} />
+        <LiveMiniMetric icon={Clock3} label="Stage" value="Live" />
+      </div>
+
       <div className="mt-5 grid gap-3">
         {productDetails.map((item) => (
           <div key={item} className="rounded-[22px] border border-white/10 bg-[#171720] px-4 py-3 text-sm text-slate-300">
@@ -533,6 +794,8 @@ function ProductPanel({
           </div>
         ))}
       </div>
+
+      <LiveDealMeter bargainState={bargainState} />
 
       <CustomerBargainPanel
         bargainState={bargainState}
@@ -607,6 +870,7 @@ function MobileLiveCommerceRoom({
   liveStartedAt,
   featured,
   relatedProducts,
+  productQueue,
   quantity,
   setQuantity,
   cartPulse,
@@ -638,6 +902,7 @@ function MobileLiveCommerceRoom({
   liveStartedAt: string | null;
   featured: Product | null;
   relatedProducts: Product[];
+  productQueue: Product[];
   quantity: number;
   setQuantity: (updater: (current: number) => number) => void;
   cartPulse: boolean;
@@ -664,7 +929,7 @@ function MobileLiveCommerceRoom({
   onLeave: () => void;
 }) {
   return (
-    <section className="min-h-[100dvh] bg-[var(--bg)] px-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-[calc(0.8rem+env(safe-area-inset-top))] text-[var(--text)]">
+    <section className="min-h-[100dvh] bg-[var(--bg)] px-4 pb-[calc(15rem+env(safe-area-inset-bottom))] pt-[calc(0.8rem+env(safe-area-inset-top))] text-[var(--text)]">
       <header className="mb-4 flex items-center justify-between gap-3">
         <button type="button" onClick={onLeave} className="grid h-11 w-11 place-items-center rounded-2xl border border-[color:var(--border)] bg-[var(--surface-strong)] text-[var(--gold)]" aria-label="Leave live room">
           AE
@@ -741,8 +1006,10 @@ function MobileLiveCommerceRoom({
         <span className="rounded-full bg-[var(--surface)] px-4 py-2 text-sm font-black text-[var(--text)]">{viewerCount}</span>
       </div>
 
+      <MobileProductQueue products={productQueue} pinnedProductId={featured?.id} />
+
       <div className="mt-5 rounded-[30px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-3 shadow-[var(--shadow-soft)]">
-        <div className="grid grid-cols-2 rounded-[22px] bg-[var(--surface)] p-1">
+        <div className="grid grid-cols-3 rounded-[22px] bg-[var(--surface)] p-1">
           {(["chat", "products", "bargain"] as const).map((tab) => (
             <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`min-h-11 rounded-[18px] text-sm font-black capitalize ${activeTab === tab ? "bg-[var(--coral)] text-white" : "text-[var(--muted)]"}`}>
               {tab === "products" ? `Products (${relatedProducts.length + (featured ? 1 : 0)})` : tab}
@@ -799,7 +1066,106 @@ function MobileLiveCommerceRoom({
           setActiveTab(tab);
         }}
       />
+      <MobilePurchaseSheet
+        featured={featured}
+        quantity={quantity}
+        setQuantity={setQuantity}
+        cartPulse={cartPulse}
+        onAddToCart={onAddToCart}
+        onBuyNow={onBuyNow}
+      />
     </section>
+  );
+}
+
+function MobileProductQueue({ products, pinnedProductId }: { products: Product[]; pinnedProductId?: string }) {
+  if (!products.length) {
+    return null;
+  }
+
+  return (
+    <section className="mt-5 rounded-[28px] border border-[color:var(--border)] bg-[var(--surface-strong)] p-3 shadow-[var(--shadow-soft)]">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--gold)]">Product queue</p>
+          <p className="mt-1 text-xs text-[var(--muted)]">Coming up in this live room</p>
+        </div>
+        <span className="rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-black text-[var(--text)]">{products.length}</span>
+      </div>
+      <div className="app-no-scrollbar flex gap-3 overflow-x-auto pb-1">
+        {products.map((product) => {
+          const active = product.id === pinnedProductId;
+          return (
+            <article key={product.id} className={cn(
+              "min-w-[150px] overflow-hidden rounded-[20px] border bg-[var(--surface)]",
+              active ? "border-[var(--coral)]" : "border-[color:var(--border)]"
+            )}>
+              <div className="relative h-24">
+                <AppImage src={product.images[0] ?? "/products/product-placeholder.png"} alt={product.title} fallbackSrc="/products/product-placeholder.png" className="h-full w-full rounded-none object-cover" />
+                {active ? <span className="absolute left-2 top-2 rounded-full bg-[var(--coral)] px-2 py-1 text-[10px] font-black text-white">Live</span> : null}
+              </div>
+              <div className="p-2.5">
+                <p className="line-clamp-2 min-h-9 text-xs font-black leading-4 text-[var(--text)]">{product.title}</p>
+                <p className="mt-1 text-sm font-black text-[var(--coral)]">{formatPrice(product.price)}</p>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function MobilePurchaseSheet({
+  featured,
+  quantity,
+  setQuantity,
+  cartPulse,
+  onAddToCart,
+  onBuyNow
+}: {
+  featured: Product | null;
+  quantity: number;
+  setQuantity: (updater: (current: number) => number) => void;
+  cartPulse: boolean;
+  onAddToCart: () => void;
+  onBuyNow: () => void;
+}) {
+  const discount = featured ? productDiscount(featured) : 0;
+
+  return (
+    <aside className="fixed inset-x-3 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[60] rounded-[28px] border border-[color:var(--border)] bg-[var(--card)] p-3 shadow-[0_20px_60px_rgba(0,0,0,0.26)] backdrop-blur-xl dark:bg-[#11131D]/96 md:hidden" aria-label="Live purchase sheet">
+      <div className="flex min-w-0 items-center gap-3">
+        <AppImage src={featured?.images[0] ?? "/products/product-placeholder.png"} alt={featured?.title ?? "Pinned product"} fallbackSrc="/products/product-placeholder.png" className="h-14 w-14 rounded-2xl" />
+        <div className="min-w-0 flex-1">
+          <p className="line-clamp-1 text-xs font-black uppercase text-[var(--gold)]">Pinned offer</p>
+          <h2 className="mt-0.5 line-clamp-1 text-sm font-black text-[var(--text)]">{featured?.title ?? "No product pinned"}</h2>
+          <div className="mt-1 flex items-center gap-2">
+            <p className="text-base font-black text-[var(--coral)]">{featured ? formatPrice(featured.price) : "Unavailable"}</p>
+            {featured && discount ? <span className="rounded-full bg-emerald-500/12 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-300">{discount}%</span> : null}
+          </div>
+        </div>
+        <div className="flex items-center rounded-full border border-[color:var(--border)] bg-[var(--surface)]">
+          <button type="button" onClick={() => setQuantity((current) => Math.max(1, current - 1))} className="grid h-10 w-9 place-items-center" aria-label="Decrease quantity"><Minus className="h-4 w-4" /></button>
+          <span className="min-w-5 text-center text-sm font-black">{quantity}</span>
+          <button type="button" onClick={() => setQuantity((current) => current + 1)} className="grid h-10 w-9 place-items-center" aria-label="Increase quantity"><Plus className="h-4 w-4" /></button>
+        </div>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <motion.button
+          animate={cartPulse ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+          type="button"
+          onClick={onAddToCart}
+          disabled={!featured}
+          className="min-h-11 rounded-full border border-[color:var(--border)] bg-[var(--surface)] px-3 text-sm font-black text-[var(--text)] disabled:opacity-50"
+        >
+          Add cart
+        </motion.button>
+        <button type="button" onClick={onBuyNow} disabled={!featured} className="min-h-11 rounded-full bg-[var(--coral)] px-3 text-sm font-black text-white shadow-[0_14px_34px_rgba(255,120,92,0.28)] disabled:opacity-50">
+          Buy now
+        </button>
+      </div>
+    </aside>
   );
 }
 

@@ -5,14 +5,16 @@ import { HomepageAdvertisementCarousel } from "@/components/marketplace/homepage
 import {
   CategoryRail,
   FeedCard,
+  LiveSellerStrip,
   SocialEmptyState,
   SocialShell,
   StoriesRow,
+  TrendingProductRails,
   useSocialShoppingData
 } from "@/components/social/social-shopping";
 
 export default function Home() {
-  const { posts, stalls, exhibitions, isLoading, isLoadingMore, hasMore, loadMore, error } = useSocialShoppingData(8);
+  const { products, posts, stalls, exhibitions, isLoading, isLoadingMore, hasMore, loadMore, error } = useSocialShoppingData(8);
   const [visibleCount, setVisibleCount] = useState(6);
   const loadTriggerRef = useRef<HTMLDivElement | null>(null);
   const visiblePosts = useMemo(() => posts.slice(0, visibleCount), [posts, visibleCount]);
@@ -44,6 +46,7 @@ export default function Home() {
   return (
     <SocialShell>
       <div className="grid gap-0 sm:gap-4">
+        <LiveSellerStrip stalls={stalls} />
         <StoriesRow stalls={stalls} exhibitions={exhibitions} />
         <CategoryRail />
         {error ? (
@@ -52,9 +55,10 @@ export default function Home() {
           </div>
         ) : null}
         <HomepageAdvertisementCarousel />
+        <TrendingProductRails products={products} stalls={stalls} />
         {isLoading ? (
           <div className="grid gap-0 sm:gap-4">
-            {Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-[620px] animate-pulse border-b border-border bg-muted sm:h-[520px] sm:rounded-[30px] sm:border-0 sm:bg-card" />)}
+            {Array.from({ length: 3 }).map((_, index) => <div key={index} className="app-skeleton h-[620px] border-b border-border sm:h-[520px] sm:rounded-[30px] sm:border" />)}
           </div>
         ) : posts.length ? (
           <div className="grid gap-0 sm:gap-5">
@@ -65,7 +69,7 @@ export default function Home() {
                   <div className="mx-auto h-1.5 w-16 overflow-hidden rounded-full bg-muted">
                     <span className="block h-full w-1/2 animate-pulse rounded-full bg-primary" />
                   </div>
-                  {isLoadingMore ? <div className="h-[560px] animate-pulse border-y border-border bg-muted sm:h-[420px] sm:rounded-[30px] sm:border-0 sm:bg-card" /> : null}
+                  {isLoadingMore ? <div className="app-skeleton h-[560px] border-y border-border sm:h-[420px] sm:rounded-[30px] sm:border" /> : null}
                 </div>
               ) : (
                 <p className="py-4 text-center text-xs font-bold text-muted-foreground">You are all caught up.</p>

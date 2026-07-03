@@ -22,7 +22,7 @@ import {
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { AppImage } from "@/components/ui/app-image";
-import { AppBrand } from "@/components/ui/app-primitives";
+import { AppBrand, LiveBadge, PremiumProductCard, ProductRail, StoryCircle, VendorBoutiqueHeader } from "@/components/ui/app-primitives";
 import {
   addCartItem,
   followVendor,
@@ -96,6 +96,12 @@ export function slugify(value: string) {
 function vendorNameForProduct(product: Product, stalls: Stall[]) {
   const stall = stalls.find((item) => item.id === product.stallId);
   return stall?.vendorName || stall?.assignedVendorName || stall?.name || "Vendor";
+}
+
+function categoryForProduct(product: Product, stalls: Stall[]) {
+  const stall = stalls.find((item) => item.id === product.stallId);
+  const searchable = `${stall?.category ?? ""} ${product.title} ${product.description}`.toLowerCase();
+  return categoryLinks.find((category) => searchable.includes(category.toLowerCase())) || stall?.category || "Boutique";
 }
 
 function postFromProduct(product: Product, stalls: Stall[]): SocialPost {
@@ -209,7 +215,7 @@ export function useSocialShoppingData(limitProducts = 30) {
 
 export function SocialShell({ children, rightRail }: { children: React.ReactNode; rightRail?: React.ReactNode }) {
   return (
-    <main className="app-page pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
+    <main className="app-page pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0">
       <SocialTopBar />
       <div className="app-container grid gap-0 py-0 sm:gap-6 sm:py-4 lg:grid-cols-[220px_minmax(0,620px)_280px] lg:py-6">
         <SocialSidebar />
@@ -293,12 +299,12 @@ function SocialBottomNav() {
   ];
 
   return (
-    <nav className="app-bottom-nav fixed inset-x-0 bottom-0 z-50 border-t px-2 pb-[env(safe-area-inset-bottom)] md:hidden" aria-label="Mobile social navigation">
-      <div className="grid grid-cols-5 gap-1">
+    <nav className="app-bottom-nav fixed inset-x-3 bottom-3 z-50 rounded-[28px] border px-2 pb-[calc(0.45rem+env(safe-area-inset-bottom))] pt-2 md:hidden" aria-label="Mobile social navigation">
+      <div className="grid grid-cols-5 items-end gap-1">
         {items.slice(0, 2).map((item) => <SocialBottomLink key={item.href} item={item} active={pathname === item.href} />)}
-        <button type="button" onClick={openCart} className="flex min-h-12 items-center justify-center text-muted-foreground transition active:scale-90 active:text-foreground" aria-label="Open cart">
+        <button type="button" onClick={openCart} className="app-press -mt-6 flex min-h-16 flex-col items-center justify-center gap-1 rounded-[24px] bg-primary text-primary-foreground shadow-[var(--shadow-hover)]" aria-label="Open cart">
           <ShoppingBag className="h-5 w-5" />
-          <span className="sr-only">Cart</span>
+          <span className="text-[10px] font-black">Cart</span>
         </button>
         {items.slice(2).map((item) => <SocialBottomLink key={item.href} item={item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />)}
       </div>
@@ -309,9 +315,9 @@ function SocialBottomNav() {
 function SocialBottomLink({ item, active }: { item: { label: string; href: string; icon: typeof Home }; active: boolean }) {
   const Icon = item.icon;
   return (
-    <Link href={item.href} className={cn("flex min-h-12 items-center justify-center transition active:scale-90", active ? "text-foreground" : "text-muted-foreground")}>
+    <Link href={item.href} className={cn("app-press flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl transition", active ? "bg-secondary text-secondary-foreground" : "text-muted-foreground")}>
       <Icon className={cn("h-5 w-5", active && item.href === "/" && "fill-current")} />
-      <span className="sr-only">{item.label}</span>
+      <span className="text-[10px] font-black">{item.label}</span>
     </Link>
   );
 }
@@ -344,20 +350,129 @@ export function StoriesRow({ stalls, exhibitions }: { stalls: Stall[]; exhibitio
   if (!stories.length) return null;
 
   return (
-    <section className="border-b border-border bg-card px-2.5 py-2.5 sm:rounded-[28px] sm:border sm:p-3 sm:shadow-soft">
-      <div className="flex touch-pan-x snap-x gap-2.5 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <section className="app-card app-slide-in border-b px-2.5 py-3 sm:p-4">
+      <div className="mb-3 flex items-center justify-between gap-3 px-1">
+        <div>
+          <p className="app-section-eyebrow">Live bazaar</p>
+          <h2 className="text-base font-black text-foreground">Stories from stalls</h2>
+        </div>
+        {stories.some((story) => story.live) ? <LiveBadge label="Live now" /> : null}
+      </div>
+      <div className="app-no-scrollbar flex touch-pan-x snap-x gap-3 overflow-x-auto overscroll-x-contain scroll-smooth">
         {stories.map((story) => (
-          <Link key={`${story.type}-${story.id}`} href={story.href} className="w-[58px] shrink-0 snap-start text-center sm:w-[74px]">
-            <span className={cn("mx-auto grid h-14 w-14 place-items-center rounded-full p-[2.5px] sm:h-16 sm:w-16 sm:p-[3px]", story.live ? "bg-gradient-to-tr from-primary via-accent to-emerald-400" : "bg-gradient-to-tr from-primary via-accent to-orange-500")}>
-              <span className="relative h-full w-full overflow-hidden rounded-full border-2 border-card bg-muted">
-                <AppImage src={story.image} alt={story.title} fallbackSrc="/stalls/stall-placeholder.png" className="h-full w-full object-cover" />
-              </span>
-            </span>
-            <span className="mt-1 block truncate text-[9px] font-semibold text-foreground sm:mt-2 sm:text-[11px] sm:font-black">{story.title}</span>
-          </Link>
+          <StoryCircle
+            key={`${story.type}-${story.id}`}
+            href={story.href}
+            image={story.image}
+            title={story.title}
+            subtitle={story.type === "event" ? "Event" : "Vendor"}
+            live={story.live}
+          />
         ))}
       </div>
     </section>
+  );
+}
+
+export function LiveSellerStrip({ stalls }: { stalls: Stall[] }) {
+  const sellers = useMemo(() => {
+    const sorted = [...stalls].sort((left, right) => {
+      const leftLive = left.liveStatus === "live" || left.status === "live";
+      const rightLive = right.liveStatus === "live" || right.status === "live";
+      if (leftLive !== rightLive) return leftLive ? -1 : 1;
+      return (right.viewerCount ?? 0) - (left.viewerCount ?? 0);
+    });
+    return sorted.slice(0, 8);
+  }, [stalls]);
+
+  if (!sellers.length) return null;
+
+  const liveCount = sellers.filter((stall) => stall.liveStatus === "live" || stall.status === "live").length;
+
+  return (
+    <section className="boutique-header app-slide-in p-4 sm:p-5">
+      <div className="relative z-10 flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-black uppercase text-white/68">Live seller strip</p>
+            <h2 className="mt-1 text-2xl font-black leading-tight text-white sm:text-3xl">Walk into today&apos;s live bazaar</h2>
+            <p className="mt-2 max-w-xl text-sm font-semibold leading-6 text-white/68">
+              Follow live stalls, catch fresh drops, and jump into the shopping stage before the best pieces move.
+            </p>
+          </div>
+          <LiveBadge label={liveCount ? `${liveCount} live` : "On stage soon"} />
+        </div>
+
+        <div className="app-no-scrollbar flex gap-3 overflow-x-auto pb-1">
+          {sellers.map((stall) => {
+            const isLive = stall.liveStatus === "live" || stall.status === "live";
+            const title = stall.vendorName || stall.assignedVendorName || stall.name;
+            return (
+              <Link key={stall.id} href={isLive ? `/live/${stall.id}` : `/stalls/${stall.id}/store`} className="app-press group w-[168px] shrink-0 overflow-hidden rounded-[22px] border border-white/14 bg-white/10 text-white transition hover:-translate-y-1 hover:bg-white/14">
+                <div className="relative aspect-[4/3] overflow-hidden bg-black/25">
+                  <AppImage src={stall.vendorLogo || stall.bannerImage || stall.image || "/stalls/stall-placeholder.png"} alt={title} fallbackSrc="/stalls/stall-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover transition duration-500 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/72 to-transparent" />
+                  <span className="absolute left-2 top-2 rounded-full bg-black/56 px-2 py-1 text-[10px] font-black uppercase text-white/82">{stall.category || "Vendor"}</span>
+                  {isLive ? <span className="absolute bottom-2 left-2"><LiveBadge label="Live" className="min-h-6 px-2 py-0 text-[10px]" /></span> : null}
+                </div>
+                <div className="p-3">
+                  <p className="line-clamp-1 text-sm font-black">{title}</p>
+                  <p className="mt-1 text-xs font-semibold text-white/62">{stall.viewerCount ? `${stall.viewerCount} watching` : isLive ? "Live now" : "Preview stall"}</p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function TrendingProductRails({ products, stalls }: { products: Product[]; stalls: Stall[] }) {
+  const rails = useMemo(() => {
+    const activeProducts = products.filter((product) => product.status === "active");
+    const trending = activeProducts.slice(0, 8);
+    const dealDrops = activeProducts.filter((product) => product.compareAtPrice > product.price || product.offerCode).slice(0, 8);
+    const category = categoryLinks
+      .map((label) => ({
+        label,
+        products: activeProducts.filter((product) => categoryForProduct(product, stalls).toLowerCase().includes(label.toLowerCase())).slice(0, 8)
+      }))
+      .find((entry) => entry.products.length >= 2);
+
+    return [
+      { key: "trending", eyebrow: "Trending now", title: "Pieces people are opening first", products: trending },
+      { key: "deals", eyebrow: "Live deals", title: "Fresh offers and limited drops", products: dealDrops.length ? dealDrops : activeProducts.slice(3, 11) },
+      category ? { key: "category", eyebrow: category.label, title: `Popular in ${category.label}`, products: category.products } : null
+    ].filter((rail): rail is { key: string; eyebrow: string; title: string; products: Product[] } => Boolean(rail && rail.products.length));
+  }, [products, stalls]);
+
+  if (!rails.length) return null;
+
+  return (
+    <div className="grid gap-4">
+      {rails.slice(0, 3).map((rail) => (
+        <ProductRail key={rail.key} eyebrow={rail.eyebrow} title={rail.title}>
+          {rail.products.map((product, index) => {
+            const discount = product.compareAtPrice > product.price ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100) : 0;
+            return (
+              <PremiumProductCard
+                key={product.id}
+                href={`/product/${product.id}`}
+                image={product.images[0] || "/products/product-placeholder.png"}
+                title={product.title}
+                price={product.price}
+                compareAtPrice={discount ? product.compareAtPrice : undefined}
+                vendorName={vendorNameForProduct(product, stalls)}
+                badge={discount ? `${discount}% off` : index < 3 ? "Trending" : undefined}
+                stockLabel={product.stock > 0 ? `${product.stock} left` : "Sold out"}
+                className="w-[168px] shrink-0 sm:w-[190px]"
+              />
+            );
+          })}
+        </ProductRail>
+      ))}
+    </div>
   );
 }
 
@@ -484,14 +599,14 @@ export function FeedCard({ post }: { post: SocialPost }) {
   };
 
   return (
-    <article className="overflow-hidden border-b border-border bg-card text-card-foreground sm:rounded-[30px] sm:border sm:shadow-soft">
+    <article className="app-card app-hover-lift app-slide-in overflow-hidden text-card-foreground">
       <div className="flex min-h-12 items-center gap-2.5 px-3 py-2 sm:min-h-14 sm:gap-3 sm:p-4">
-        <Link href={`/v/${viewPost.vendorSlug}`} className="grid h-8 w-8 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-[11px] font-black text-secondary-foreground sm:h-11 sm:w-11 sm:text-sm">
+        <Link href={`/v/${viewPost.vendorSlug}`} className="story-ring grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-secondary text-[11px] font-black text-secondary-foreground sm:h-11 sm:w-11 sm:text-sm">
           {viewPost.stall?.vendorLogo ? <AppImage src={viewPost.stall.vendorLogo} alt={viewPost.vendorName} className="h-full w-full object-cover" /> : viewPost.vendorName.slice(0, 1).toUpperCase()}
         </Link>
         <div className="min-w-0 flex-1">
           <Link href={`/v/${viewPost.vendorSlug}`} className="block truncate text-[13px] font-black text-foreground hover:text-primary sm:text-sm">{viewPost.vendorName}</Link>
-          <p className="truncate text-[11px] font-medium text-muted-foreground sm:text-xs sm:font-semibold">{viewPost.postType || viewPost.stall?.category || "Small business"} · Verified seller</p>
+          <p className="truncate text-[11px] font-medium text-muted-foreground sm:text-xs sm:font-semibold">{viewPost.postType || viewPost.stall?.category || "Small business"} | Verified seller</p>
         </div>
         {viewPost.vendorId ? (
           <button type="button" onClick={toggleFollow} disabled={busy === "follow"} className="px-1.5 py-1 text-xs font-black text-primary transition hover:opacity-70 sm:rounded-full sm:border sm:border-border sm:bg-background sm:px-3 sm:text-foreground sm:hover:border-primary sm:hover:text-primary">
@@ -499,31 +614,32 @@ export function FeedCard({ post }: { post: SocialPost }) {
           </button>
         ) : null}
         {(viewPost.stall?.liveStatus === "live" || viewPost.stall?.status === "live") && viewPost.stallId ? (
-          <Link href={`/live/${viewPost.stallId}`} className="rounded-full bg-destructive px-3 py-1 text-xs font-black text-destructive-foreground">Live</Link>
+          <Link href={`/live/${viewPost.stallId}`}><LiveBadge label="Live" /></Link>
         ) : null}
         <MoreHorizontal className="h-5 w-5 shrink-0 text-foreground sm:hidden" aria-hidden="true" />
       </div>
       <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="block bg-muted">
-        <div className="relative aspect-square">
-          <AppImage src={viewPost.mediaUrl} alt={product?.title || viewPost.caption || viewPost.vendorName} fallbackSrc="/products/product-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
+        <div className="relative aspect-[4/5] sm:aspect-square">
+          <AppImage src={viewPost.mediaUrl} alt={product?.title || viewPost.caption || viewPost.vendorName} fallbackSrc="/products/product-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover transition duration-500 hover:scale-105" />
           {discount ? <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">{discount}% off</span> : null}
+          {product ? <span className="absolute bottom-3 left-3 rounded-full bg-black/72 px-3 py-1 text-xs font-black text-white">Quick shop</span> : null}
         </div>
       </Link>
       <div className="px-3 pb-3 pt-2.5 sm:p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3.5 text-foreground sm:gap-4">
-            <button type="button" onClick={toggleLike} disabled={busy === "like"} className={cn("transition active:scale-90 hover:text-primary", viewPost.likedByMe && "text-primary")} aria-label="Like post">
+            <button type="button" onClick={toggleLike} disabled={busy === "like"} className={cn("app-press transition hover:text-primary", viewPost.likedByMe && "scale-110 text-primary")} aria-label="Like post">
               <Heart className={cn("h-[22px] w-[22px] sm:h-[25px] sm:w-[25px]", viewPost.likedByMe && "fill-current")} />
             </button>
-            <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="transition active:scale-90 hover:text-primary" aria-label="Open post">
+            <Link href={viewPost.realPostId ? `/p/${viewPost.realPostId}` : product ? `/product/${product.id}` : `/v/${viewPost.vendorSlug}`} className="app-press transition hover:text-primary" aria-label="Open post">
               <MessageCircle className="h-[22px] w-[22px] sm:h-[25px] sm:w-[25px]" />
             </Link>
-            <button type="button" onClick={sharePost} className="transition active:scale-90 hover:text-primary" aria-label="Share post">
+            <button type="button" onClick={sharePost} className="app-press transition hover:text-primary" aria-label="Share post">
               <Send className="h-[21px] w-[21px] sm:h-[24px] sm:w-[24px]" />
             </button>
             {viewPost.stallId ? <Link href={`/stalls/${viewPost.stallId}/store`} className="hidden transition hover:text-primary sm:block" aria-label="Open vendor stall"><Store className="h-6 w-6" /></Link> : null}
           </div>
-          <button type="button" onClick={toggleSave} disabled={busy === "save"} className={cn("text-foreground transition active:scale-90 hover:text-primary", viewPost.savedByMe && "text-primary")} aria-label="Save post">
+          <button type="button" onClick={toggleSave} disabled={busy === "save"} className={cn("app-press text-foreground transition hover:text-primary", viewPost.savedByMe && "scale-110 text-primary")} aria-label="Save post">
             {viewPost.savedByMe ? <BookmarkCheck className="h-[22px] w-[22px] sm:h-[25px] sm:w-[25px]" /> : <Bookmark className="h-[22px] w-[22px] sm:h-[25px] sm:w-[25px]" />}
           </button>
         </div>
@@ -544,7 +660,7 @@ export function FeedCard({ post }: { post: SocialPost }) {
             ) : null}
           </div>
           {product ? (
-            <button type="button" onClick={addToCart} disabled={busy === "cart" || product.stock <= 0} className="shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-black text-primary-foreground transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-55 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
+            <button type="button" onClick={addToCart} disabled={busy === "cart" || product.stock <= 0} className="app-press shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-black text-primary-foreground transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-55 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
               {busy === "cart" ? "Adding" : "Add to cart"}
             </button>
           ) : null}
@@ -575,27 +691,80 @@ export function ExploreGrid({ posts }: { posts: SocialPost[] }) {
 }
 
 export function SocialSuggestions() {
-  const { stalls, exhibitions, isLoading } = useSocialShoppingData(8);
+  const { products, stalls, exhibitions, isLoading } = useSocialShoppingData(8);
+  const liveSellers = stalls.filter((stall) => stall.liveStatus === "live" || stall.status === "live");
+  const featuredProducts = products.slice(0, 3);
+
   return (
     <div className="sticky top-[86px] grid gap-4">
+      <section className="boutique-header p-4">
+        <div className="relative z-10">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-black uppercase text-white/64">Discovery rail</p>
+            <LiveBadge label={liveSellers.length ? `${liveSellers.length} live` : "Live stage"} className="min-h-6 px-2 text-[10px]" />
+          </div>
+          <h2 className="mt-3 text-2xl font-black leading-tight text-white">Shopping is happening now</h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-white/68">
+            Jump between sellers, product drops, and exhibition rooms from one rail.
+          </p>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <div className="rounded-2xl border border-white/14 bg-white/10 px-3 py-2 text-center">
+              <p className="text-lg font-black text-white">{stalls.length}</p>
+              <p className="text-[10px] font-bold uppercase text-white/58">Stalls</p>
+            </div>
+            <div className="rounded-2xl border border-white/14 bg-white/10 px-3 py-2 text-center">
+              <p className="text-lg font-black text-white">{products.length}</p>
+              <p className="text-[10px] font-bold uppercase text-white/58">Drops</p>
+            </div>
+            <div className="rounded-2xl border border-white/14 bg-white/10 px-3 py-2 text-center">
+              <p className="text-lg font-black text-white">{exhibitions.length}</p>
+              <p className="text-[10px] font-bold uppercase text-white/58">Events</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="app-card p-4">
-        <h2 className="text-sm font-black text-foreground">Live sellers</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-sm font-black text-foreground">Live sellers</h2>
+          {liveSellers.length ? <LiveBadge label="Live" className="min-h-6 px-2 text-[10px]" /> : null}
+        </div>
         <div className="mt-3 grid gap-3">
           {isLoading ? <p className="text-sm font-semibold text-muted-foreground">Loading suggestions...</p> : null}
           {stalls.slice(0, 4).map((stall) => (
-            <Link key={stall.id} href={`/stalls/${stall.id}/store`} className="flex items-center gap-3 rounded-2xl p-2 transition hover:bg-secondary">
-              <span className="grid h-11 w-11 place-items-center overflow-hidden rounded-full bg-muted">
+            <Link key={stall.id} href={stall.liveStatus === "live" || stall.status === "live" ? `/live/${stall.id}` : `/stalls/${stall.id}/store`} className="app-press flex items-center gap-3 rounded-2xl p-2 transition hover:bg-secondary">
+              <span className={cn("grid h-11 w-11 place-items-center overflow-hidden rounded-full bg-muted", stall.liveStatus === "live" || stall.status === "live" ? "story-ring-live" : "story-ring")}>
                 <AppImage src={stall.vendorLogo || stall.bannerImage || stall.image || "/stalls/stall-placeholder.png"} alt={stall.name} fallbackSrc="/stalls/stall-placeholder.png" className="h-full w-full object-cover" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-black text-foreground">{stall.vendorName || stall.assignedVendorName || stall.name}</span>
                 <span className="block truncate text-xs font-semibold text-muted-foreground">{stall.category || "Vendor"}</span>
               </span>
-              {stall.liveStatus === "live" || stall.status === "live" ? <span className="rounded-full bg-destructive px-2 py-1 text-[10px] font-black text-destructive-foreground">Live</span> : null}
+              {stall.liveStatus === "live" || stall.status === "live" ? <LiveBadge label="Live" className="px-2 py-0.5 text-[10px]" /> : null}
             </Link>
           ))}
         </div>
       </section>
+
+      {featuredProducts.length ? (
+        <section className="app-card p-4">
+          <h2 className="text-sm font-black text-foreground">Trending now</h2>
+          <div className="mt-3 grid gap-3">
+            {featuredProducts.map((product) => (
+              <Link key={product.id} href={`/product/${product.id}`} className="app-press grid grid-cols-[58px_minmax(0,1fr)] gap-3 rounded-2xl p-2 transition hover:bg-secondary">
+                <span className="relative aspect-square overflow-hidden rounded-2xl bg-muted">
+                  <AppImage src={product.images[0] || "/products/product-placeholder.png"} alt={product.title} fallbackSrc="/products/product-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
+                </span>
+                <span className="min-w-0">
+                  <span className="line-clamp-2 text-sm font-black text-foreground">{product.title}</span>
+                  <span className="mt-1 block text-xs font-black text-primary">{formatPrice(product.price)}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section className="app-card p-4">
         <h2 className="text-sm font-black text-foreground">Shopping events</h2>
         <div className="mt-3 grid gap-2">
@@ -624,9 +793,9 @@ export function SocialEmptyState({ title, description }: { title: string; descri
 
 export function CategoryRail() {
   return (
-    <div className="hidden gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex">
+    <div className="app-no-scrollbar flex gap-2 overflow-x-auto px-1 py-1">
       {categoryLinks.map((category) => (
-        <Link key={category} href={`/explore?category=${encodeURIComponent(category)}`} className="shrink-0 rounded-full border border-border bg-card px-3 py-2 text-xs font-black text-muted-foreground transition hover:border-primary hover:bg-secondary hover:text-secondary-foreground">
+        <Link key={category} href={`/explore?category=${encodeURIComponent(category)}`} className="app-press shrink-0 rounded-full border border-border bg-card px-3 py-2 text-xs font-black text-muted-foreground transition hover:border-primary hover:bg-secondary hover:text-secondary-foreground">
           {category}
         </Link>
       ))}
@@ -739,22 +908,20 @@ export function ProductDetailView({ productId }: { productId: string }) {
         {saveMessage ? <p className="mt-3 text-sm font-semibold text-muted-foreground">{saveMessage}</p> : null}
       </div>
       {related.length ? (
-        <section className="mt-5 rounded-[30px] border border-border bg-card p-4 shadow-soft">
-          <h2 className="text-lg font-black text-foreground">More from this vendor</h2>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {related.map((item) => (
-              <Link key={item.id} href={`/product/${item.id}`} className="overflow-hidden rounded-2xl border border-border bg-background">
-                <div className="relative aspect-square bg-muted">
-                  <AppImage src={item.images[0] || "/products/product-placeholder.png"} alt={item.title} fallbackSrc="/products/product-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
-                </div>
-                <div className="p-3">
-                  <p className="line-clamp-2 text-sm font-black text-foreground">{item.title}</p>
-                  <p className="mt-1 text-sm font-black text-primary">{formatPrice(item.price)}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <ProductRail eyebrow="Vendor shelf" title="More from this vendor" className="mt-5">
+          {related.map((item) => (
+            <PremiumProductCard
+              key={item.id}
+              href={`/product/${item.id}`}
+              image={item.images[0] || "/products/product-placeholder.png"}
+              title={item.title}
+              price={item.price}
+              compareAtPrice={item.compareAtPrice > item.price ? item.compareAtPrice : undefined}
+              stockLabel={item.stock > 0 ? `${item.stock} in stock` : "Out of stock"}
+              className="w-[168px] shrink-0 sm:w-[190px]"
+            />
+          ))}
+        </ProductRail>
       ) : null}
     </SocialShell>
   );
@@ -819,52 +986,53 @@ export function VendorProfileView({ vendorSlug }: { vendorSlug: string }) {
 
   return (
     <SocialShell>
-      <section className="overflow-hidden rounded-[32px] border border-border bg-card shadow-soft">
-        {profile?.bannerImageUrl ? (
-          <div className="relative aspect-[16/6] bg-muted">
-            <AppImage src={profile.bannerImageUrl} alt={vendorName} fallbackSrc="/stalls/stall-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover" />
-          </div>
-        ) : null}
-        <div className="p-4 sm:p-5">
-          <div className="grid grid-cols-[86px_minmax(0,1fr)] gap-4 sm:grid-cols-[112px_minmax(0,1fr)]">
-            <span className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-secondary text-2xl font-black text-secondary-foreground sm:h-24 sm:w-24">
-              {profile?.profileImageUrl || fallbackStall?.vendorLogo ? <AppImage src={profile?.profileImageUrl || fallbackStall?.vendorLogo || ""} alt={vendorName} className="h-full w-full object-cover" /> : vendorName.slice(0, 1).toUpperCase()}
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex min-w-0 items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h1 className="truncate text-xl font-black text-foreground sm:text-2xl">{vendorName}</h1>
-                  <p className="mt-1 truncate text-xs font-black uppercase text-primary">{category}</p>
-                </div>
-                {liveStall ? <Link href={`/live/${liveStall.id}`} className="shrink-0 rounded-full bg-destructive px-3 py-1 text-xs font-black text-destructive-foreground">Live</Link> : null}
-              </div>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <ProfileMetric label="posts" value={profile?.postCount ?? visiblePosts.length} flat />
-                <ProfileMetric label="products" value={profile?.productCount ?? products.length} flat />
-                <ProfileMetric label="followers" value={profile?.followerCount ?? 0} flat />
-              </div>
-            </div>
-          </div>
-          <div className="mt-4">
-            <p className="text-sm font-black text-foreground">{vendorName}</p>
-            {profile?.bio ? <p className="mt-1 text-sm font-semibold leading-6 text-foreground">{profile.bio}</p> : null}
-          </div>
-          <div className="mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+      <VendorBoutiqueHeader
+        banner={profile?.bannerImageUrl || fallbackStall?.bannerImage || fallbackStall?.image}
+        logo={profile?.profileImageUrl || fallbackStall?.vendorLogo}
+        title={vendorName}
+        category={category}
+        description={profile?.bio || "A curated digital stall from the Ankita Designs live shopping bazaar."}
+        live={Boolean(liveStall)}
+        stats={[
+          { label: "Posts", value: profile?.postCount ?? visiblePosts.length },
+          { label: "Products", value: profile?.productCount ?? products.length },
+          { label: "Followers", value: profile?.followerCount ?? 0 }
+        ]}
+        actions={
+          <>
             {isOwnVendorProfile ? (
               <>
-                <Link href="/vendor" className="rounded-2xl bg-primary px-5 py-3 text-center text-sm font-black text-primary-foreground">Dashboard</Link>
-                <Link href="/vendor/profile" className="rounded-2xl border border-border bg-secondary px-5 py-3 text-center text-sm font-black text-secondary-foreground">Edit profile</Link>
-                <Link href="/vendor/posts" className="rounded-2xl border border-border bg-background px-5 py-3 text-center text-sm font-black text-foreground">New post</Link>
+                <Link href="/vendor" className="app-press rounded-2xl bg-white px-5 py-3 text-center text-sm font-black text-[#18131f]">Dashboard</Link>
+                <Link href="/vendor/profile" className="app-press rounded-2xl border border-white/24 bg-white/10 px-5 py-3 text-center text-sm font-black text-white">Edit profile</Link>
+                <Link href="/vendor/posts" className="app-press rounded-2xl border border-white/24 bg-white/10 px-5 py-3 text-center text-sm font-black text-white">New post</Link>
               </>
             ) : profile ? (
-              <button type="button" onClick={toggleFollow} className="rounded-2xl bg-primary px-5 py-3 text-sm font-black text-primary-foreground">{profile.followingByMe ? "Following" : "Follow"}</button>
+              <button type="button" onClick={toggleFollow} className="app-press rounded-2xl bg-white px-5 py-3 text-sm font-black text-[#18131f]">{profile.followingByMe ? "Following" : "Follow"}</button>
             ) : null}
-            {storeStall ? <Link href={`/stalls/${storeStall.id}/store`} className="rounded-2xl border border-border bg-secondary px-5 py-3 text-center text-sm font-black text-secondary-foreground">Visit store</Link> : null}
-            {liveStall ? <Link href={`/live/${liveStall.id}`} className="rounded-2xl border border-border bg-secondary px-5 py-3 text-center text-sm font-black text-secondary-foreground">Watch live</Link> : null}
-          </div>
-          {followMessage ? <p className="mt-3 text-sm font-semibold text-muted-foreground">{followMessage}</p> : null}
-        </div>
-      </section>
+            {storeStall ? <Link href={`/stalls/${storeStall.id}/store`} className="app-press rounded-2xl border border-white/24 bg-white/10 px-5 py-3 text-center text-sm font-black text-white">Visit store</Link> : null}
+            {liveStall ? <Link href={`/live/${liveStall.id}`} className="app-press rounded-2xl border border-white/24 bg-white/10 px-5 py-3 text-center text-sm font-black text-white">Watch live</Link> : null}
+          </>
+        }
+      />
+      {followMessage ? <p className="mt-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-muted-foreground">{followMessage}</p> : null}
+
+      {products.length ? (
+        <ProductRail eyebrow="Boutique shelf" title="Shop this stall" className="mt-5">
+          {products.slice(0, 10).map((item) => (
+            <PremiumProductCard
+              key={item.id}
+              href={`/product/${item.id}`}
+              image={item.images[0] || "/products/product-placeholder.png"}
+              title={item.title}
+              price={item.price}
+              compareAtPrice={item.compareAtPrice > item.price ? item.compareAtPrice : undefined}
+              vendorName={vendorName}
+              stockLabel={item.stock > 0 ? `${item.stock} in stock` : "Out of stock"}
+              className="w-[168px] shrink-0 sm:w-[190px]"
+            />
+          ))}
+        </ProductRail>
+      ) : null}
 
       <section className="mt-5">
         {isLoading || fallback.isLoading ? <SocialEmptyState title="Loading vendor" description="Fetching this vendor profile from social marketplace data." /> : null}

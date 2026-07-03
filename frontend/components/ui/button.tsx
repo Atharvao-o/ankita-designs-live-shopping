@@ -12,7 +12,7 @@ export function buttonStyles(
   className?: string
 ) {
   return cn(
-    "inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black transition duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:pointer-events-none disabled:opacity-55",
+    "app-press inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-black transition duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:pointer-events-none disabled:opacity-55",
     variant === "primary" &&
       "bg-primary text-primary-foreground shadow-[var(--shadow-card)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-hover)]",
     variant === "secondary" &&

@@ -110,6 +110,8 @@ export interface Stall {
   description?: string;
   liveStatus?: "live" | "offline" | "starting-soon" | "break" | "busy";
   productCount?: number;
+  followerCount?: number;
+  postCount?: number;
   proximityRadius?: number;
   route?: string;
   socialLinks?: {

@@ -12,6 +12,7 @@ from app.models.exhibition import Exhibition
 from app.models.live_session import LiveChatMessage, LiveSession
 from app.models.order import Order, OrderItem
 from app.models.product import Product
+from app.models.social import VendorFollow, VendorPost, VendorPublicProfile
 from app.models.stall import Stall
 from app.models.user import User
 from app.models.vendor import Vendor
@@ -280,6 +281,23 @@ def serialize_stall(db: Session, stall: Stall) -> dict:
     vendor = db.get(Vendor, stall.vendor_id) if stall.vendor_id else None
     exhibition = db.get(Exhibition, stall.exhibition_id)
     active_products = db.scalar(select(func.count(Product.id)).where(Product.stall_id == stall.id, Product.status == "active")) or 0
+    follower_count = 0
+    post_count = 0
+    if vendor:
+        follower_count = db.scalar(select(func.count(VendorFollow.id)).where(VendorFollow.vendor_id == vendor.id)) or 0
+        post_count = (
+            db.scalar(
+                select(func.count(VendorPost.id))
+                .join(VendorPublicProfile, VendorPublicProfile.vendor_id == VendorPost.vendor_id)
+                .where(
+                    VendorPost.vendor_id == vendor.id,
+                    VendorPost.status == "published",
+                    VendorPost.moderation_status == "approved",
+                    VendorPublicProfile.is_public.is_(True),
+                )
+            )
+            or 0
+        )
     exhibition_status = status_payload(exhibition)["status"] if exhibition else "ended"
     live_session = None
     if exhibition_status == "live":
@@ -340,6 +358,8 @@ def serialize_stall(db: Session, stall: Stall) -> dict:
         "activeFrom": to_iso(stall.active_from),
         "activeTo": to_iso(stall.active_to),
         "productCount": active_products,
+        "followerCount": follower_count,
+        "postCount": post_count,
         "route": stall.route or f"/live/{stall.id}",
         "socialLinks": social_links,
         "createdAt": to_iso(stall.created_at),

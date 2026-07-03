@@ -72,7 +72,7 @@ import {
   archiveVendorPost
 } from "@/lib/api";
 import { AdminDashboardResponse, AdminRecentActivity, AvatarOption, BargainState, Exhibition, LiveAccessStatus, LiveKitConnection, LiveSlot, Order, Product, Stall, Vendor, VendorExhibitionRequest, VendorPost, VendorSubscriptionState } from "@/lib/types";
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { LiveKitStage } from "@/components/live/livekit-stage";
 import { LiveChatPanel } from "@/components/live/live-chat-panel";
 import { LiveElapsedCounter } from "@/components/marketplace/live-timers";
@@ -1037,6 +1037,199 @@ function VendorLoadingState({ rows = 3, className = "" }: { rows?: number; class
   return <AppLoadingState rows={rows} className={className} />;
 }
 
+function VendorTodayActionPanel({
+  action,
+  readinessPercent,
+  liveStatus,
+  viewerCount
+}: {
+  action: { eyebrow: string; title: string; description: string; href: string; label: string; icon: typeof Store };
+  readinessPercent: number;
+  liveStatus: string;
+  viewerCount: number;
+}) {
+  const Icon = action.icon;
+  return (
+    <VendorPanel className="relative overflow-hidden border-primary/20 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--card)_92%,var(--coral)),var(--card))] p-5 sm:p-6">
+      <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-center">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-black uppercase text-primary">
+              <Icon className="h-3.5 w-3.5" />
+              {action.eyebrow}
+            </span>
+            <AppStatusPill status={liveStatus} />
+          </div>
+          <h2 className="mt-4 text-2xl font-black leading-tight text-foreground sm:text-3xl">{action.title}</h2>
+          <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-muted-foreground">{action.description}</p>
+          <Link href={action.href} className={buttonStyles("primary", "mt-5 justify-center px-5 py-3")}>
+            {action.label}
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-4 py-3">
+            <p className="text-xs font-black uppercase text-muted-foreground">Readiness</p>
+            <div className="mt-2 flex items-end justify-between gap-3">
+              <p className="text-3xl font-black text-foreground">{readinessPercent}%</p>
+              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+              <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--coral),var(--gold))]" style={{ width: `${readinessPercent}%` }} />
+            </div>
+          </div>
+          <div className="rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-4 py-3">
+            <p className="text-xs font-black uppercase text-muted-foreground">Live viewers</p>
+            <p className="mt-2 text-3xl font-black text-foreground">{viewerCount}</p>
+            <p className="mt-1 text-xs font-semibold text-muted-foreground">{viewerCount ? "Watching now" : "No active room"}</p>
+          </div>
+        </div>
+      </div>
+    </VendorPanel>
+  );
+}
+
+function VendorReadinessPanel({
+  items,
+  percent
+}: {
+  items: Array<{ label: string; complete: boolean; href: string }>;
+  percent: number;
+}) {
+  return (
+    <VendorPanel className="p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="app-section-eyebrow">Readiness checklist</p>
+          <h2 className="mt-2 text-xl font-black text-foreground">Ready to sell live</h2>
+        </div>
+        <span className="rounded-full bg-[color:var(--gold)]/12 px-3 py-1 text-xs font-black text-[var(--gold)]">{percent}%</span>
+      </div>
+      <div className="mt-4 grid gap-2">
+        {items.map((item) => (
+          <Link key={item.label} href={item.href} className="flex min-h-12 items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-3 transition hover:border-primary/40">
+            <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-xl", item.complete ? "bg-emerald-500/12 text-emerald-600 dark:text-emerald-200" : "bg-[color:var(--gold)]/12 text-[var(--gold)]")}>
+              {item.complete ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+            </span>
+            <span className="min-w-0 flex-1 text-sm font-black text-foreground">{item.label}</span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+          </Link>
+        ))}
+      </div>
+    </VendorPanel>
+  );
+}
+
+function VendorLiveSlotTimeline({ slots }: { slots: LiveSlot[] }) {
+  return (
+    <VendorPanel className="p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="app-section-eyebrow">Live timeline</p>
+          <h2 className="mt-2 text-xl font-black text-foreground">Upcoming selling slots</h2>
+        </div>
+        <Link href="/vendor/live-slots" className="text-xs font-black text-[var(--gold)]">Manage</Link>
+      </div>
+      {slots.length ? (
+        <div className="mt-5 grid gap-0">
+          {slots.map((slot, index) => (
+            <div key={slot.id} className="relative grid grid-cols-[28px_1fr] gap-3 pb-4 last:pb-0">
+              {index < slots.length - 1 ? <span className="absolute left-[13px] top-7 h-[calc(100%-1rem)] w-px bg-[color:var(--border)]" /> : null}
+              <span className={cn("relative z-10 mt-1 h-7 w-7 rounded-full border-4 border-card", slot.status === "approved" ? "bg-emerald-500" : "bg-[var(--gold)]")} />
+              <div className="rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] px-4 py-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-black text-foreground">{slot.title || slot.stallName || "Live selling slot"}</p>
+                    <p className="mt-1 text-xs font-semibold text-muted-foreground">{formatDateTime(slot.startTime)}</p>
+                  </div>
+                  <AppStatusPill status={slot.status} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-4 rounded-2xl border border-dashed border-[color:var(--border)] bg-[var(--surface)] p-5 text-center">
+          <CalendarClock className="mx-auto h-6 w-6 text-[var(--gold)]" />
+          <p className="mt-2 text-sm font-black text-foreground">No upcoming live slots</p>
+          <Link href="/vendor/live-slots" className="mt-2 inline-block text-xs font-black text-primary">Request a slot</Link>
+        </div>
+      )}
+    </VendorPanel>
+  );
+}
+
+function VendorProductPerformancePanel({ products }: { products: Product[] }) {
+  return (
+    <VendorPanel className="p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="app-section-eyebrow">Product performance</p>
+          <h2 className="mt-2 text-xl font-black text-foreground">Catalog health</h2>
+        </div>
+        <Link href="/vendor/products" className="text-xs font-black text-[var(--gold)]">Products</Link>
+      </div>
+      {products.length ? (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {products.map((product) => {
+            const discount = product.compareAtPrice > product.price ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100) : 0;
+            return (
+              <article key={product.id} className="flex min-w-0 gap-3 rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] p-3">
+                <AppImage src={product.images[0] || "/products/product-placeholder.png"} alt={product.title} fallbackSrc="/products/product-placeholder.png" className="h-16 w-16 shrink-0 rounded-xl" />
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-1 text-sm font-black text-foreground">{product.title}</p>
+                  <p className="mt-1 text-sm font-black text-primary">{formatPrice(product.price)}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-black", product.stock <= 5 ? "bg-destructive/10 text-destructive" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-200")}>{product.stock} stock</span>
+                    {discount ? <span className="rounded-full bg-[color:var(--gold)]/12 px-2 py-0.5 text-[10px] font-black text-[var(--gold)]">{discount}% offer</span> : null}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="mt-4 rounded-2xl border border-dashed border-[color:var(--border)] bg-[var(--surface)] p-5 text-center text-sm font-semibold text-muted-foreground">
+          Add products to see inventory and offer health.
+        </div>
+      )}
+    </VendorPanel>
+  );
+}
+
+function VendorOrdersAttentionPanel({ orders }: { orders: Order[] }) {
+  return (
+    <VendorPanel className="p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="app-section-eyebrow">Needs attention</p>
+          <h2 className="mt-2 text-xl font-black text-foreground">Active orders</h2>
+        </div>
+        <Link href="/vendor/orders" className="text-xs font-black text-[var(--gold)]">View all</Link>
+      </div>
+      {orders.length ? (
+        <div className="mt-4 grid gap-2">
+          {orders.map((order) => (
+            <Link key={order.id} href="/vendor/orders" className="flex min-w-0 items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] p-3 transition hover:border-primary/40">
+              <AppImage src={order.items[0]?.image || "/products/product-placeholder.png"} alt={order.items[0]?.title || "Order product"} fallbackSrc="/products/product-placeholder.png" className="h-12 w-12 shrink-0 rounded-xl" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-black text-foreground">{order.items[0]?.title || order.id}</p>
+                <p className="mt-1 text-xs font-semibold text-muted-foreground">{order.customerName || "Customer"} | {formatPrice(order.totalAmount)}</p>
+              </div>
+              <AppStatusPill status={order.orderStatus} />
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-4 rounded-2xl border border-dashed border-[color:var(--border)] bg-[var(--surface)] p-5 text-center">
+          <CheckCircle2 className="mx-auto h-6 w-6 text-emerald-500" />
+          <p className="mt-2 text-sm font-black text-foreground">No orders need attention</p>
+        </div>
+      )}
+    </VendorPanel>
+  );
+}
+
 function VendorAlert({ tone = "error", children }: { tone?: "error" | "warning" | "info"; children: ReactNode }) {
   const toneClass =
     tone === "warning"
@@ -1197,7 +1390,6 @@ export function VendorDashboardContent() {
   const assignedStall = dashboard?.assignedStall ?? stall;
   const latestRequest = dashboard?.participation ?? participationRequests[0];
   const currentLiveSession = dashboard?.currentLiveSession ?? (dashboard?.liveSession?.status === "live" ? dashboard.liveSession : null);
-  const pinnedProduct = currentLiveSession?.pinned_product ?? (currentLiveSession ? dashboard?.pinnedProduct : null);
   const revenue = dashboardStats?.revenue ?? 0;
   const productCount = dashboardStats?.productCount ?? dashboard?.products?.length ?? 0;
   const orderCount = dashboardStats?.orderCount ?? dashboard?.orders.length ?? 0;
@@ -1206,6 +1398,25 @@ export function VendorDashboardContent() {
   const nextApprovedSlot = liveSlots
     .filter((slot) => slot.status === "approved" && new Date(slot.endTime).getTime() >= Date.now())
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())[0] ?? null;
+  const upcomingLiveSlots = liveSlots
+    .filter((slot) => new Date(slot.endTime).getTime() >= Date.now() && !["cancelled", "rejected"].includes(slot.status))
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+    .slice(0, 4);
+  const attentionOrders = (dashboard?.orders ?? [])
+    .filter((order) => !["delivered", "fulfilled", "cancelled"].includes(order.orderStatus))
+    .slice(0, 4);
+  const productPerformance = [...(dashboard?.products ?? [])]
+    .sort((left, right) => left.stock - right.stock || right.price - left.price)
+    .slice(0, 4);
+  const readinessItems = [
+    { label: "Vendor approved", complete: currentVendor?.status === "approved", href: "/vendor" },
+    { label: "Stall assigned", complete: Boolean(assignedStall), href: "/vendor/exhibitions" },
+    { label: "Stall branding uploaded", complete: Boolean(hasUploadedBrandAsset(assignedStall?.bannerImage) && hasUploadedBrandAsset(assignedStall?.vendorLogo)), href: "/vendor/stall" },
+    { label: "At least 2 active products", complete: productCount >= 2, href: "/vendor/products" },
+    { label: "Live access available", complete: Boolean(currentLiveSession || liveAccess?.canGoLive || (!liveAccess?.enforcementEnabled && liveConsoleUnlocked)), href: "/vendor/live-slots" }
+  ];
+  const readinessComplete = readinessItems.filter((item) => item.complete).length;
+  const readinessPercent = Math.round((readinessComplete / readinessItems.length) * 100);
   const liveStatus = !assignedStall
     ? "No assigned stall"
     : currentLiveSession?.status === "live"
@@ -1213,6 +1424,59 @@ export function VendorDashboardContent() {
       : liveConsoleUnlocked
         ? "Ready to go live"
         : "Offline";
+  const todayAction = currentLiveSession
+    ? {
+        eyebrow: "Live now",
+        title: "Keep the live room moving",
+        description: `${viewerCount} viewers are connected. Manage the pinned product, chat, and live bargain from the console.`,
+        href: "/vendor/live",
+        label: "Open live console",
+        icon: Radio
+      }
+    : !assignedStall
+      ? {
+          eyebrow: "Today first",
+          title: "Request an exhibition stall",
+          description: "A stall assignment unlocks products, live selling, and your public boutique.",
+          href: "/vendor/exhibitions",
+          label: "Find exhibitions",
+          icon: Store
+        }
+      : productCount < 2
+        ? {
+            eyebrow: "Catalog readiness",
+            title: "Add products before going live",
+            description: `${Math.max(0, 2 - productCount)} more active product${2 - productCount === 1 ? "" : "s"} needed to unlock the live console.`,
+            href: "/vendor/products",
+            label: "Add products",
+            icon: Boxes
+          }
+        : attentionOrders.length
+          ? {
+              eyebrow: "Orders need attention",
+              title: `Move ${attentionOrders.length} active order${attentionOrders.length === 1 ? "" : "s"} forward`,
+              description: "Review payment and fulfillment status before preparing the next live session.",
+              href: "/vendor/orders",
+              label: "Review orders",
+              icon: ClipboardList
+            }
+          : nextApprovedSlot
+            ? {
+                eyebrow: "Next live slot",
+                title: `Prepare for ${formatDateTime(nextApprovedSlot.startTime)}`,
+                description: nextApprovedSlot.title || "Your approved live slot is ready. Review products and stall branding before it begins.",
+                href: "/vendor/live",
+                label: "Prepare live room",
+                icon: CalendarClock
+              }
+            : {
+                eyebrow: "Live schedule",
+                title: "Request your next live slot",
+                description: "Your stall and catalog are ready. Reserve a selling window to bring customers into the room.",
+                href: "/vendor/live-slots",
+                label: "Request live slot",
+                icon: CalendarClock
+              };
 
   return (
     <RoleShell role="vendor" title="Vendor">
@@ -1235,92 +1499,46 @@ export function VendorDashboardContent() {
         }
         desktop={
           <VendorPageFrame>
-            <div className="grid gap-5 xl:grid-cols-[1fr_0.42fr]">
-              <VendorPanel className="relative overflow-hidden p-5 sm:p-7">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,120,92,0.14),transparent_30%),radial-gradient(circle_at_5%_15%,rgba(97,73,154,0.16),transparent_34%)]" />
-                <div className="relative">
-                  <VendorSectionTitle
-                    eyebrow={exhibition?.title ?? "Vendor command center"}
-                    title={dashboard?.vendor.displayName ?? currentVendor?.businessName ?? "Vendor workspace"}
-                    description="Track stall status, products, live selling, orders, and revenue from database records."
-                    action={<AdminStatusPill status={liveStatus} />}
-                  />
-                  {error ? <div className="mt-5"><VendorAlert>{error}</VendorAlert></div> : null}
-                  {isLoadingDashboard ? (
-                    <VendorLoadingState rows={6} className="mt-7 sm:grid-cols-2 xl:grid-cols-3" />
-                  ) : (
-                    <>
-                  <div data-tour-id="vendor-approval-status" className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                        <VendorMetricCard label="Revenue" value={formatPrice(revenue)} helper="Paid and confirmed order value" icon={ShoppingBag} />
-                        <VendorMetricCard label="Orders" value={String(orderCount)} helper="Orders containing your products" icon={ClipboardList} />
-                        <VendorMetricCard label="Products" value={String(productCount)} helper={productCount ? "Catalog available for selling" : "Add products to sell live"} icon={Boxes} />
-                        <VendorMetricCard label="Viewers" value={String(viewerCount)} helper="Current persisted live viewers" icon={Activity} />
-                      </div>
-                      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                        <VendorPanel className="bg-[#F7F1E8] p-5 shadow-none dark:bg-[#171720]">
-                          <h2 className="text-xl font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">Operations</h2>
-                          <div className="mt-4 grid gap-3">
-                            <VendorMetricCard label="Assigned stall" value={assignedStall?.name ?? "No stall assigned yet"} helper={assignedStall?.category ?? "Request participation before assignment"} icon={Store} />
-                        <VendorMetricCard label="Participation" value={latestRequest ? `${latestRequest.status} request` : "No request submitted"} helper={latestRequest?.message || "Request an exhibition from the exhibitions tab"} icon={UserPlus} />
-                        <VendorMetricCard label="Pinned product" value={pinnedProduct?.title ?? "No pinned product"} helper={currentLiveSession ? "Pin a product in the live console" : "Start live to showcase products"} icon={Radio} />
-                        <VendorMetricCard label="Plan" value={subscriptionState?.currentSubscription?.plan?.name ?? "No active plan"} helper={subscriptionState?.latestSubscription ? `${subscriptionState.latestSubscription.status} request` : "Request a plan for controlled live access"} icon={ShieldCheck} />
-                        <VendorMetricCard label="Next live slot" value={nextApprovedSlot ? formatDateTime(nextApprovedSlot.startTime) : "No approved slot"} helper={liveAccess?.enforcementEnabled ? liveAccess.message : "Slot gating is in rollout mode"} icon={CalendarClock} />
-                      </div>
-                        </VendorPanel>
-                        <VendorPanel className="flex flex-col overflow-hidden bg-[#F7F1E8] shadow-none dark:bg-[#171720]">
-                          {dashboard?.vendor.image ? (
-                            <AppImage src={dashboard.vendor.image} alt={dashboard.vendor.displayName} className="h-64 w-full rounded-none" />
-                          ) : (
-                            <div className="grid h-64 place-items-center bg-[radial-gradient(circle_at_70%_20%,rgba(255,120,92,0.22),transparent_32%),linear-gradient(135deg,#F7F1E8,#FFFDF8)] text-sm text-[#6F675C] dark:bg-[radial-gradient(circle_at_70%_20%,rgba(255,120,92,0.16),transparent_32%),linear-gradient(135deg,#11101A,#171525)] dark:text-white/54">
-                              Vendor image unavailable
-                            </div>
-                          )}
-                          <div className="grid gap-3 p-5 sm:grid-cols-2">
-                            <Link data-tour-id="vendor-go-live" href={liveConsoleUnlocked || currentLiveSession ? "/vendor/live" : assignedStall ? "/vendor/products" : "/vendor/exhibitions"} className={buttonStyles("primary", "justify-center px-5 py-3")}>
-                              {currentLiveSession ? "Open Live Console" : liveConsoleUnlocked ? "Start Live Session" : assignedStall ? "Add 2 Products" : "Request Exhibition"}
-                            </Link>
-                            <Link data-tour-id="vendor-add-product" href={assignedStall ? "/vendor/products" : "/vendor/exhibitions"} className={buttonStyles("secondary", "justify-center px-5 py-3")}>
-                              {assignedStall ? "Manage Products" : "Request Exhibition"}
-                            </Link>
-                          </div>
-                        </VendorPanel>
-                      </div>
-                    </>
-                  )}
+            <VendorSectionTitle
+              eyebrow={exhibition?.title ?? "Vendor dashboard"}
+              title={dashboard?.vendor.displayName ?? currentVendor?.businessName ?? "Vendor workspace"}
+              description="Your daily selling priorities, live readiness, product health, and order operations."
+              action={<AdminStatusPill status={liveStatus} />}
+            />
+            {error ? <div className="mt-5"><VendorAlert>{error}</VendorAlert></div> : null}
+            {isLoadingDashboard ? (
+              <VendorLoadingState rows={8} className="mt-6 sm:grid-cols-2 xl:grid-cols-4" />
+            ) : (
+              <div className="mt-6 grid gap-5">
+                <VendorTodayActionPanel action={todayAction} readinessPercent={readinessPercent} liveStatus={liveStatus} viewerCount={viewerCount} />
+
+                <div data-tour-id="vendor-approval-status" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <VendorMetricCard label="Revenue" value={formatPrice(revenue)} helper="Paid and confirmed orders" icon={ShoppingBag} />
+                  <VendorMetricCard label="Orders" value={String(orderCount)} helper={`${attentionOrders.length} need attention`} icon={ClipboardList} />
+                  <VendorMetricCard label="Products" value={String(productCount)} helper={`${dashboardStats?.productsSold ?? dashboard?.productsSold ?? 0} sold`} icon={Boxes} />
+                  <VendorMetricCard label="Viewers" value={String(viewerCount)} helper={currentLiveSession ? "Watching your live room" : "No active room"} icon={Activity} />
                 </div>
-              </VendorPanel>
-              <div className="grid gap-5">
-                <VendorPanel className="p-5">
-                  <h2 className="text-xl font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">Quick actions</h2>
-                  <div className="mt-4 grid gap-3">
-                    <Link href="/vendor/exhibitions" className={buttonStyles("primary", "justify-between px-5 py-4")}>Join Exhibition <ArrowRight className="h-4 w-4" /></Link>
-                    <Link href="/vendor/stall" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Stall <ArrowRight className="h-4 w-4" /></Link>
-                    <Link href="/vendor/products" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Products <ArrowRight className="h-4 w-4" /></Link>
-                    <Link href="/vendor/posts" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Posts <ArrowRight className="h-4 w-4" /></Link>
-                    <Link href="/vendor/subscription" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Subscription <ArrowRight className="h-4 w-4" /></Link>
-                    <Link href="/vendor/live-slots" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Live Slots <ArrowRight className="h-4 w-4" /></Link>
-                    <Link data-tour-id="vendor-orders" href="/vendor/orders" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Orders <ArrowRight className="h-4 w-4" /></Link>
-                  </div>
-                </VendorPanel>
-                <VendorPanel className="p-5">
-                  <h2 className="text-xl font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">Readiness</h2>
-                  <div className="mt-4 grid gap-3">
-                    {[
-                      { label: "Vendor approved", complete: currentVendor?.status === "approved" },
-                      { label: "Stall assigned", complete: Boolean(assignedStall) },
-                      { label: "At least 2 active products", complete: productCount >= 2 }
-                    ].map((item) => (
-                      <div key={item.label} className="flex items-center gap-3 rounded-[18px] border border-[#E8DDCC] bg-[#F7F1E8] px-4 py-3 dark:border-white/10 dark:bg-[#171720]">
-                        <span className={`grid h-9 w-9 place-items-center rounded-full ${item.complete ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" : "bg-[#B88A3D]/10 text-[#B88A3D] dark:text-[#F4C879]"}`}>
-                          {item.complete ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                        </span>
-                        <p className="text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{item.label}</p>
-                      </div>
-                    ))}
+
+                <div className="grid gap-5 xl:grid-cols-[0.82fr_1.18fr]">
+                  <VendorReadinessPanel items={readinessItems} percent={readinessPercent} />
+                  <VendorLiveSlotTimeline slots={upcomingLiveSlots} />
+                </div>
+
+                <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+                  <VendorProductPerformancePanel products={productPerformance} />
+                  <VendorOrdersAttentionPanel orders={attentionOrders} />
+                </div>
+
+                <VendorPanel className="p-4">
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <Link data-tour-id="vendor-go-live" href={todayAction.href} className={buttonStyles("primary", "justify-between px-5 py-4")}>{todayAction.label}<ArrowRight className="h-4 w-4" /></Link>
+                    <Link data-tour-id="vendor-add-product" href="/vendor/products" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Products<ArrowRight className="h-4 w-4" /></Link>
+                    <Link href="/vendor/stall" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Stall boutique<ArrowRight className="h-4 w-4" /></Link>
+                    <Link data-tour-id="vendor-orders" href="/vendor/orders" className={buttonStyles("secondary", "justify-between px-5 py-4")}>Orders<ArrowRight className="h-4 w-4" /></Link>
                   </div>
                 </VendorPanel>
               </div>
-            </div>
+            )}
           </VendorPageFrame>
         }
       />
@@ -2902,6 +3120,20 @@ export function AdminDashboardContent() {
     totals?.revenue ?? 0,
     1
   );
+  const adminReadinessItems = [
+    { label: "Exhibitions created", value: totals?.exhibitions ?? 0, complete: (totals?.exhibitions ?? 0) > 0 },
+    { label: "Stalls generated", value: totals?.stalls ?? 0, complete: (totals?.stalls ?? 0) > 0 },
+    { label: "Vendors approved", value: totals?.approvedVendors ?? 0, complete: (totals?.approvedVendors ?? 0) > 0 },
+    { label: "Live sessions active", value: totals?.liveSessions ?? 0, complete: (totals?.liveSessions ?? 0) > 0 }
+  ];
+  const adminReadinessComplete = adminReadinessItems.filter((item) => item.complete).length;
+  const adminReadinessPercent = Math.round((adminReadinessComplete / adminReadinessItems.length) * 100);
+  const commandAlerts = [
+    { label: "Vendor reviews", value: totals?.pendingVendors ?? 0, href: "/admin/vendors", icon: UserPlus },
+    { label: "Unassigned stalls", value: totals?.unassignedStalls ?? 0, href: "/admin/stalls", icon: Boxes },
+    { label: "Orders", value: totals?.orders ?? 0, href: "/admin/orders", icon: ClipboardList },
+    { label: "Live sessions", value: totals?.liveSessions ?? 0, href: "/admin/analytics", icon: Radio }
+  ];
 
   return (
     <RoleShell role="admin" title="Admin">
@@ -2944,6 +3176,24 @@ export function AdminDashboardContent() {
           </div>
         </div>
 
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {commandAlerts.map((alert) => {
+            const Icon = alert.icon;
+            return (
+              <Link key={alert.label} href={alert.href} className="app-card-flat app-hover-lift flex min-h-20 items-center gap-3 p-4">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[color:var(--gold)]/12 text-[var(--gold)]">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-xs font-black uppercase text-muted-foreground">{alert.label}</span>
+                  <span className="mt-1 block text-2xl font-black text-foreground">{alert.value}</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+              </Link>
+            );
+          })}
+        </div>
+
         {error ? (
           <div className="mt-4 flex flex-col gap-3 rounded-[26px] border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/25 dark:bg-red-500/10 dark:text-red-100 sm:flex-row sm:items-center sm:justify-between">
             <span className="flex items-center gap-2 font-semibold">
@@ -2958,13 +3208,13 @@ export function AdminDashboardContent() {
         ) : null}
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
-          <AdminKpiCard loading={isLoading && !dashboard} label="Total Exhibitions" value={String(totals?.exhibitions ?? 0)} helper={hasExhibitions ? "Created in database" : "Create your first exhibition"} icon={Store} />
-          <AdminKpiCard loading={isLoading && !dashboard} label="Active Exhibitions" value={String(totals?.activeExhibitions ?? 0)} helper="Live status only" icon={Radio} />
-          <AdminKpiCard loading={isLoading && !dashboard} label="Vendors Pending" value={String(totals?.pendingVendors ?? 0)} helper="Awaiting admin review" icon={UserPlus} />
-          <AdminKpiCard loading={isLoading && !dashboard} label="Total Stalls" value={String(totals?.stalls ?? 0)} helper={`${totals?.assignedStalls ?? 0} assigned`} icon={Boxes} />
-          <AdminKpiCard loading={isLoading && !dashboard} label="Orders" value={String(totals?.orders ?? 0)} helper="Orders table count" icon={ShoppingBag} />
-          <AdminKpiCard loading={isLoading && !dashboard} label="Revenue" value={formatPrice(totals?.revenue ?? 0)} helper="Paid orders only" icon={BarChart3} />
-          <AdminKpiCard loading={isLoading && !dashboard} label="Live Visitors" value={String(totals?.liveVisitors ?? 0)} helper="Persisted live viewers" icon={Users} />
+          <AdminKpiCard loading={isLoading && !dashboard} label="Total Exhibitions" value={String(totals?.exhibitions ?? 0)} helper={hasExhibitions ? "Created in database" : "Create your first exhibition"} icon={Store} tone="gold" />
+          <AdminKpiCard loading={isLoading && !dashboard} label="Active Exhibitions" value={String(totals?.activeExhibitions ?? 0)} helper="Live status only" icon={Radio} tone="live" />
+          <AdminKpiCard loading={isLoading && !dashboard} label="Vendors Pending" value={String(totals?.pendingVendors ?? 0)} helper="Awaiting admin review" icon={UserPlus} tone="warning" />
+          <AdminKpiCard loading={isLoading && !dashboard} label="Total Stalls" value={String(totals?.stalls ?? 0)} helper={`${totals?.assignedStalls ?? 0} assigned`} icon={Boxes} tone="neutral" />
+          <AdminKpiCard loading={isLoading && !dashboard} label="Orders" value={String(totals?.orders ?? 0)} helper="Orders table count" icon={ShoppingBag} tone="coral" />
+          <AdminKpiCard loading={isLoading && !dashboard} label="Revenue" value={formatPrice(totals?.revenue ?? 0)} helper="Paid orders only" icon={BarChart3} tone="success" />
+          <AdminKpiCard loading={isLoading && !dashboard} label="Live Visitors" value={String(totals?.liveVisitors ?? 0)} helper="Persisted live viewers" icon={Users} tone="info" />
         </div>
 
         <div className="mt-5 grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
@@ -2991,20 +3241,30 @@ export function AdminDashboardContent() {
           </AdminPanel>
 
           <AdminPanel className="p-5 sm:p-6">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_140px] sm:items-center">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#B88A3D] dark:text-[#D6AC63]">Next actions</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-[#1B1A17] dark:text-[#FFF8EA]">Platform readiness</h2>
+                <p className="app-section-eyebrow">Next actions</p>
+                <h2 className="mt-2 text-2xl font-black text-foreground">Platform readiness</h2>
+                <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">
+                  {adminReadinessComplete} of {adminReadinessItems.length} core platform checks are active.
+                </p>
+                <Link href="/admin/analytics" className="mt-3 inline-block text-sm font-black text-[var(--gold)] transition hover:text-[var(--coral)]">
+                  Open analytics
+                </Link>
               </div>
-              <Link href="/admin/analytics" className="text-sm font-bold text-[#B88A3D] transition hover:text-[#F36B4F] dark:text-[#D6AC63]">
-                Open analytics
-              </Link>
+              <div className="mx-auto grid h-28 w-28 place-items-center rounded-full p-2" style={{ background: `conic-gradient(var(--coral) ${adminReadinessPercent}%, var(--muted) ${adminReadinessPercent}% 100%)` }}>
+                <div className="grid h-full w-full place-items-center rounded-full bg-card text-center">
+                  <span>
+                    <strong className="block text-2xl font-black text-foreground">{adminReadinessPercent}%</strong>
+                    <span className="text-[10px] font-black uppercase text-muted-foreground">Ready</span>
+                  </span>
+                </div>
+              </div>
             </div>
             <div className="mt-5 grid gap-3">
-              <AdminReadinessRow label="Exhibitions created" value={totals?.exhibitions ?? 0} complete={(totals?.exhibitions ?? 0) > 0} />
-              <AdminReadinessRow label="Stalls generated" value={totals?.stalls ?? 0} complete={(totals?.stalls ?? 0) > 0} />
-              <AdminReadinessRow label="Vendors approved" value={totals?.approvedVendors ?? 0} complete={(totals?.approvedVendors ?? 0) > 0} />
-              <AdminReadinessRow label="Live sessions active" value={totals?.liveSessions ?? 0} complete={(totals?.liveSessions ?? 0) > 0} />
+              {adminReadinessItems.map((item) => (
+                <AdminReadinessRow key={item.label} label={item.label} value={item.value} complete={item.complete} />
+              ))}
             </div>
           </AdminPanel>
         </div>
@@ -3173,19 +3433,24 @@ export function AdminDashboardContent() {
                 {hasAnalyticsData ? (
                   <div className="mt-5 grid gap-2 rounded-[24px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
                     {[
-                      ["Visitors", totals?.liveVisitors ?? 0],
-                      ["Orders", totals?.orders ?? 0],
-                      ["Live", totals?.liveSessions ?? 0],
-                      ["Revenue", totals?.revenue ?? 0]
-                    ].map(([label, value]) => (
-                      <div key={String(label)} className="grid grid-cols-[86px_1fr_72px] items-center gap-3 text-xs">
-                        <span className="font-semibold text-[#6F675C] dark:text-white/56">{label}</span>
-                        <span className="h-2 overflow-hidden rounded-full bg-[#F1E3CF] dark:bg-[#23232d]">
-                          <span className="block h-full rounded-full bg-[#F36B4F]" style={{ width: `${Math.max(4, Math.round((Number(value) / analyticsMax) * 100))}%` }} />
+                      { label: "Visitors", value: totals?.liveVisitors ?? 0, icon: Users, barClass: "bg-cyan-500" },
+                      { label: "Orders", value: totals?.orders ?? 0, icon: ShoppingBag, barClass: "bg-[var(--coral)]" },
+                      { label: "Live", value: totals?.liveSessions ?? 0, icon: Radio, barClass: "bg-red-500" },
+                      { label: "Revenue", value: totals?.revenue ?? 0, icon: BarChart3, barClass: "bg-emerald-500" }
+                    ].map((metric) => {
+                      const Icon = metric.icon;
+                      return (
+                      <div key={metric.label} className="grid grid-cols-[104px_1fr_82px] items-center gap-3 text-xs">
+                        <span className="inline-flex items-center gap-2 font-semibold text-[#6F675C] dark:text-white/56">
+                          <Icon className="h-3.5 w-3.5 text-[var(--gold)]" />
+                          {metric.label}
                         </span>
-                        <span className="text-right font-bold text-[#1B1A17] dark:text-[#FFF8EA]">{label === "Revenue" ? formatPrice(Number(value)) : String(value)}</span>
+                        <span className="h-2 overflow-hidden rounded-full bg-[#F1E3CF] dark:bg-[#23232d]">
+                          <span className={cn("block h-full rounded-full", metric.barClass)} style={{ width: `${Math.max(4, Math.round((metric.value / analyticsMax) * 100))}%` }} />
+                        </span>
+                        <span className="text-right font-bold text-[#1B1A17] dark:text-[#FFF8EA]">{metric.label === "Revenue" ? formatPrice(metric.value) : String(metric.value)}</span>
                       </div>
-                    ))}
+                    );})}
                   </div>
                 ) : (
                   <AdminEmptyState icon={Activity} title="Analytics will appear soon" description="Once visitors join exhibitions and orders are placed, metrics will populate automatically." compact />
@@ -3213,20 +3478,23 @@ export function AdminDashboardContent() {
             <div className="mt-4 grid gap-3">
               {isLoading && !dashboard ? (
                 <AdminLoadingState rows={5} className="mt-0" />
-              ) : recentActivities.length ? recentActivities.map((activity) => {
+              ) : recentActivities.length ? recentActivities.map((activity, index) => {
                 const Icon = getActivityIcon(activity);
                 return (
-                  <Link key={activity.id} href={activity.href ?? "/admin"} className="flex items-center gap-3 rounded-[22px] border border-[#E8DDCC] bg-white p-3 transition hover:-translate-y-0.5 hover:border-[#D6AC63] dark:border-white/10 dark:bg-[#171720]">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#D6AC63]">
-                      <Icon className="h-4 w-4" />
+                  <div key={activity.id} className="relative grid grid-cols-[32px_1fr] gap-3">
+                    {index < recentActivities.length - 1 ? <span className="absolute left-[15px] top-9 h-[calc(100%+0.75rem)] w-px bg-[color:var(--border)]" /> : null}
+                    <span className="relative z-10 mt-3 flex h-8 w-8 items-center justify-center rounded-full border-4 border-card bg-[color:var(--gold)] text-white">
+                      <Icon className="h-3.5 w-3.5" />
                     </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{activity.title}</p>
-                      <p className="truncate text-xs text-[#6F675C] dark:text-white/56">{activity.description}</p>
-                      <p className="mt-1 text-[11px] text-[#8A8175] dark:text-white/42">{formatDateTime(activity.createdAt)}</p>
-                    </div>
-                    {activity.status ? <AdminStatusPill status={activity.status} /> : null}
-                  </Link>
+                    <Link href={activity.href ?? "/admin"} className="app-card-flat app-hover-lift flex min-w-0 items-center gap-3 p-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-black text-foreground">{activity.title}</p>
+                        <p className="mt-1 line-clamp-2 text-xs font-semibold text-muted-foreground">{activity.description}</p>
+                        <p className="mt-1 text-[11px] font-semibold text-muted-foreground">{formatDateTime(activity.createdAt)}</p>
+                      </div>
+                      {activity.status ? <AdminStatusPill status={activity.status} /> : null}
+                    </Link>
+                  </div>
                 );
               }) : (
                 <AdminEmptyState icon={Activity} title="No recent activity" description="Admin actions and platform events will appear here." actionHref="/admin/exhibitions" actionLabel="Create Exhibition" compact />
@@ -3280,18 +3548,30 @@ function AdminKpiCard({
   value,
   helper,
   icon: Icon,
-  loading
+  loading,
+  tone = "gold"
 }: {
   label: string;
   value: string;
   helper: string;
   icon: typeof Store;
   loading?: boolean;
+  tone?: "gold" | "live" | "warning" | "neutral" | "coral" | "success" | "info";
 }) {
+  const tones = {
+    gold: "bg-[color:var(--gold)]/12 text-[var(--gold)]",
+    live: "bg-red-500/10 text-red-600 dark:text-red-300",
+    warning: "bg-amber-500/12 text-amber-700 dark:text-amber-200",
+    neutral: "bg-muted text-muted-foreground",
+    coral: "bg-primary/10 text-primary",
+    success: "bg-emerald-500/12 text-emerald-700 dark:text-emerald-200",
+    info: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-200"
+  };
   return (
-    <div className="app-card-flat p-4">
+    <div className="app-card-flat app-hover-lift relative overflow-hidden p-4">
+      <span className={cn("absolute inset-x-0 top-0 h-1", tones[tone])} />
       <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[color:var(--gold)]/12 text-[var(--gold)]">
+        <span className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl", tones[tone])}>
           <Icon className="h-5 w-5" />
         </span>
         <div className="min-w-0">
