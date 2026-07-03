@@ -98,12 +98,6 @@ function vendorNameForProduct(product: Product, stalls: Stall[]) {
   return stall?.vendorName || stall?.assignedVendorName || stall?.name || "Vendor";
 }
 
-function categoryForProduct(product: Product, stalls: Stall[]) {
-  const stall = stalls.find((item) => item.id === product.stallId);
-  const searchable = `${stall?.category ?? ""} ${product.title} ${product.description}`.toLowerCase();
-  return categoryLinks.find((category) => searchable.includes(category.toLowerCase())) || stall?.category || "Boutique";
-}
-
 function postFromProduct(product: Product, stalls: Stall[]): SocialPost {
   const stall = stalls.find((item) => item.id === product.stallId);
   const vendorName = vendorNameForProduct(product, stalls);
@@ -350,15 +344,8 @@ export function StoriesRow({ stalls, exhibitions }: { stalls: Stall[]; exhibitio
   if (!stories.length) return null;
 
   return (
-    <section className="app-card app-slide-in border-b px-2.5 py-3 sm:p-4">
-      <div className="mb-3 flex items-center justify-between gap-3 px-1">
-        <div>
-          <p className="app-section-eyebrow">Live bazaar</p>
-          <h2 className="text-base font-black text-foreground">Stories from stalls</h2>
-        </div>
-        {stories.some((story) => story.live) ? <LiveBadge label="Live now" /> : null}
-      </div>
-      <div className="app-no-scrollbar flex touch-pan-x snap-x gap-3 overflow-x-auto overscroll-x-contain scroll-smooth">
+    <section className="app-slide-in border-b border-border bg-card px-2.5 py-3 sm:rounded-lg sm:border sm:px-4" aria-label="Vendor stories">
+      <div className="app-no-scrollbar flex touch-pan-x snap-x gap-3 overflow-x-auto overscroll-x-contain scroll-smooth py-0.5">
         {stories.map((story) => (
           <StoryCircle
             key={`${story.type}-${story.id}`}
@@ -371,108 +358,6 @@ export function StoriesRow({ stalls, exhibitions }: { stalls: Stall[]; exhibitio
         ))}
       </div>
     </section>
-  );
-}
-
-export function LiveSellerStrip({ stalls }: { stalls: Stall[] }) {
-  const sellers = useMemo(() => {
-    const sorted = [...stalls].sort((left, right) => {
-      const leftLive = left.liveStatus === "live" || left.status === "live";
-      const rightLive = right.liveStatus === "live" || right.status === "live";
-      if (leftLive !== rightLive) return leftLive ? -1 : 1;
-      return (right.viewerCount ?? 0) - (left.viewerCount ?? 0);
-    });
-    return sorted.slice(0, 8);
-  }, [stalls]);
-
-  if (!sellers.length) return null;
-
-  const liveCount = sellers.filter((stall) => stall.liveStatus === "live" || stall.status === "live").length;
-
-  return (
-    <section className="boutique-header app-slide-in p-4 sm:p-5">
-      <div className="relative z-10 flex flex-col gap-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-black uppercase text-white/68">Live seller strip</p>
-            <h2 className="mt-1 text-2xl font-black leading-tight text-white sm:text-3xl">Walk into today&apos;s live bazaar</h2>
-            <p className="mt-2 max-w-xl text-sm font-semibold leading-6 text-white/68">
-              Follow live stalls, catch fresh drops, and jump into the shopping stage before the best pieces move.
-            </p>
-          </div>
-          <LiveBadge label={liveCount ? `${liveCount} live` : "On stage soon"} />
-        </div>
-
-        <div className="app-no-scrollbar flex gap-3 overflow-x-auto pb-1">
-          {sellers.map((stall) => {
-            const isLive = stall.liveStatus === "live" || stall.status === "live";
-            const title = stall.vendorName || stall.assignedVendorName || stall.name;
-            return (
-              <Link key={stall.id} href={isLive ? `/live/${stall.id}` : `/stalls/${stall.id}/store`} className="app-press group w-[168px] shrink-0 overflow-hidden rounded-[22px] border border-white/14 bg-white/10 text-white transition hover:-translate-y-1 hover:bg-white/14">
-                <div className="relative aspect-[4/3] overflow-hidden bg-black/25">
-                  <AppImage src={stall.vendorLogo || stall.bannerImage || stall.image || "/stalls/stall-placeholder.png"} alt={title} fallbackSrc="/stalls/stall-placeholder.png" className="absolute inset-0 h-full w-full rounded-none object-cover transition duration-500 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/72 to-transparent" />
-                  <span className="absolute left-2 top-2 rounded-full bg-black/56 px-2 py-1 text-[10px] font-black uppercase text-white/82">{stall.category || "Vendor"}</span>
-                  {isLive ? <span className="absolute bottom-2 left-2"><LiveBadge label="Live" className="min-h-6 px-2 py-0 text-[10px]" /></span> : null}
-                </div>
-                <div className="p-3">
-                  <p className="line-clamp-1 text-sm font-black">{title}</p>
-                  <p className="mt-1 text-xs font-semibold text-white/62">{stall.viewerCount ? `${stall.viewerCount} watching` : isLive ? "Live now" : "Preview stall"}</p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function TrendingProductRails({ products, stalls }: { products: Product[]; stalls: Stall[] }) {
-  const rails = useMemo(() => {
-    const activeProducts = products.filter((product) => product.status === "active");
-    const trending = activeProducts.slice(0, 8);
-    const dealDrops = activeProducts.filter((product) => product.compareAtPrice > product.price || product.offerCode).slice(0, 8);
-    const category = categoryLinks
-      .map((label) => ({
-        label,
-        products: activeProducts.filter((product) => categoryForProduct(product, stalls).toLowerCase().includes(label.toLowerCase())).slice(0, 8)
-      }))
-      .find((entry) => entry.products.length >= 2);
-
-    return [
-      { key: "trending", eyebrow: "Trending now", title: "Pieces people are opening first", products: trending },
-      { key: "deals", eyebrow: "Live deals", title: "Fresh offers and limited drops", products: dealDrops.length ? dealDrops : activeProducts.slice(3, 11) },
-      category ? { key: "category", eyebrow: category.label, title: `Popular in ${category.label}`, products: category.products } : null
-    ].filter((rail): rail is { key: string; eyebrow: string; title: string; products: Product[] } => Boolean(rail && rail.products.length));
-  }, [products, stalls]);
-
-  if (!rails.length) return null;
-
-  return (
-    <div className="grid gap-4">
-      {rails.slice(0, 3).map((rail) => (
-        <ProductRail key={rail.key} eyebrow={rail.eyebrow} title={rail.title}>
-          {rail.products.map((product, index) => {
-            const discount = product.compareAtPrice > product.price ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100) : 0;
-            return (
-              <PremiumProductCard
-                key={product.id}
-                href={`/product/${product.id}`}
-                image={product.images[0] || "/products/product-placeholder.png"}
-                title={product.title}
-                price={product.price}
-                compareAtPrice={discount ? product.compareAtPrice : undefined}
-                vendorName={vendorNameForProduct(product, stalls)}
-                badge={discount ? `${discount}% off` : index < 3 ? "Trending" : undefined}
-                stockLabel={product.stock > 0 ? `${product.stock} left` : "Sold out"}
-                className="w-[168px] shrink-0 sm:w-[190px]"
-              />
-            );
-          })}
-        </ProductRail>
-      ))}
-    </div>
   );
 }
 

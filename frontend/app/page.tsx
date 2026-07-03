@@ -1,20 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { HomepageAdvertisementCarousel } from "@/components/marketplace/homepage-advertisement-carousel";
 import {
-  CategoryRail,
   FeedCard,
-  LiveSellerStrip,
   SocialEmptyState,
   SocialShell,
   StoriesRow,
-  TrendingProductRails,
   useSocialShoppingData
 } from "@/components/social/social-shopping";
 
 export default function Home() {
-  const { products, posts, stalls, exhibitions, isLoading, isLoadingMore, hasMore, loadMore, error } = useSocialShoppingData(8);
+  const { posts, stalls, exhibitions, isLoading, isLoadingMore, hasMore, loadMore, error } = useSocialShoppingData(8);
   const [visibleCount, setVisibleCount] = useState(6);
   const loadTriggerRef = useRef<HTMLDivElement | null>(null);
   const visiblePosts = useMemo(() => posts.slice(0, visibleCount), [posts, visibleCount]);
@@ -46,16 +42,12 @@ export default function Home() {
   return (
     <SocialShell>
       <div className="grid gap-0 sm:gap-4">
-        <LiveSellerStrip stalls={stalls} />
         <StoriesRow stalls={stalls} exhibitions={exhibitions} />
-        <CategoryRail />
         {error ? (
           <div className="border-b border-amber-300 bg-amber-100 px-4 py-3 text-sm font-black text-amber-950 dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-100 sm:rounded-[24px] sm:border">
             {error}
           </div>
         ) : null}
-        <HomepageAdvertisementCarousel />
-        <TrendingProductRails products={products} stalls={stalls} />
         {isLoading ? (
           <div className="grid gap-0 sm:gap-4">
             {Array.from({ length: 3 }).map((_, index) => <div key={index} className="app-skeleton h-[620px] border-b border-border sm:h-[520px] sm:rounded-[30px] sm:border" />)}
