@@ -32,7 +32,7 @@ export function OtpCodeInput({
             <span
               key={index}
               className={cn(
-                "grid h-11 min-w-0 place-items-center rounded-xl border border-[color:var(--border)] bg-[var(--surface-strong)] text-lg font-black text-[var(--text)] sm:h-12 sm:text-xl",
+                "grid aspect-square min-h-9 min-w-0 place-items-center rounded-xl border border-[color:var(--border)] bg-[var(--surface-strong)] text-base font-black text-[var(--text)] sm:text-xl",
                 digits[index] && "border-[color:var(--gold)] bg-[color:var(--gold)]/10"
               )}
             >

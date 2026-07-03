@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Activity, AlertCircle, ArrowRight, BarChart3, Boxes, CalendarClock, CalendarDays, CheckCircle2, ClipboardList, Database, Filter, Gavel, MessageCircleMore, MousePointer2, PlusCircle, Radio, RefreshCw, Search, ShieldCheck, ShoppingBag, Sparkles, Store, UserPlus, Users } from "lucide-react";
 import { RoleShell } from "@/components/layout/role-shell";
 import { AppImage } from "@/components/ui/app-image";
+import { AppCard, AppEmptyState, AppLoadingState, AppStatCard, AppStatusPill } from "@/components/ui/app-primitives";
 import { buttonStyles } from "@/components/ui/button";
 import { EmptyStateCard, PremiumCard, PremiumMetricCard, SectionHeader, StatusBadge } from "@/components/ui/premium";
 import { useExpoStore } from "@/lib/cart-store";
@@ -182,7 +183,7 @@ export function ExhibitionsPageContent() {
                 {selectedAvatar ? (
                   <AppImage src={selectedAvatar.image} alt={selectedAvatar.name} fallbackSrc="/avatars/default-avatar.png" className="h-8 w-8 rounded-full" />
                 ) : (
-                  <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--surface-strong)] font-serif text-[var(--gold)]">AE</span>
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--surface-strong)] font-serif text-[var(--gold)]">AD</span>
                 )}
                 <span>{selectedAvatar ? "Change" : "Avatar"}</span>
               </Link>
@@ -228,7 +229,7 @@ export function ExhibitionsPageContent() {
             <div className="relative grid gap-6 p-5 sm:p-7 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="flex flex-col justify-between">
                 <SectionHeader
-                  eyebrow="Exhibit â€¢ Connect â€¢ Sell"
+                  eyebrow="Exhibit | Connect | Sell"
                   title="Choose an Exhibition"
                   description="Enter a live exhibition, discover premium vendor stalls, watch live shopping streams, and buy from the products being showcased in real time."
                   action={<Link href="/exhibitions" className={buttonStyles("secondary", "justify-center px-5 py-3")}>Browse Stalls</Link>}
@@ -451,7 +452,7 @@ function DesktopExhibitionsExperience({
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[var(--surface)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-[var(--gold)]">
                   <Sparkles className="h-4 w-4" />
-                  Exhibit â€¢ Connect â€¢ Sell
+                  Exhibit | Connect | Sell
                 </div>
                 <h1 className="mt-6 max-w-4xl text-6xl font-semibold leading-[0.96] tracking-[-0.07em] text-[var(--text)] 2xl:text-7xl">
                   Choose an Exhibition
@@ -475,7 +476,7 @@ function DesktopExhibitionsExperience({
                     {selectedAvatar ? (
                       <AppImage src={selectedAvatar.image} alt={selectedAvatar.name} fallbackSrc="/avatars/default-avatar.png" className="h-9 w-9 rounded-full" />
                     ) : (
-                      <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--surface-strong)] text-sm font-semibold text-[var(--gold)]">AE</span>
+                      <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--surface-strong)] text-sm font-semibold text-[var(--gold)]">AD</span>
                     )}
                     <span className="text-sm font-semibold text-[var(--text)]">{selectedAvatar?.name ?? "Avatar required before entry"}</span>
                   </div>
@@ -957,7 +958,7 @@ export function UserOrdersPageContent() {
 
 function VendorPageFrame({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <section className={`min-h-[calc(100vh-76px)] bg-[#FAF7F0] px-3 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-4 text-[#1B1A17] dark:bg-[#05040A] dark:text-[#FFF8EA] sm:px-5 sm:py-6 xl:px-8 ${className}`}>
+    <section className={`min-h-[calc(100vh-72px)] px-3 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-4 text-foreground sm:px-5 sm:py-6 xl:px-8 ${className}`}>
       {children}
     </section>
   );
@@ -965,9 +966,9 @@ function VendorPageFrame({ children, className = "" }: { children: ReactNode; cl
 
 function VendorPanel({ children, className = "", ...props }: HTMLAttributes<HTMLDivElement> & { children: ReactNode; className?: string }) {
   return (
-    <div {...props} className={`rounded-[30px] border border-[#E8DDCC] bg-[#FFFDF8] shadow-[0_24px_80px_rgba(128,91,44,0.12)] dark:border-white/10 dark:bg-[#11101A] dark:shadow-[0_24px_90px_rgba(0,0,0,0.34)] ${className}`}>
+    <AppCard {...props} className={className}>
       {children}
-    </div>
+    </AppCard>
   );
 }
 
@@ -983,11 +984,11 @@ function VendorSectionTitle({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        {eyebrow ? <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#B88A3D] dark:text-[#F4C879]">{eyebrow}</p> : null}
-        <h1 className="luxury-display mt-2 text-3xl font-semibold tracking-[-0.06em] text-[#1B1A17] dark:text-[#FFF8EA] sm:text-5xl">{title}</h1>
-        {description ? <p className="mt-3 max-w-3xl text-sm leading-6 text-[#6F675C] dark:text-white/58">{description}</p> : null}
+        {eyebrow ? <p className="app-section-eyebrow">{eyebrow}</p> : null}
+        <h1 className="mt-2 text-3xl font-black leading-tight text-foreground sm:text-4xl">{title}</h1>
+        {description ? <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p> : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>
@@ -1008,18 +1009,7 @@ function VendorMetricCard({
   compact?: boolean;
 }) {
   return (
-    <div className={`${compact ? "rounded-[20px] p-3" : "rounded-[24px] p-4"} border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-card`}>
-      <div className="flex items-center justify-between gap-3">
-        <p className={`${compact ? "text-[10px] tracking-[0.12em]" : "text-xs tracking-[0.14em]"} font-bold uppercase text-[#8A8176] dark:text-white/45`}>{label}</p>
-        {Icon ? (
-          <span className={`${compact ? "h-8 w-8 rounded-xl" : "h-9 w-9 rounded-2xl"} grid place-items-center bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#F4C879]`}>
-            <Icon className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} />
-          </span>
-        ) : null}
-      </div>
-      <p className={`${compact ? "mt-2 text-xl" : "mt-3 text-2xl"} break-words font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]`}>{value}</p>
-      {helper ? <p className={`${compact ? "mt-0.5 line-clamp-2 text-[10px] leading-4" : "mt-1 text-xs leading-5"} text-[#6F675C] dark:text-white/48`}>{helper}</p> : null}
-    </div>
+    <AppStatCard label={label} value={value} helper={helper} icon={Icon} compact={compact} />
   );
 }
 
@@ -1039,30 +1029,12 @@ function VendorEmptyState({
   compact?: boolean;
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center rounded-[26px] border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-6 text-center dark:border-[#D6AC63]/30 dark:bg-card ${compact ? "min-h-[180px]" : "min-h-[260px]"}`}>
-      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#F4C879]">
-        <Icon className="h-6 w-6" />
-      </span>
-      <h3 className="mt-4 text-lg font-semibold tracking-[-0.03em] text-[#1B1A17] dark:text-[#FFF8EA]">{title}</h3>
-      <p className="mt-2 max-w-md text-sm leading-6 text-[#6F675C] dark:text-white/56">{description}</p>
-      {actionHref && actionLabel ? (
-        <Link href={actionHref} className={buttonStyles("primary", "mt-5 justify-center px-5 py-3 text-sm")}>
-          {actionLabel}
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Link>
-      ) : null}
-    </div>
+    <AppEmptyState icon={Icon} title={title} description={description} actionHref={actionHref} actionLabel={actionLabel} compact={compact} />
   );
 }
 
 function VendorLoadingState({ rows = 3, className = "" }: { rows?: number; className?: string }) {
-  return (
-    <div className={`grid gap-3 ${className}`}>
-      {Array.from({ length: rows }).map((_, index) => (
-        <div key={index} className="min-h-28 animate-pulse rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-[#1d1d27]" />
-      ))}
-    </div>
-  );
+  return <AppLoadingState rows={rows} className={className} />;
 }
 
 function VendorAlert({ tone = "error", children }: { tone?: "error" | "warning" | "info"; children: ReactNode }) {
@@ -1081,7 +1053,7 @@ function hasUploadedBrandAsset(value?: string | null) {
 }
 
 const vendorInputClass =
-  "min-h-12 rounded-[18px] border border-[#E8DDCC] bg-white px-4 py-3 text-sm text-[#1B1A17] outline-none transition placeholder:text-[#8A8176] focus:border-[#B88A3D] dark:border-white/10 dark:bg-[#1d1d27] dark:text-[#FFF8EA] dark:placeholder:text-white/38 dark:focus:border-[#D6AC63]/70";
+  "app-input min-h-12 px-4 py-3 text-sm font-semibold placeholder:text-muted-foreground";
 
 export function VendorDashboardContent() {
   const currentVendor = useExpoStore((state) => state.currentVendor);
@@ -2319,7 +2291,7 @@ export function VendorLivePageContent() {
             {liveReadiness.map((item) => (
               <div key={item.label} className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3 dark:bg-[#1d1d27]">
                 <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-[0px] before:text-sm before:font-black ${item.done ? "bg-emerald-500/10 text-emerald-600 before:content-['OK'] dark:text-emerald-300" : "bg-[#B88A3D]/10 text-[#B88A3D] before:content-['!'] dark:text-[#F4C879]"}`}>
-                  {item.done ? "âœ“" : "!"}
+                  {item.done ? "Done" : "!"}
                 </span>
                 <p className="text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{item.label}</p>
               </div>
@@ -3281,9 +3253,9 @@ export function AdminDashboardContent() {
 
 function AdminPanel({ className = "", children, ...props }: HTMLAttributes<HTMLDivElement> & { className?: string; children: ReactNode }) {
   return (
-    <div {...props} className={`rounded-[30px] border border-[#E8DDCC] bg-[#FFFDF8] shadow-[0_22px_70px_rgba(128,91,44,0.1)] dark:border-white/10 dark:bg-[#0F0E18] dark:shadow-[0_22px_80px_rgba(0,0,0,0.28)] ${className}`}>
+    <AppCard {...props} className={className}>
       {children}
-    </div>
+    </AppCard>
   );
 }
 
@@ -3291,11 +3263,11 @@ function AdminSectionTitle({ title, eyebrow, href, action }: { title: string; ey
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        {eyebrow ? <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#B88A3D] dark:text-[#D6AC63]">{eyebrow}</p> : null}
-        <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">{title}</h2>
+        {eyebrow ? <p className="app-section-eyebrow">{eyebrow}</p> : null}
+        <h2 className="mt-1 text-xl font-black text-foreground">{title}</h2>
       </div>
       {href && action ? (
-        <Link href={href} className="text-sm font-bold text-[#B88A3D] transition hover:text-[#F36B4F] dark:text-[#D6AC63]">
+        <Link href={href} className="text-sm font-black text-[var(--gold)] transition hover:text-[var(--coral)]">
           {action}
         </Link>
       ) : null}
@@ -3317,39 +3289,39 @@ function AdminKpiCard({
   loading?: boolean;
 }) {
   return (
-    <div className="rounded-[24px] border border-[#E8DDCC] bg-[#FFFDF8] p-4 shadow-[0_16px_40px_rgba(128,91,44,0.08)] dark:border-white/10 dark:bg-[#171720]">
+    <div className="app-card-flat p-4">
       <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#E8DDCC] bg-[#F7F1E8] text-[#B88A3D] dark:border-white/10 dark:bg-[#D6AC63]/10 dark:text-[#D6AC63]">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[color:var(--gold)]/12 text-[var(--gold)]">
           <Icon className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-xs font-bold uppercase tracking-[0.08em] text-[#6F675C] dark:text-white/52">{label}</p>
+          <p className="truncate text-xs font-black uppercase text-muted-foreground">{label}</p>
           {loading ? (
-            <span className="mt-2 block h-7 w-16 animate-pulse rounded-xl bg-[#E8DDCC] dark:bg-[#23232d]" />
+            <span className="mt-2 block h-7 w-16 animate-pulse rounded-xl bg-muted" />
           ) : (
-            <p className="mt-1 text-2xl font-semibold tracking-[-0.05em] text-[#1B1A17] dark:text-[#FFF8EA]">{value}</p>
+            <p className="mt-1 text-2xl font-black text-foreground">{value}</p>
           )}
         </div>
       </div>
-      <p className="mt-3 text-xs font-semibold text-[#6F675C] dark:text-white/50">{helper}</p>
+      <p className="mt-3 text-xs font-semibold text-muted-foreground">{helper}</p>
     </div>
   );
 }
 
 function AdminMiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-[#F7F1E8] px-3 py-2 dark:bg-[#1d1d27]">
-      <p className="text-[11px] text-[#6F675C] dark:text-white/50">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{value}</p>
+    <div className="rounded-2xl bg-[var(--surface)] px-3 py-2">
+      <p className="text-[11px] text-muted-foreground">{label}</p>
+      <p className="mt-1 text-sm font-black text-foreground">{value}</p>
     </div>
   );
 }
 
 function AdminAnalyticsCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[22px] border border-[#E8DDCC] bg-white p-4 dark:border-white/10 dark:bg-[#171720]">
-      <p className="text-xs font-semibold text-[#6F675C] dark:text-white/52">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[#1B1A17] dark:text-[#FFF8EA]">{value}</p>
+    <div className="app-card-flat p-4">
+      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+      <p className="mt-2 text-2xl font-black text-foreground">{value}</p>
     </div>
   );
 }
@@ -3368,13 +3340,13 @@ function AdminActionCard({
   badge?: string;
 }) {
   return (
-    <Link href={href} className="group relative min-h-28 rounded-[22px] border border-[#E8DDCC] bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#F36B4F] hover:shadow-[0_18px_48px_rgba(128,91,44,0.14)] dark:border-white/10 dark:bg-[#171720] dark:hover:border-[#FF785C]/70">
-      {badge ? <span className="absolute right-3 top-3 rounded-full bg-[#F36B4F] px-2 py-0.5 text-[10px] font-bold text-white">{badge}</span> : null}
-      <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#D6AC63]">
+    <Link href={href} className="app-card-flat group relative min-h-28 p-4 text-left transition hover:-translate-y-0.5 hover:border-primary hover:shadow-[var(--shadow-hover)]">
+      {badge ? <span className="absolute right-3 top-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-black text-primary-foreground">{badge}</span> : null}
+      <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[color:var(--gold)]/12 text-[var(--gold)]">
         <Icon className="h-5 w-5" />
       </span>
-      <p className="mt-3 text-sm font-bold text-[#1B1A17] dark:text-[#FFF8EA]">{title}</p>
-      <p className="mt-1 text-xs leading-5 text-[#6F675C] dark:text-white/52">{description}</p>
+      <p className="mt-3 text-sm font-black text-foreground">{title}</p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
     </Link>
   );
 }
@@ -3399,68 +3371,41 @@ function AdminEmptyState({
   compact?: boolean;
 }) {
   return (
-    <div className={`mt-5 flex flex-col items-center justify-center rounded-[26px] border border-dashed border-[#D7BE86] bg-[#F7F1E8] p-6 text-center dark:border-[#D6AC63]/30 dark:bg-card ${compact ? "min-h-[190px]" : "min-h-[260px]"}`}>
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#B88A3D]/10 text-[#B88A3D] dark:bg-[#D6AC63]/12 dark:text-[#D6AC63]">
-        <Icon className="h-6 w-6" />
-      </span>
-      <h3 className="mt-4 text-lg font-semibold tracking-[-0.03em] text-[#1B1A17] dark:text-[#FFF8EA]">{title}</h3>
-      <p className="mt-2 max-w-md text-sm leading-6 text-[#6F675C] dark:text-white/56">{description}</p>
-      {actionHref && actionLabel ? (
-        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-          <Link href={actionHref} className={buttonStyles("primary", "justify-center px-5 py-3 text-sm")}>
-            {actionLabel}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-          {secondaryHref && secondaryLabel ? (
-            <Link href={secondaryHref} className={buttonStyles("secondary", "justify-center px-5 py-3 text-sm")}>
-              {secondaryLabel}
-            </Link>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+    <AppEmptyState
+      icon={Icon}
+      title={title}
+      description={description}
+      actionHref={actionHref}
+      actionLabel={actionLabel}
+      secondaryHref={secondaryHref}
+      secondaryLabel={secondaryLabel}
+      compact={compact}
+      className="mt-5"
+    />
   );
 }
 
 function AdminLoadingState({ rows = 3, className = "" }: { rows?: number; className?: string }) {
   const spacingClass = className.includes("mt-") ? className : `mt-5 ${className}`;
-  return (
-    <div className={`grid gap-3 ${spacingClass}`}>
-      {Array.from({ length: rows }).map((_, index) => (
-        <div key={index} className="min-h-28 animate-pulse rounded-[24px] border border-[#E8DDCC] bg-[#F7F1E8] dark:border-white/10 dark:bg-[#1d1d27]" />
-      ))}
-    </div>
-  );
+  return <AppLoadingState rows={rows} className={spacingClass} />;
 }
 
 function AdminReadinessRow({ label, value, complete }: { label: string; value: number; complete: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-[20px] border border-[#E8DDCC] bg-white px-4 py-3 dark:border-white/10 dark:bg-[#171720]">
+    <div className="flex items-center justify-between gap-3 rounded-[var(--radius-control)] border border-[color:var(--border)] bg-[var(--surface)] px-4 py-3">
       <div className="flex min-w-0 items-center gap-3">
-        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${complete ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" : "bg-[#B88A3D]/10 text-[#B88A3D] dark:text-[#D6AC63]"}`}>
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${complete ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" : "bg-[color:var(--gold)]/12 text-[var(--gold)]"}`}>
           {complete ? <CheckCircle2 className="h-4 w-4" /> : <CalendarDays className="h-4 w-4" />}
         </span>
-        <p className="truncate text-sm font-semibold text-[#1B1A17] dark:text-[#FFF8EA]">{label}</p>
+        <p className="truncate text-sm font-black text-foreground">{label}</p>
       </div>
-      <span className="text-sm font-bold text-[#6F675C] dark:text-white/58">{value}</span>
+      <span className="text-sm font-black text-muted-foreground">{value}</span>
     </div>
   );
 }
 
 function AdminStatusPill({ status }: { status: string }) {
-  const normalized = status.toLowerCase();
-  const tone = ["live", "active", "approved", "accepted", "paid"].includes(normalized)
-    ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200"
-    : ["pending", "scheduled", "available"].includes(normalized)
-      ? "border-[#D6AC63]/35 bg-[#D6AC63]/10 text-[#8A5A24] dark:text-[#F4C879]"
-      : ["rejected", "denied", "failed", "cancelled"].includes(normalized)
-        ? "border-red-500/25 bg-red-500/10 text-red-700 dark:text-red-200"
-        : "border-[#E8DDCC] bg-[#F7F1E8] text-[#6F675C] dark:border-white/10 dark:bg-[#1d1d27] dark:text-white/62";
-  return (
-    <span className={`inline-flex min-h-7 shrink-0 items-center rounded-full border px-3 text-[11px] font-bold uppercase tracking-[0.08em] ${tone}`}>
-      {status}
-    </span>
-  );
+  return <AppStatusPill status={status} />;
 }
 
 function getActivityIcon(activity: AdminRecentActivity) {

@@ -22,6 +22,7 @@ import {
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { AppImage } from "@/components/ui/app-image";
+import { AppBrand } from "@/components/ui/app-primitives";
 import {
   addCartItem,
   followVendor,
@@ -208,9 +209,9 @@ export function useSocialShoppingData(limitProducts = 30) {
 
 export function SocialShell({ children, rightRail }: { children: React.ReactNode; rightRail?: React.ReactNode }) {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-card pb-[calc(3.5rem+env(safe-area-inset-bottom))] text-foreground sm:bg-background md:pb-0">
+    <main className="app-page pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <SocialTopBar />
-      <div className="mx-auto grid w-full max-w-[1180px] gap-0 px-0 py-0 sm:gap-6 sm:px-5 sm:py-4 lg:grid-cols-[220px_minmax(0,620px)_280px] lg:py-6">
+      <div className="app-container grid gap-0 py-0 sm:gap-6 sm:py-4 lg:grid-cols-[220px_minmax(0,620px)_280px] lg:py-6">
         <SocialSidebar />
         <section className="min-w-0">{children}</section>
         <aside className="hidden min-w-0 lg:block">{rightRail ?? <SocialSuggestions />}</aside>
@@ -224,22 +225,15 @@ export function SocialShell({ children, rightRail }: { children: React.ReactNode
 function SocialTopBar() {
   const openCart = useExpoStore((state) => state.openCart);
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-card text-card-foreground sm:shadow-soft">
-      <div className="mx-auto flex h-[52px] max-w-[1180px] items-center gap-2.5 px-3 sm:h-auto sm:px-5 sm:py-3">
-        <Link href="/" className="flex items-center gap-2" aria-label="Ankita Social Shopping home">
-          <span className="hidden h-10 w-10 place-items-center rounded-2xl bg-primary text-sm font-black text-primary-foreground sm:grid">AD</span>
-          <span className="leading-tight">
-            <span className="block text-lg font-black tracking-[-0.03em] sm:hidden">Ankita</span>
-            <span className="hidden text-sm font-black sm:block">Ankita Designs</span>
-            <span className="hidden text-[11px] font-black uppercase tracking-[0.14em] text-primary sm:block">Social Shopping</span>
-          </span>
-        </Link>
+    <header className="app-topbar sticky top-0 z-40 border-b">
+      <div className="app-container flex h-[58px] items-center gap-2.5 sm:h-auto sm:py-3">
+        <AppBrand context="Social Shopping" compact className="flex-1 sm:flex-none" />
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle className="h-8 w-8 rounded-full border-0 bg-transparent shadow-none hover:bg-secondary sm:h-10 sm:w-10 sm:rounded-2xl sm:border sm:bg-card sm:shadow-sm" />
-          <button type="button" onClick={openCart} className="grid h-8 w-8 place-items-center rounded-full bg-transparent text-foreground transition hover:bg-secondary sm:h-10 sm:w-10 sm:rounded-2xl sm:border sm:border-border sm:bg-background" aria-label="Open cart">
+          <ThemeToggle className="h-10 w-10 rounded-2xl" />
+          <button type="button" onClick={openCart} className="app-icon-button h-10 w-10 shadow-none" aria-label="Open cart">
             <ShoppingBag className="h-5 w-5 sm:h-[22px] sm:w-[22px]" />
           </button>
-          <Link href="/profile" className="hidden h-10 w-10 place-items-center rounded-2xl border border-border bg-background text-foreground transition hover:border-primary hover:bg-secondary sm:grid" aria-label="Profile">
+          <Link href="/profile" className="app-icon-button hidden h-10 w-10 shadow-none sm:grid" aria-label="Profile">
             <UserRound className="h-5 w-5" />
           </Link>
         </div>
@@ -260,9 +254,9 @@ function SocialSidebar() {
   ];
 
   return (
-    <aside className="sticky top-[86px] hidden h-fit rounded-[28px] border border-border bg-card p-3 text-card-foreground shadow-soft lg:block">
-      <div className="mb-3 rounded-3xl bg-secondary p-4 text-secondary-foreground">
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Shop socially</p>
+    <aside className="app-card sticky top-[86px] hidden h-fit p-3 lg:block">
+      <div className="app-card-flat mb-3 p-4">
+        <p className="app-section-eyebrow text-primary">Shop socially</p>
         <p className="mt-2 text-lg font-black leading-5">Follow vendors, discover drops, buy from live sellers.</p>
       </div>
       <nav className="grid gap-1" aria-label="Social shopping navigation">
@@ -299,7 +293,7 @@ function SocialBottomNav() {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card px-2 pb-[env(safe-area-inset-bottom)] text-card-foreground md:hidden" aria-label="Mobile social navigation">
+    <nav className="app-bottom-nav fixed inset-x-0 bottom-0 z-50 border-t px-2 pb-[env(safe-area-inset-bottom)] md:hidden" aria-label="Mobile social navigation">
       <div className="grid grid-cols-5 gap-1">
         {items.slice(0, 2).map((item) => <SocialBottomLink key={item.href} item={item} active={pathname === item.href} />)}
         <button type="button" onClick={openCart} className="flex min-h-12 items-center justify-center text-muted-foreground transition active:scale-90 active:text-foreground" aria-label="Open cart">
@@ -584,7 +578,7 @@ export function SocialSuggestions() {
   const { stalls, exhibitions, isLoading } = useSocialShoppingData(8);
   return (
     <div className="sticky top-[86px] grid gap-4">
-      <section className="rounded-[28px] border border-border bg-card p-4 shadow-soft">
+      <section className="app-card p-4">
         <h2 className="text-sm font-black text-foreground">Live sellers</h2>
         <div className="mt-3 grid gap-3">
           {isLoading ? <p className="text-sm font-semibold text-muted-foreground">Loading suggestions...</p> : null}
@@ -602,7 +596,7 @@ export function SocialSuggestions() {
           ))}
         </div>
       </section>
-      <section className="rounded-[28px] border border-border bg-card p-4 shadow-soft">
+      <section className="app-card p-4">
         <h2 className="text-sm font-black text-foreground">Shopping events</h2>
         <div className="mt-3 grid gap-2">
           {exhibitions.slice(0, 3).map((event) => (
@@ -620,7 +614,7 @@ export function SocialSuggestions() {
 
 export function SocialEmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-[30px] border border-dashed border-border bg-card p-8 text-center shadow-soft">
+    <div className="app-card border-dashed p-8 text-center">
       <PackageOpen className="mx-auto h-10 w-10 text-primary" />
       <h2 className="mt-4 text-xl font-black text-foreground">{title}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm font-semibold leading-6 text-muted-foreground">{description}</p>
@@ -839,8 +833,8 @@ export function VendorProfileView({ vendorSlug }: { vendorSlug: string }) {
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h1 className="truncate text-xl font-black tracking-[-0.03em] text-foreground sm:text-2xl">{vendorName}</h1>
-                  <p className="mt-1 truncate text-xs font-black uppercase tracking-[0.12em] text-primary">{category}</p>
+                  <h1 className="truncate text-xl font-black text-foreground sm:text-2xl">{vendorName}</h1>
+                  <p className="mt-1 truncate text-xs font-black uppercase text-primary">{category}</p>
                 </div>
                 {liveStall ? <Link href={`/live/${liveStall.id}`} className="shrink-0 rounded-full bg-destructive px-3 py-1 text-xs font-black text-destructive-foreground">Live</Link> : null}
               </div>
