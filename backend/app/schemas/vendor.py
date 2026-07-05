@@ -35,9 +35,35 @@ class VendorResponse(BaseModel):
     pincode: str | None = None
     address: str | None = None
     rejectionReason: str | None = None
+    correctionReason: str | None = None
+    correctionRequestedAt: str | None = None
+    resubmittedAt: str | None = None
+    applicationRevision: int = 1
     approvedAt: str | None = None
     approvedByAdminId: str | None = None
     createdAt: str | None = None
+
+
+class VendorApplicationUpdateRequest(BaseModel):
+    ownerName: str
+    businessName: str
+    businessCategory: str
+    businessDescription: str
+    phone: str
+    instagram: str | None = None
+    website: str | None = None
+    whatsapp: str | None = None
+    gstNumber: str | None = None
+    fssaiNumber: str | None = None
+    panNumber: str | None = None
+    upiId: str | None = None
+    bankAccountNumber: str | None = None
+    ifsc: str | None = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    pincode: str | None = None
+    productCategories: list[str] = []
 
 
 class VendorDashboardStats(BaseModel):

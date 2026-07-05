@@ -59,6 +59,7 @@ import {
   postLiveMessage,
   rejectAdminVendor,
   removeVendorFromStall,
+  requestAdminVendorCorrections,
   requestJoinExhibition,
   resumeExhibition,
   startExhibition,
@@ -1340,25 +1341,61 @@ export function VendorDashboardContent() {
   };
 
   if (currentVendor?.status === "pending") {
+    const isResubmitted = (currentVendor.applicationRevision ?? 1) > 1;
     return (
       <RoleShell role="vendor" title="Vendor">
         <VendorPageFrame>
           <VendorPanel className="mx-auto max-w-5xl overflow-hidden p-5 sm:p-7">
             <VendorSectionTitle
-              eyebrow="Approval pending"
-              title="Your vendor registration is under review"
+              eyebrow={isResubmitted ? "Corrections resubmitted" : "Approval pending"}
+              title={isResubmitted ? "Your corrected application is back under review" : "Your vendor registration is under review"}
               description="Admin approval is required before products, live sessions, and stall assignments become available."
               action={<AdminStatusPill status="pending" />}
             />
             <div className="mt-7 grid gap-4 md:grid-cols-3">
               <VendorMetricCard label="Business" value={currentVendor.businessName} icon={Store} />
               <VendorMetricCard label="Category" value={currentVendor.businessCategory ?? "Not provided"} icon={Boxes} />
-              <VendorMetricCard label="Next step" value="Wait for approval" helper="This page refreshes your session automatically." icon={RefreshCw} />
+              <VendorMetricCard label="Application" value={`Revision ${currentVendor.applicationRevision ?? 1}`} helper={currentVendor.resubmittedAt ? `Resubmitted ${formatDateTime(currentVendor.resubmittedAt)}` : "Initial submission"} icon={RefreshCw} />
             </div>
             <div className="mt-5">
               <VendorAlert tone="info">
-                Once approved, you can request exhibition participation, receive a stall assignment, add products, and go live.
+                {isResubmitted
+                  ? "The admin can now review your corrected information. This page refreshes your approval status automatically."
+                  : "Once approved, you can request exhibition participation, receive a stall assignment, add products, and go live."}
               </VendorAlert>
+            </div>
+          </VendorPanel>
+        </VendorPageFrame>
+      </RoleShell>
+    );
+  }
+
+  if (currentVendor?.status === "changes_requested") {
+    return (
+      <RoleShell role="vendor" title="Vendor">
+        <VendorPageFrame>
+          <VendorPanel className="mx-auto max-w-5xl p-5 sm:p-7">
+            <VendorSectionTitle
+              eyebrow="Corrections requested"
+              title="Your application has been returned for correction"
+              description="Review the admin message, correct the original application, and resubmit it for approval."
+              action={<AdminStatusPill status="changes requested" />}
+            />
+            <div className="mt-6">
+              <VendorAlert tone="warning">
+                {currentVendor.correctionReason || "The admin requested changes to your vendor application."}
+              </VendorAlert>
+            </div>
+            <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-black text-foreground">Application revision {currentVendor.applicationRevision ?? 1}</p>
+                <p className="mt-1 text-xs font-semibold text-muted-foreground">
+                  Requested {currentVendor.correctionRequestedAt ? formatDateTime(currentVendor.correctionRequestedAt) : "by the admin"}
+                </p>
+              </div>
+              <Link href="/vendor/application" className={buttonStyles("primary", "min-h-12 justify-center px-5 py-3 text-sm")}>
+                Review and correct application
+              </Link>
             </div>
           </VendorPanel>
         </VendorPageFrame>
@@ -4354,13 +4391,13 @@ export function AdminVendorsPageContent() {
   const selectedVendor = vendors.find((vendor) => vendor.id === selectedVendorId) ?? null;
 
   useEffect(() => {
-    setRejectionReason(selectedVendor?.rejectionReason ?? "");
-  }, [selectedVendor?.id, selectedVendor?.rejectionReason]);
+    setRejectionReason(selectedVendor?.correctionReason ?? selectedVendor?.rejectionReason ?? "");
+  }, [selectedVendor?.id, selectedVendor?.correctionReason, selectedVendor?.rejectionReason]);
 
-  const updateVendor = async (status: "approved" | "rejected") => {
+  const updateVendor = async (status: "approved" | "changes_requested" | "rejected") => {
     if (!selectedVendor) return;
-    if (status === "rejected" && !rejectionReason.trim()) {
-      setError("Add a clear rejection reason so the vendor knows what must be corrected.");
+    if (status !== "approved" && !rejectionReason.trim()) {
+      setError("Add a clear review message before returning or rejecting the application.");
       return;
     }
     setIsUpdatingVendor(true);
@@ -4368,7 +4405,9 @@ export function AdminVendorsPageContent() {
     try {
       const updated = status === "approved"
         ? await approveAdminVendor(selectedVendor.id)
-        : await rejectAdminVendor(selectedVendor.id, rejectionReason);
+        : status === "changes_requested"
+          ? await requestAdminVendorCorrections(selectedVendor.id, rejectionReason)
+          : await rejectAdminVendor(selectedVendor.id, rejectionReason);
       setVendors((current) => current.map((vendor) => vendor.id === updated.id ? updated : vendor));
     } catch (errorValue) {
       setError(errorValue instanceof Error ? errorValue.message : "Could not update vendor.");
@@ -4378,6 +4417,7 @@ export function AdminVendorsPageContent() {
   };
 
   const pendingVendors = vendors.filter((vendor) => vendor.status === "pending").length;
+  const changesRequestedVendors = vendors.filter((vendor) => vendor.status === "changes_requested").length;
   const approvedVendors = vendors.filter((vendor) => vendor.status === "approved").length;
   const rejectedVendors = vendors.filter((vendor) => vendor.status === "rejected").length;
   const whatsappHref = selectedVendor?.whatsapp?.startsWith("http")
@@ -4406,8 +4446,9 @@ export function AdminVendorsPageContent() {
 
           {error ? <p role="alert" className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-700 dark:text-red-200">{error}</p> : null}
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <AdminMiniStat label="Pending" value={isLoading ? "Loading" : String(pendingVendors)} />
+            <AdminMiniStat label="Corrections" value={isLoading ? "Loading" : String(changesRequestedVendors)} />
             <AdminMiniStat label="Approved" value={isLoading ? "Loading" : String(approvedVendors)} />
             <AdminMiniStat label="Rejected" value={isLoading ? "Loading" : String(rejectedVendors)} />
           </div>
@@ -4505,9 +4546,13 @@ export function AdminVendorsPageContent() {
                     <VendorApplicationSection icon={ClipboardList} title="Application record" description="Submission and previous review information stored with this account.">
                       <VendorApplicationField label="Submitted at" value={selectedVendor.createdAt ? formatDateTime(selectedVendor.createdAt) : null} />
                       <VendorApplicationField label="Current status" value={selectedVendor.status} />
+                      <VendorApplicationField label="Application revision" value={selectedVendor.applicationRevision ?? 1} />
+                      <VendorApplicationField label="Correction requested at" value={selectedVendor.correctionRequestedAt ? formatDateTime(selectedVendor.correctionRequestedAt) : null} />
+                      <VendorApplicationField label="Correction request" value={selectedVendor.correctionReason} wide />
+                      <VendorApplicationField label="Last resubmitted at" value={selectedVendor.resubmittedAt ? formatDateTime(selectedVendor.resubmittedAt) : null} />
                       <VendorApplicationField label="Approved at" value={selectedVendor.approvedAt ? formatDateTime(selectedVendor.approvedAt) : null} />
                       <VendorApplicationField label="Approved by admin" value={selectedVendor.approvedByAdminId} mono />
-                      <VendorApplicationField label="Previous rejection reason" value={selectedVendor.rejectionReason} wide />
+                      <VendorApplicationField label="Rejection reason" value={selectedVendor.rejectionReason} wide />
                     </VendorApplicationSection>
                   </div>
 
@@ -4524,11 +4569,11 @@ export function AdminVendorsPageContent() {
                       </div>
 
                       <label className="mt-5 block">
-                        <span className="text-xs font-black uppercase text-[#6F675C] dark:text-white/52">Rejection reason</span>
+                        <span className="text-xs font-black uppercase text-[#6F675C] dark:text-white/52">Review message</span>
                         <textarea
                           value={rejectionReason}
                           onChange={(event) => setRejectionReason(event.target.value)}
-                          placeholder="Explain exactly what must be corrected."
+                          placeholder="Explain exactly what must be corrected or why the application is rejected."
                           className="mt-2 min-h-32 w-full resize-y rounded-xl border border-[#D9CEBD] bg-white px-4 py-3 text-sm font-semibold leading-6 text-[#1B1A17] outline-none transition placeholder:text-[#9B948A] focus:border-[#B88A3D] focus:ring-2 focus:ring-[#B88A3D]/20 dark:border-white/12 dark:bg-[#171720] dark:text-[#FFF8EA] dark:placeholder:text-white/32"
                         />
                       </label>
@@ -4542,6 +4587,15 @@ export function AdminVendorsPageContent() {
                         >
                           <CheckCircle2 className="mr-2 h-4 w-4" />
                           {isUpdatingVendor ? "Updating..." : "Approve vendor"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateVendor("changes_requested")}
+                          disabled={isUpdatingVendor || selectedVendor.status === "approved" || selectedVendor.status === "changes_requested"}
+                          className="app-press inline-flex min-h-11 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm font-black text-amber-800 transition hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-amber-200"
+                        >
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Request corrections and email vendor
                         </button>
                         <button
                           type="button"

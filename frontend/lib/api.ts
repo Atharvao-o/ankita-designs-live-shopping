@@ -751,6 +751,39 @@ export function getVendorDashboard(): Promise<VendorDashboard> {
   return request<VendorDashboard>("/vendor/dashboard");
 }
 
+export type VendorApplicationUpdatePayload = {
+  ownerName: string;
+  businessName: string;
+  businessCategory: string;
+  businessDescription: string;
+  phone: string;
+  instagram?: string;
+  website?: string;
+  whatsapp?: string;
+  gstNumber?: string;
+  fssaiNumber?: string;
+  panNumber?: string;
+  upiId?: string;
+  bankAccountNumber?: string;
+  ifsc?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  productCategories?: string[];
+};
+
+export function getVendorApplication(): Promise<Vendor> {
+  return request<Vendor>("/vendor/application");
+}
+
+export function resubmitVendorApplication(payload: VendorApplicationUpdatePayload): Promise<Vendor> {
+  return request<Vendor>("/vendor/application/resubmit", {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+}
+
 export function getVendorStall(): Promise<Stall> {
   return request<Stall>("/vendor/stall");
 }
@@ -1001,6 +1034,13 @@ export function rejectAdminVendor(vendorId: string, rejectionReason?: string): P
   return request<Vendor>(`/admin/vendors/${vendorId}/reject`, {
     method: "PATCH",
     body: JSON.stringify({ reason: rejectionReason?.trim() || null })
+  });
+}
+
+export function requestAdminVendorCorrections(vendorId: string, reason: string): Promise<Vendor> {
+  return request<Vendor>(`/admin/vendors/${vendorId}/request-corrections`, {
+    method: "PATCH",
+    body: JSON.stringify({ reason: reason.trim() })
   });
 }
 

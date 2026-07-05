@@ -20,6 +20,7 @@ from app.schemas.stall import StallResponse
 from app.schemas.vendor import VendorResponse
 from app.services.analytics_service import analytics_service
 from app.services.auth_context import current_user_from_request
+from app.services.email_verification_service import send_vendor_correction_email
 from app.services.db_data_service import (
     VALID_EXHIBITION_STATUSES,
     generate_stalls_for_exhibition,
@@ -104,6 +105,10 @@ class StallUpdateRequest(BaseModel):
 
 class VendorRejectRequest(BaseModel):
     reason: str | None = None
+
+
+class VendorCorrectionRequest(BaseModel):
+    reason: str
 
 
 class AssignVendorRequest(BaseModel):
@@ -430,6 +435,39 @@ def approve_vendor(vendor_id: str, db: Session = Depends(get_db)) -> dict:
 @router.patch("/vendors/{vendor_id}/reject")
 def reject_vendor(vendor_id: str, payload: VendorRejectRequest | None = None, db: Session = Depends(get_db)) -> dict:
     return set_vendor_status(vendor_id, "rejected", db, payload.reason if payload else None)
+
+
+@router.patch("/vendors/{vendor_id}/request-corrections", response_model=VendorResponse)
+def request_vendor_corrections(vendor_id: str, payload: VendorCorrectionRequest, db: Session = Depends(get_db)) -> dict:
+    vendor = db.get(Vendor, vendor_id)
+    if vendor is None:
+        raise HTTPException(status_code=404, detail={"code": "VENDOR_NOT_FOUND", "message": "Vendor not found."})
+    if vendor.status == "approved":
+        raise HTTPException(
+            status_code=409,
+            detail={"code": "VENDOR_ALREADY_APPROVED", "message": "Approved vendors cannot be returned to the application correction queue."},
+        )
+    reason = payload.reason.strip()
+    if len(reason) < 5:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "CORRECTION_REASON_REQUIRED", "message": "Describe the correction the vendor must make."},
+        )
+    if not vendor.email:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "VENDOR_EMAIL_MISSING", "message": "This vendor has no email address for the correction notice."},
+        )
+
+    send_vendor_correction_email(vendor.email, vendor.display_name or vendor.business_name, reason)
+    vendor.status = "changes_requested"
+    vendor.rejection_reason = None
+    vendor.correction_reason = reason
+    vendor.correction_requested_at = now_utc()
+    vendor.updated_at = now_utc()
+    db.commit()
+    db.refresh(vendor)
+    return serialize_vendor(vendor)
 
 
 @router.get("/stalls", response_model=list[StallResponse])

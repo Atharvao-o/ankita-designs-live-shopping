@@ -16,7 +16,7 @@ from app.models.vendor_exhibition_request import VendorExhibitionRequest
 from app.schemas.live_session import LiveSessionPinProductRequest, LiveSessionStartRequest
 from app.schemas.order import OrderResponse, VendorOrderStatusUpdateRequest
 from app.schemas.product import ProductCreateRequest, ProductResponse, ProductUpdateRequest
-from app.schemas.vendor import VendorDashboardResponse
+from app.schemas.vendor import VendorApplicationUpdateRequest, VendorDashboardResponse, VendorResponse
 from app.services.analytics_service import analytics_service
 from app.services.auth_context import current_user_from_request
 from app.services.db_data_service import (
@@ -26,6 +26,7 @@ from app.services.db_data_service import (
     serialize_order,
     serialize_product,
     serialize_stall,
+    serialize_vendor,
     serialize_vendor_request,
     status_payload,
 )
@@ -121,6 +122,33 @@ def assert_vendor_approved(vendor: Vendor) -> None:
         )
 
 
+def _clean_optional(value: str | None) -> str | None:
+    cleaned = (value or "").strip()
+    return cleaned or None
+
+
+def _validate_application_update(payload: VendorApplicationUpdateRequest) -> None:
+    required = {
+        "owner name": payload.ownerName,
+        "business name": payload.businessName,
+        "business category": payload.businessCategory,
+        "business description": payload.businessDescription,
+        "phone number": payload.phone,
+    }
+    missing = [label for label, value in required.items() if not value.strip()]
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "VENDOR_APPLICATION_INCOMPLETE", "message": f"Complete these required fields: {', '.join(missing)}."},
+        )
+    for label, value in (("Instagram", payload.instagram), ("website", payload.website)):
+        if value and not value.strip().lower().startswith(("http://", "https://")):
+            raise HTTPException(
+                status_code=400,
+                detail={"code": "INVALID_VENDOR_URL", "message": f"{label} URL must start with http:// or https://."},
+            )
+
+
 def get_assigned_vendor_stall(db: Session, vendor: Vendor) -> Stall | None:
     stalls = db.scalars(select(Stall).where(Stall.vendor_id == vendor.id).order_by(Stall.assigned_at.desc().nulls_last(), Stall.id.asc())).all()
     active_stalls: list[Stall] = []
@@ -141,6 +169,64 @@ def get_assigned_vendor_stall(db: Session, vendor: Vendor) -> Stall | None:
 def get_vendor_dashboard(request: Request, db: Session = Depends(get_db)) -> dict:
     vendor = current_vendor_or_401(request, db)
     return analytics_service.get_vendor_dashboard(db, vendor.id)
+
+
+@router.get("/application", response_model=VendorResponse)
+def get_vendor_application(request: Request, db: Session = Depends(get_db)) -> dict:
+    vendor = current_vendor_or_401(request, db)
+    return serialize_vendor(vendor)
+
+
+@router.put("/application/resubmit", response_model=VendorResponse)
+def resubmit_vendor_application(
+    payload: VendorApplicationUpdateRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> dict:
+    vendor = current_vendor_or_401(request, db)
+    if vendor.status != "changes_requested":
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "code": "APPLICATION_NOT_RETURNED",
+                "message": "This application is not currently open for corrections.",
+            },
+        )
+    _validate_application_update(payload)
+    now = now_utc()
+    vendor.owner_name = payload.ownerName.strip()
+    vendor.business_name = payload.businessName.strip()
+    vendor.display_name = payload.businessName.strip()
+    vendor.business_category = payload.businessCategory.strip()
+    vendor.product_categories = payload.productCategories or [payload.businessCategory.strip()]
+    vendor.business_description = payload.businessDescription.strip()
+    vendor.phone = payload.phone.strip()
+    vendor.instagram = _clean_optional(payload.instagram)
+    vendor.website = _clean_optional(payload.website)
+    vendor.whatsapp = _clean_optional(payload.whatsapp)
+    vendor.gst_number = _clean_optional(payload.gstNumber)
+    vendor.fssai_number = _clean_optional(payload.fssaiNumber)
+    vendor.pan_number = _clean_optional(payload.panNumber)
+    vendor.upi_id = _clean_optional(payload.upiId)
+    vendor.bank_account_number = _clean_optional(payload.bankAccountNumber)
+    vendor.ifsc = _clean_optional(payload.ifsc)
+    vendor.address = _clean_optional(payload.address)
+    vendor.city = _clean_optional(payload.city)
+    vendor.state = _clean_optional(payload.state)
+    vendor.pincode = _clean_optional(payload.pincode)
+    vendor.status = "pending"
+    vendor.resubmitted_at = now
+    vendor.application_revision = (vendor.application_revision or 1) + 1
+    vendor.updated_at = now
+
+    user = current_user_from_request(request, db)
+    if user is not None:
+        user.name = vendor.owner_name
+        user.phone = vendor.phone or ""
+
+    db.commit()
+    db.refresh(vendor)
+    return serialize_vendor(vendor)
 
 
 @router.get("/exhibitions")

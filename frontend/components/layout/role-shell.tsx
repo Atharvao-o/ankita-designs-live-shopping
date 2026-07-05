@@ -58,6 +58,7 @@ const roleNavItems: Record<UserRole, RoleNavItem[]> = {
   ],
   vendor: [
     { label: "Overview", href: "/vendor", icon: LayoutDashboard },
+    { label: "Application", href: "/vendor/application", icon: FileText },
     { label: "Profile", href: "/vendor/profile", icon: UserRound },
     { label: "Posts", href: "/vendor/posts", icon: FileText },
     { label: "Subscription", href: "/vendor/subscription", icon: CreditCard },

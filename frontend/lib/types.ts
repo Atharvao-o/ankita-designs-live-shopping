@@ -23,7 +23,7 @@ export interface Vendor {
   businessName: string;
   displayName: string;
   phone?: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "changes_requested" | "rejected";
   commissionRate: number;
   image?: string;
   ownerName?: string;
@@ -47,6 +47,10 @@ export interface Vendor {
   productCategories?: string[];
   address?: string;
   rejectionReason?: string;
+  correctionReason?: string;
+  correctionRequestedAt?: string;
+  resubmittedAt?: string;
+  applicationRevision?: number;
   approvedAt?: string;
   approvedByAdminId?: string;
   createdAt?: string;

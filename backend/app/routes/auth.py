@@ -94,6 +94,10 @@ def serialize_vendor(vendor: Vendor | None) -> dict | None:
         "state": vendor.state,
         "pincode": vendor.pincode,
         "rejectionReason": vendor.rejection_reason,
+        "correctionReason": vendor.correction_reason,
+        "correctionRequestedAt": _iso(vendor.correction_requested_at),
+        "resubmittedAt": _iso(vendor.resubmitted_at),
+        "applicationRevision": vendor.application_revision or 1,
         "approvedAt": _iso(vendor.approved_at),
         "approvedByAdminId": vendor.approved_by_admin_id,
         "createdAt": _iso(vendor.created_at),
@@ -419,6 +423,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> dict:
             state=payload.state,
             pincode=payload.pincode,
             status="pending",
+            application_revision=1,
             commission_rate=12,
         )
         db.add(vendor)

@@ -171,7 +171,7 @@ export function AppStatusPill({
   const normalized = status.toLowerCase();
   const tone = ["live", "active", "approved", "accepted", "paid", "assigned"].includes(normalized)
     ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200"
-    : ["pending", "scheduled", "available", "starting-soon", "paused"].includes(normalized)
+    : ["pending", "scheduled", "available", "starting-soon", "paused", "changes_requested", "changes requested"].includes(normalized)
       ? "border-[color:var(--warning)]/30 bg-[color:var(--warning)]/12 text-[var(--warning)]"
       : ["rejected", "denied", "failed", "cancelled", "ended", "inactive", "offline"].includes(normalized)
         ? "border-destructive/25 bg-destructive/10 text-destructive"

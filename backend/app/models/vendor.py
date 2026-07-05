@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, JSON, String, Text
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -35,6 +35,10 @@ class Vendor(Base):
     pincode: Mapped[str | None] = mapped_column(String(16), nullable=True)
     status: Mapped[str] = mapped_column(String(64), nullable=False)
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    correction_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    correction_requested_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    resubmitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    application_revision: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     approved_by_admin_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     commission_rate: Mapped[float] = mapped_column(Float, default=0.0)

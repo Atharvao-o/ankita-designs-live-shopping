@@ -83,12 +83,8 @@ def _build_message(recipient: str, code: str, expires_minutes: int) -> EmailMess
     return message
 
 
-def _send_email(recipient: str, code: str) -> None:
+def _deliver_message(message: EmailMessage, recipient: str) -> None:
     settings = get_settings()
-    if settings.email_otp_debug_response:
-        logger.warning("Email OTP debug mode enabled. OTP for %s is %s", recipient, code)
-        return
-
     sender_email = (settings.smtp_from_email or settings.smtp_username).strip()
     if not settings.smtp_host.strip() or not sender_email:
         raise HTTPException(
@@ -98,12 +94,6 @@ def _send_email(recipient: str, code: str) -> None:
                 "message": "Email delivery is not configured. Add your SMTP server and sender details to the backend environment.",
             },
         )
-
-    message = _build_message(
-        recipient,
-        code,
-        max(1, round(settings.email_otp_expiry_seconds / 60)),
-    )
     context = ssl.create_default_context()
     try:
         if settings.smtp_use_ssl:
@@ -130,9 +120,73 @@ def _send_email(recipient: str, code: str) -> None:
             status_code=502,
             detail={
                 "code": "EMAIL_SEND_FAILED",
-                "message": "We could not send the verification email. Check the website email server configuration and try again.",
+                "message": "We could not send the email. Check the website email server configuration and try again.",
             },
         ) from exc
+
+
+def _send_email(recipient: str, code: str) -> None:
+    settings = get_settings()
+    if settings.email_otp_debug_response:
+        logger.warning("Email OTP debug mode enabled. OTP for %s is %s", recipient, code)
+        return
+    message = _build_message(
+        recipient,
+        code,
+        max(1, round(settings.email_otp_expiry_seconds / 60)),
+    )
+    _deliver_message(message, recipient)
+
+
+def send_vendor_correction_email(recipient: str, business_name: str, reason: str) -> None:
+    settings = get_settings()
+    sender_email = (settings.smtp_from_email or settings.smtp_username).strip()
+    sender_name = settings.smtp_from_name.strip() or "Ankita Designs"
+    application_url = f"{settings.frontend_url.rstrip('/')}/vendor/application"
+    message = EmailMessage()
+    message["Subject"] = f"Correction requested for {business_name} vendor application"
+    message["From"] = formataddr((sender_name, sender_email))
+    message["To"] = recipient
+    message.set_content(
+        "\n".join(
+            [
+                f"Hello {business_name},",
+                "",
+                "The Ankita Designs admin team reviewed your vendor application and requested corrections.",
+                "",
+                "Correction requested:",
+                reason,
+                "",
+                f"Open your application, make the corrections, and resubmit it: {application_url}",
+                "",
+                "Your application will return to pending review after resubmission.",
+            ]
+        )
+    )
+    safe_business_name = html.escape(business_name)
+    safe_reason = html.escape(reason)
+    safe_application_url = html.escape(application_url, quote=True)
+    message.add_alternative(
+        f"""
+        <!doctype html>
+        <html lang="en">
+          <body style="margin:0;background:#f7f3ec;color:#19171f;font-family:Arial,sans-serif">
+            <div style="max-width:600px;margin:0 auto;padding:32px 18px">
+              <div style="border:1px solid #e5ddd0;background:#ffffff;padding:32px">
+                <p style="margin:0;color:#b07823;font-size:12px;font-weight:700;text-transform:uppercase">Ankita Designs</p>
+                <h1 style="margin:12px 0 8px;font-size:26px">Application correction requested</h1>
+                <p style="margin:0 0 20px;color:#655f57;line-height:1.6">Hello {safe_business_name}, the admin team needs you to correct information in your vendor application.</p>
+                <div style="border-left:4px solid #f36b4f;background:#fff3ef;padding:16px;white-space:pre-wrap;line-height:1.6">{safe_reason}</div>
+                <a href="{safe_application_url}" style="display:inline-block;margin-top:24px;background:#19171f;color:#ffffff;padding:13px 20px;text-decoration:none;font-weight:700">Review and correct application</a>
+                <p style="margin:24px 0 0;color:#655f57;font-size:14px;line-height:1.6">After resubmission, your application will return to the admin review queue.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+        """,
+        subtype="html",
+    )
+    _deliver_message(message, recipient)
 
 
 def request_vendor_email_otp(db: Session, raw_email: str) -> dict:
