@@ -24,7 +24,7 @@ export function GlobalBackButton() {
   const fallbackPath = useMemo(() => getFallbackPath(pathname), [pathname]);
   const topLevelRoutes = new Set(["/", "/explore", "/exhibitions", "/orders", "/cart", "/profile", "/profile/settings", "/settings"]);
 
-  if (topLevelRoutes.has(pathname)) {
+  if (topLevelRoutes.has(pathname) || pathname.startsWith("/live/")) {
     return null;
   }
 

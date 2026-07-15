@@ -85,7 +85,7 @@ export function LiveChatPanel({
                 <p className={cn("text-[10px] font-bold uppercase tracking-[0.2em]", isDark ? "text-[#D6AC63]" : "text-[#B88A3D]")}>Conversation</p>
                 <h2 className={cn("mt-1 text-lg font-semibold tracking-[-0.04em]", isDark ? "text-white" : "text-[#17120C]")}>Live chat</h2>
                 <p className={cn("mt-1 text-xs", isDark ? "text-slate-400" : "text-[#7B7065]")}>
-                  {messages.length ? `${messages.length} database message${messages.length === 1 ? "" : "s"}` : "Messages will appear here from the backend"}
+                  {messages.length ? `${messages.length} live message${messages.length === 1 ? "" : "s"}` : "Messages will appear here during the live room"}
                 </p>
               </>
             )}
@@ -111,7 +111,7 @@ export function LiveChatPanel({
             <div className={cn("flex min-h-36 flex-col items-center justify-center rounded-[24px] border border-dashed px-5 py-6 text-center text-sm", isDark ? "border-[#D6AC63]/25 bg-card text-slate-400" : "border-[#D7BE86] bg-[#F7F1E8] text-[#7B7065]")}>
               <span className={cn("grid h-11 w-11 place-items-center rounded-2xl text-lg", isDark ? "bg-[#D6AC63]/12 text-[#F4C879]" : "bg-[#B88A3D]/10 text-[#B88A3D]")}>?</span>
               <span className="mt-3 font-semibold">No live chat messages yet</span>
-              <span className="mt-1 text-xs">Visitor messages from PostgreSQL will appear here.</span>
+              <span className="mt-1 text-xs">Customer messages will appear here during the live room.</span>
             </div>
           )}
         </div>
